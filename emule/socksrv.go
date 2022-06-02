@@ -23,7 +23,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/eyedeekay/sam3"
+	sam "github.com/eyedeekay/sam3/helper"
 )
 
 type SockSrv struct {
@@ -105,22 +105,7 @@ func (this *SockSrv) yoursam() string {
 
 func (this *SockSrv) Start() {
 	if this.I2P {
-		sam, err := sam3.NewSAM(this.yoursam())
-		if err != nil {
-			fmt.Println("ERROR:", err.Error())
-			return
-		}
-		keys, err := sam.NewKeys()
-		if err != nil {
-			fmt.Println("ERROR:", err.Error())
-			return
-		}
-		stream, err := sam.NewStreamSession("serverTun", keys, sam3.Options_Medium)
-		if err != nil {
-			fmt.Println("ERROR:", err.Error())
-			return
-		}
-		ln, err := stream.Listen()
+		ln, err := sam.I2PListener("go-imule-servr", this.yoursam(), "go-imule-server")
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
 			return

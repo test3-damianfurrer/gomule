@@ -21,32 +21,43 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"github.com/HackLinux/gomule/emule"
-	"os"
 )
 
 var (
-	debug bool
-	host  string
-	port  int
+	debug   bool
+	host    string
+	port    int
+	version bool
+	i2p     bool
+	sam     string
+	samport int
 )
 
 func init() {
 	flag.BoolVar(&debug, "d", false, "Debug")
-	flag.StringVar(&host, "h", "0.0.0.0", "Host address")
+	flag.StringVar(&host, "h", "localhost", "Host address")
 	flag.IntVar(&port, "p", 7111, "Port number")
+	flag.BoolVar(&i2p, "i", false, "Use I2P")
+	flag.StringVar(&sam, "s", "127.0.0.1", "SAM host address")
+	flag.IntVar(&samport, "sp", 7656, "SAM port number")
+	flag.BoolVar(&version, "v", false, "Version")
 }
 
 func main() {
-	if os.Args[1] == "-v" {
+	flag.Parse()
+
+	if version {
 		fmt.Println("GoMule server Version 1.0")
 		fmt.Println("Copyright 2013 Leslie Zhai")
 		return
 	}
 
-	flag.Parse()
-
 	sock := emule.NewSockSrv(host, port, debug)
+	sock.I2P = i2p
+	sock.SAM = sam
+	sock.SAMPort = samport
 	sock.Start()
 	defer sock.Stop()
 }
