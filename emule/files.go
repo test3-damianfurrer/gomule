@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n var) {
 	//type=buf[0]
   count := byteToInt32(buf[1:5])
   if debug {
