@@ -43,7 +43,7 @@ func NewSockSrv(host string, port int, debug bool) *SockSrv {
 		Debug: debug}
 }
 
-func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error) {
+func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, buflen int) {
 	protocol = 0xE3
 	buf = make([]byte, 5)
 	err = nil
@@ -62,12 +62,13 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error) 
 	if this.Debug {
 		fmt.Printf("DEBUG: protocol 0x%02x\n", protocol)
 	}
-	size := byteToInt32(buf[1:n])
+	size := byteToUint32(buf[1:n])
 	if this.Debug {
 		fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
 	}
 	buf = make([]byte, size)
 	n, err = conn.Read(buf)
+	buflen = n
 	return
 }
 
@@ -76,7 +77,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())
 	}
 	for {
-		buf, protocol, err := this.read(conn)
+		buf, protocol, err, buflen := this.read(conn)
 		if err != nil {
 			if err == io.EOF {
 				fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
@@ -94,6 +95,19 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		} else if buf[0] == 0x14 {
 			if this.Debug {
 				fmt.Println("DEBUG: Get list of servers")
+			}
+		} else if buf[0] == 0x15 {
+			if this.Debug {
+				fmt.Println("DEBUG: Client offers Files")
+			}
+			offerfiles(buf, protocol, conn, this.Debug, buflen)
+		} else if buf[0] == 0x16 {
+			if this.Debug {
+				fmt.Println("DEBUG: Client looks for Files")
+			}
+		} else if buf[0] == 0x19 {
+			if this.Debug {
+				fmt.Println("DEBUG: Client looks for File Sources")
 			}
 		}
 	}
