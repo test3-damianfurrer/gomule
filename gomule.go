@@ -22,7 +22,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/HackLinux/gomule/emule"
+	"github.com/eyedeekay/gomule/emule"
 )
 
 var (
