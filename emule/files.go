@@ -11,6 +11,8 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
     fmt.Println("DEBUG: type:", buf[0])
     fmt.Println("DEBUG: files:", count)
+    count := byteToInt32(buf[5:9])
+    fmt.Println("DEBUG: files(tst):", count)
     fmt.Println("DEBUG: filecnt buf:", buf[1:5])
     fmt.Println("DEBUG: metadata:", buf[5:n])
   }
