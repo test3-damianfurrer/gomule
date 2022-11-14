@@ -95,6 +95,18 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			if this.Debug {
 				fmt.Println("DEBUG: Get list of servers")
 			}
+		} else if buf[0] == 0x15 {
+			if this.Debug {
+				fmt.Println("DEBUG: Client offers Files")
+			}
+		} else if buf[0] == 0x16 {
+			if this.Debug {
+				fmt.Println("DEBUG: Client looks for Files")
+			}
+		} else if buf[0] == 0x19 {
+			if this.Debug {
+				fmt.Println("DEBUG: Client looks for File Sources")
+			}
 		}
 	}
 }
