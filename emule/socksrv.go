@@ -109,6 +109,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			if this.Debug {
 				fmt.Println("DEBUG: Client looks for File Sources")
 			}
+			filesources(buf, protocol, conn, this.Debug, buflen)
 		}
 	}
 }
