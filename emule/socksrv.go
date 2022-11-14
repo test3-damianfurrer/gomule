@@ -43,7 +43,7 @@ func NewSockSrv(host string, port int, debug bool) *SockSrv {
 		Debug: debug}
 }
 
-func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, n int) {
+func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, n var) {
 	protocol = 0xE3
 	buf = make([]byte, 5)
 	err = nil
@@ -76,7 +76,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())
 	}
 	for {
-		buf, protocol, err, n := this.read(conn)
+		buf, protocol, err, buflen := this.read(conn)
 		if err != nil {
 			if err == io.EOF {
 				fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
@@ -99,7 +99,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			if this.Debug {
 				fmt.Println("DEBUG: Client offers Files")
 			}
-			offerfiles(buf, protocol, conn, this.Debug, n)
+			offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
 			if this.Debug {
 				fmt.Println("DEBUG: Client looks for Files")
