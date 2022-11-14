@@ -62,7 +62,7 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error) 
 	if this.Debug {
 		fmt.Printf("DEBUG: protocol 0x%02x\n", protocol)
 	}
-	size := byteToInt32(buf[1:n])
+	size := byteToUint32(buf[1:n])
 	if this.Debug {
 		fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
 	}
