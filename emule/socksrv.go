@@ -43,7 +43,7 @@ func NewSockSrv(host string, port int, debug bool) *SockSrv {
 		Debug: debug}
 }
 
-func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, n var) {
+func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, buflen int) {
 	protocol = 0xE3
 	buf = make([]byte, 5)
 	err = nil
@@ -68,6 +68,7 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 	}
 	buf = make([]byte, size)
 	n, err = conn.Read(buf)
+	buflen = n
 	return
 }
 
