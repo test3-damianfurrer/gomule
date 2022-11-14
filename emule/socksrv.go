@@ -99,6 +99,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			if this.Debug {
 				fmt.Println("DEBUG: Client offers Files")
 			}
+			offerfiles(buf, protocol, conn, this.Debug)
 		} else if buf[0] == 0x16 {
 			if this.Debug {
 				fmt.Println("DEBUG: Client looks for Files")
