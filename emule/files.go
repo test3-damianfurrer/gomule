@@ -12,6 +12,14 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
     fmt.Println("DEBUG: type:", buf[0])
     fmt.Println("DEBUG: files:", count)
     fmt.Println("DEBUG: filecnt buf:", buf[1:5])
-    fmt.Println("DEBUG: metadata:", buf[6:n])
+    fmt.Println("DEBUG: metadata:", buf[5:n])
+  }
+}
+
+func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+	//type=buf[0]
+  if debug {
+    fmt.Println("DEBUG: filehash:", buf[1:n])
+    fmt.Println("DEBUG: 16lehash:", buf[1:17])
   }
 }
