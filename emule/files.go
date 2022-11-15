@@ -49,9 +49,19 @@ func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
+  strlen := byteToInt32(buf[2:4])
+  strbuf := buf[4:4+strlen]
+  str := fmt.Sprintf("%s",strbuf)
   if debug {
     fmt.Println("DEBUG: searchfiles")
     fmt.Println("DEBUG: buf query:", buf[1:n])
+    fmt.Println("DEBUG: buf string:", buf[4:4+strlen])
+    fmt.Println("DEBUG: strlen:", strlen)
+    fmt.Println("DEBUG: str:", str)
+    //fmt.Println("DEBUG: buf query:", buf[1:n])
+	  
+	  //buf query: [1 5 0 101 109 117 108 101]
+	  //emule, len 5
   }
 }
 		
