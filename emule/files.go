@@ -9,11 +9,16 @@ import (
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
 //it's compressed ...
-  dc, err := libdeflate.NewDecompressor()
-	if err != nil {
-		fmt.Println("ERROR:", err.Error())
-		return
-	}
+  dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
+  if err != nil {
+	fmt.Println("ERROR libdeflate:", err.Error())
+	return
+  }
+  decompressed, err = dc.Decompress(buf[1:n], nil, ModeZlib)
+  if err != nil {
+	fmt.Println("ERROR decompress:", err.Error())
+	return
+  }
   count := byteToInt32(buf[1:5]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
   if debug {
     fmt.Println("DEBUG: type:", buf[0])
