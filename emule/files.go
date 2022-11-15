@@ -43,28 +43,28 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: listservers)
+    fmt.Println("DEBUG: listservers")
   }
 }
 
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: searchfiles)
+    fmt.Println("DEBUG: searchfiles")
   }
 }
 		
 func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: requestcallback)
+    fmt.Println("DEBUG: requestcallback")
   }
 }
 
 func udpfilesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: listservers)
+    fmt.Println("DEBUG: listservers")
   }
 }
 
