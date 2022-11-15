@@ -18,6 +18,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	return
   }
   
+  if 1 != 1 {
   blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
   if err != nil {
 	fmt.Println("ERROR decompress:", err.Error())
@@ -25,6 +26,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   }
   fmt.Println("DEBUG: uncompressed len", blen)
   fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
+  }
   count := byteToInt32(buf[1:5]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
   if debug {
     fmt.Println("DEBUG: type:", buf[0])
