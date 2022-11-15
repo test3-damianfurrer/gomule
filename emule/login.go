@@ -37,7 +37,15 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		fmt.Println("DEBUG: tagscount:  ", tags)
 		fmt.Println("DEBUG: port bytes:  ", buf[21:23])
 		fmt.Println("DEBUG: tagscount bytes:  ", buf[23:27])
-		fmt.Println("DEBUG: other:  ", buf[27:n])
+		//fmt.Println("DEBUG: other:  ", buf[27:50])
+		//+4 some codes    [2 1 0 1 21 0 104 116
+		//21 0 = lenght, 104 116 .. string
+		strlen := byteToInt16(buf[31:33])
+		str := fmt.Sprintf("%s",buf[33:33+strlen])
+		fmt.Println("DEBUG: name:  ", str)
+		fmt.Println("DEBUG: vtag:  ", buf[33+strlen:33+strlen+8])
+		fmt.Println("DEBUG: ptag:  ", buf[33+strlen+8:33+strlen+16])
+		fmt.Println("DEBUG: afterstr:  ", buf[33+strlen:33+strlen+24]) //strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
 
 	data := []byte{protocol,
