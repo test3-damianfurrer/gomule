@@ -7,19 +7,16 @@ import (
 
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
-  count := byteToInt32(buf[1:5]) //spec says, can't be more than 200
+  count := byteToInt32(buf[1:5]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
   if debug {
     fmt.Println("DEBUG: type:", buf[0])
     fmt.Println("DEBUG: files:", count)
-    count := byteToInt32(buf[5:9])
-    fmt.Println("DEBUG: files(tst):", count)
-    fmt.Println("DEBUG: filecnt buf:", buf[1:5])
     //fmt.Println("DEBUG: metadata:", buf[5:n])
     fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		buf[5:7], buf[7:9], buf[9:11], buf[11:13], buf[13:15], buf[15:17], buf[17:19],
 		buf[19:21])
-    fmt.Println("DEBUG: 1. filehash:", buf[5:21])
-    fmt.Println("DEBUG: 1. filehash:", fuuid)
+    fmt.Println("DEBUG: 1.  filehash:", buf[5:21])
+    fmt.Println("DEBUG: 1.  filehash:", fuuid)
     fmt.Println("DEBUG: 1. client id:", buf[21:25])
     cport := byteToInt16(buf[25:27])
     fmt.Println("DEBUG: 1. client port:", buf[25:27])
@@ -36,6 +33,7 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
     fmt.Println("DEBUG: filehash:", buf[1:n])
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
+    fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
   }
 }
 
