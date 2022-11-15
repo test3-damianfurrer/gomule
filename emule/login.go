@@ -43,7 +43,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		strlen := byteToInt16(buf[31:33])
 		str := fmt.Sprintf("%s",buf[33:33+strlen])
 		fmt.Println("DEBUG: name:  ", str)
-		fmt.Println("DEBUG: after:  ", buf[33+strlen:33+strlen+24]) //strlen + 3*8bytes should exactly be the end of the buffer
+		fmt.Println("DEBUG: after:  ", buf[33+strlen:33+strlen+24]) //strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 		
 	}
 
