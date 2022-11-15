@@ -49,7 +49,7 @@ func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
-  strlen := byteToInt32(buf[2:4])
+  strlen := byteToInt16(buf[2:4])
   strbuf := buf[4:4+strlen]
   str := fmt.Sprintf("%s",strbuf)
   if debug {
