@@ -88,6 +88,16 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	  //search emule with type texts
 	  //[0 0 1 5 0 101 109 117 108 101 2 3 0 68 111 99 1 0 3]
 	  
+	  //buf other: [2 3 0 68 111 99 1 0 3]
+	  //68 111 99 -> what is that? ASCII: "Doc"
+	  //search with type text and ending pdf: other:
+	  //[0 0 2 3 0 68 111 99 1 0 3 2 3 0 112 100 102 1 0 4]
+	  //[0 0 2] -> ?
+	  //[3 0 68 111 99] -> Doc, len 3
+	  //[1 0 3] -> ? , also in search with type only
+	  //[2] -> ?
+	  //[3 0 112 100 102] -> pdf, len 3
+	  //[1 0 4] -> ?
   }
 }
 		
