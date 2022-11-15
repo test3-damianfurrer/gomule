@@ -55,7 +55,7 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
     fmt.Println("DEBUG: searchfiles")
     fmt.Println("DEBUG: buf full query:", buf[1:n])
-    if(buf[1:n] == 0x01) {
+    if(buf[1] == 0x01) {
 	fmt.Println("DEBUG: simple search")
     	strlen := byteToInt16(buf[2:4])
     	fmt.Println("DEBUG: strlen:", strlen)
