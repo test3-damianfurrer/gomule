@@ -31,6 +31,12 @@ func byteToInt32(data []byte) (ret int32) {
 	return
 }
 
+func byteToUint32(data []byte) (ret uint32) {
+	buf := bytes.NewBuffer(data)
+	binary.Read(buf, binary.LittleEndian, &ret)
+	return
+}
+
 func byteToInt16(data []byte) (ret int16) {
 	buf := bytes.NewBuffer(data)
 	binary.Read(buf, binary.LittleEndian, &ret)

@@ -29,10 +29,14 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
 		buf[13:15], buf[15:17])
 	port := byteToInt16(buf[21:23])
+	tags := byteToInt32(buf[23:27])
 	if debug {
-		fmt.Println("DEBUG:", high_id)
-		fmt.Println("DEBUG:", uuid)
-		fmt.Println("DEBUG:", port)
+		fmt.Println("DEBUG: highid:", high_id)
+		fmt.Println("DEBUG: uuid:  ", uuid)
+		fmt.Println("DEBUG: port:  ", port)
+		fmt.Println("DEBUG: tagscount:  ", tags)
+		fmt.Println("DEBUG: port bytes:  ", buf[21:23])
+		fmt.Println("DEBUG: tagscount bytes:  ", buf[23:27])
 	}
 
 	data := []byte{protocol,
@@ -41,7 +45,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		5, 0,
 		'h', 'e', 'l', 'l', 'o'}
 	if debug {
-		fmt.Println("DEBUG:", data)
+		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 
@@ -55,7 +59,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		data[i+6] = high_id_b[i]
 	}
 	if debug {
-		fmt.Println("DEBUG:", data)
+		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 }
