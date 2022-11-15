@@ -111,7 +111,7 @@ func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int
 func udpfilesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: listservers")
+    fmt.Println("DEBUG: udpfilesources")
   }
 }
 
