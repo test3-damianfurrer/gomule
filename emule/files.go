@@ -51,6 +51,7 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
     fmt.Println("DEBUG: searchfiles")
+    fmt.Println("DEBUG: buf query:", buf[1:n])
   }
 }
 		

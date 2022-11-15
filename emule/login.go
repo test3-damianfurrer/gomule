@@ -34,7 +34,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		fmt.Println("DEBUG: highid:", high_id)
 		fmt.Println("DEBUG: uuid:  ", uuid)
 		fmt.Println("DEBUG: port:  ", port)
-		fmt.Println("DEBUG: tagscount:  ", port)
+		fmt.Println("DEBUG: tagscount:  ", tags)
 		fmt.Println("DEBUG: port bytes:  ", buf[21:23])
 		fmt.Println("DEBUG: tagscount bytes:  ", buf[23:27])
 	}
