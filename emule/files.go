@@ -7,6 +7,8 @@ import (
 )
 
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+  //int blen = 0
+  //[]byte decompressed = nil
 	//type=buf[0]
 //it's compressed ...
   dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
@@ -14,8 +16,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	fmt.Println("ERROR libdeflate:", err.Error())
 	return
   }
-  int blen = 0
-  []byte decompressed = nil
+  
   blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
   if err != nil {
 	fmt.Println("ERROR decompress:", err.Error())
