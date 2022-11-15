@@ -37,6 +37,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		fmt.Println("DEBUG: tagscount:  ", tags)
 		fmt.Println("DEBUG: port bytes:  ", buf[21:23])
 		fmt.Println("DEBUG: tagscount bytes:  ", buf[23:27])
+		fmt.Println("DEBUG: pre str tag bytes:  ", buf[27:31])
 		//fmt.Println("DEBUG: other:  ", buf[27:50])
 		//+4 some codes    [2 1 0 1 21 0 104 116
 		//21 0 = lenght, 104 116 .. string
