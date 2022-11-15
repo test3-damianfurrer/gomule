@@ -3,11 +3,13 @@ package emule
 import (
 	"fmt"
 	"net"
-	uncompress "github.com/4kills/go-libdeflate/v2"
+	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
+//it's compressed ...
+  dc, err := libdeflate.NewDecompressor()
   count := byteToInt32(buf[1:5]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
   if debug {
     fmt.Println("DEBUG: type:", buf[0])
@@ -27,6 +29,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
     fmt.Println("DEBUG: 1. tag count:", itag)
     fmt.Println("DEBUG: 10 bytes more:", buf[31:41])
   }
+  dc.Close()
 }
 
 func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
