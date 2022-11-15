@@ -25,3 +25,33 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
   }
 }
+
+
+func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+	//type=buf[0]
+  if debug {
+    fmt.Println("DEBUG: listservers)
+  }
+}
+
+func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+	//type=buf[0]
+  if debug {
+    fmt.Println("DEBUG: searchfiles)
+  }
+}
+		
+func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+	//type=buf[0]
+  if debug {
+    fmt.Println("DEBUG: requestcallback)
+  }
+}
+
+func udpfilesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+	//type=buf[0]
+  if debug {
+    fmt.Println("DEBUG: listservers)
+  }
+}
+
