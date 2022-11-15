@@ -7,6 +7,7 @@ import (
 )
 
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+//initial file offering seems to be always of size 224 
   var blen int = 0
   var decompressed []byte
   //[]byte decompressed = nil
