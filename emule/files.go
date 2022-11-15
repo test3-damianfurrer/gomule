@@ -7,7 +7,8 @@ import (
 )
 
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
-  //int blen = 0
+  var blen = int 0
+  var decompressed = int 0
   //[]byte decompressed = nil
 	//type=buf[0]
 //it's compressed ...
