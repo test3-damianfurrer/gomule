@@ -3,6 +3,7 @@ package emule
 import (
 	"fmt"
 	"net"
+	uncompress "github.com/4kills/go-libdeflate/v2"
 )
 
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
