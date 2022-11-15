@@ -29,10 +29,12 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
 		buf[13:15], buf[15:17])
 	port := byteToInt16(buf[21:23])
+	tags := byteToInt32(buf[23:27])
 	if debug {
 		fmt.Println("DEBUG: highid:", high_id)
 		fmt.Println("DEBUG: uuid:  ", uuid)
 		fmt.Println("DEBUG: port:  ", port)
+		fmt.Println("DEBUG: tagscount:  ", port)
 	}
 
 	data := []byte{protocol,
