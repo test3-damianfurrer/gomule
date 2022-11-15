@@ -69,6 +69,11 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	strlen := byteToInt16(buf[4:6])
     	fmt.Println("DEBUG: strlen:", strlen)
     	fmt.Println("DEBUG: strlen buf:", buf[4:6])
+	fmt.Println("DEBUG: buf string:", buf[6:6+strlen])
+	strbuf := buf[6:6+strlen]
+    	str := fmt.Sprintf("%s",strbuf)
+	fmt.Println("DEBUG: str:", str)
+	    fmt.Println("DEBUG: buf other:", buf[6+strlen:n])
     }
     //fmt.Println("DEBUG: buf query:", buf[1:n])
 	  
@@ -79,6 +84,10 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 //DEBUG: strlen buf: [5 0]
 //DEBUG: buf full query: [0 0 1 5 0 101 109 117 108 101 2 3 0 68 111 99 1 0 3]
 //emule + type texts
+	  
+	  //search emule with type texts
+	  //[0 0 1 5 0 101 109 117 108 101 2 3 0 68 111 99 1 0 3]
+	  
   }
 }
 		
