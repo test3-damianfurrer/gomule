@@ -57,6 +57,7 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
     fmt.Println("DEBUG: buf query:", buf[1:n])
     fmt.Println("DEBUG: buf string:", buf[4:4+strlen])
     fmt.Println("DEBUG: strlen:", strlen)
+    fmt.Println("DEBUG: strlen buf:", buf[2:4])
     fmt.Println("DEBUG: str:", str)
     //fmt.Println("DEBUG: buf query:", buf[1:n])
 	  
