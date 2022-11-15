@@ -7,8 +7,9 @@ import (
 )
 
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+//initial file offering seems to be always of size 224 
   var blen int = 0
-  var decompressed int = 0
+  var decompressed []byte
   //[]byte decompressed = nil
 	//type=buf[0]
 //it's compressed ...
@@ -18,11 +19,17 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	return
   }
   
+  //if 1 != 1 {
   blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
   if err != nil {
 	fmt.Println("ERROR decompress:", err.Error())
 	return
   }
+  
+  fmt.Println("DEBUG: uncompressed len", blen)
+  fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
+  //}
+  if 1 != 1 {
   count := byteToInt32(buf[1:5]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
   if debug {
     fmt.Println("DEBUG: type:", buf[0])
@@ -41,6 +48,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
     fmt.Println("DEBUG: 1. tag count:", buf[27:31])
     fmt.Println("DEBUG: 1. tag count:", itag)
     fmt.Println("DEBUG: 10 bytes more:", buf[31:41])
+  }
   }
   dc.Close()
 }
