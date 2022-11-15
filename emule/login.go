@@ -46,7 +46,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		fmt.Println("DEBUG: user name:  ", str)
 		fmt.Println("DEBUG: vers tag:  ", buf[33+strlen:33+strlen+8])
 		fmt.Println("DEBUG: port tag:  ", buf[33+strlen+8:33+strlen+16])
-		fmt.Println("DEBUG: port tag:  ", buf[33+strlen+16:33+strlen+24])
+		fmt.Println("DEBUG: flag tag:  ", buf[33+strlen+16:33+strlen+24])
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
 
