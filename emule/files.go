@@ -37,9 +37,9 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
   debugloop:=false
   for{
     //if byteoffset > uint32(blen) {
-    if iteration > 201{
+    if iteration > 202{
 	    if debug {	
-		    fmt.Println("DEBUG: exiting, byteoffset >= bufferlength", blen)
+		    //fmt.Println("DEBUG: exiting, byteoffset >= bufferlength", blen)
 		    fmt.Println("byteoffset", byteoffset)
 		    fmt.Println("iteration", iteration)
 	    }
@@ -49,6 +49,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
       fmt.Println("DEBUG: byteoffset", byteoffset)
       fmt.Println("DEBUG: iteration", iteration)
     }
+fmt.Println("DEBUG: byte on offset", buf[byteoffset])
     filehashbuf := buf[byteoffset+0:byteoffset+16]
     
 	 //obfuscated
