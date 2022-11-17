@@ -3,6 +3,7 @@ package emule
 import (
 	"fmt"
 	"net"
+	"errors"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 
