@@ -13,12 +13,19 @@ import (
 //	ModeZlib
 //	ModeGzip
 //)
-
+func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
+  count := byteToInt32(buf[0:4]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
+  if debug {
+    fmt.Println("DEBUG: prcofferfiles")
+    fmt.Println("DEBUG: files:", count)
+  }
+}
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
 	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
   }
+  bufcomp := buf[1:n]
   if protocol == 0xd4 {
 	var blen int = 0
  	var decompressed []byte
@@ -28,7 +35,6 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 		return
   	}
   	fmt.Println("DEBUG: decompressing")
-	bufcomp := buf[1:n]
   	blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
 	  fmt.Println("DEBUG: after decompressing")
 	if err != nil {
@@ -37,8 +43,13 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
 		return
 	}
-  	fmt.Println("DEBUG: uncompressed len", blen)
+  	fmt.Println("DEBUG: uncompressed len", blen) //9927 vs 9928-1 compressed? lol??? There might be something off
   	fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
+	prcofferfiles(decompressed, conn, debug, blen)
+  } else if protocol == 0xe3 {
+	prcofferfiles(bufcomp, conn, debug, n-1)
+  } else {
+	  fmt.Println("Error: offerfiles: worong protocol")
   }
 	
 	
