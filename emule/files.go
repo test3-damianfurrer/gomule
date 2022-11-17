@@ -31,14 +31,21 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
   }
-  iteration := 1
+  iteration := 0
   byteoffset := uint32(4)
   //debugloop:=debug
   debugloop:=false
   for{
     if byteoffset >= uint32(blen) {
+    //if iteration > 202{
+	    if byteoffset != uint32(blen){
+		    fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
+	    }
+	    if int32(iteration) != count{
+		    fmt.Println("WARNING: iteration doesn't match filecount", iteration, count)
+	    }
 	    if debug {	
-		    fmt.Println("DEBUG: exiting, byteoffset >= bufferlength", blen)
+		    //fmt.Println("DEBUG: exiting, byteoffset >= bufferlength", blen)
 		    fmt.Println("byteoffset", byteoffset)
 		    fmt.Println("iteration", iteration)
 	    }
@@ -48,6 +55,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
       fmt.Println("DEBUG: byteoffset", byteoffset)
       fmt.Println("DEBUG: iteration", iteration)
     }
+//fmt.Println("DEBUG: iteration", iteration)
+//fmt.Println("DEBUG: byte on offset", buf[byteoffset])
     filehashbuf := buf[byteoffset+0:byteoffset+16]
     
 	 //obfuscated
@@ -85,6 +94,9 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
       fmt.Println("DEBUG: next iteration", iteration)
     }
   }
+  if debug {
+    fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
+  }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
@@ -104,8 +116,12 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   		fmt.Println("DEBUG: decompressing")
 	}
 	//blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
-  	blen, decompressed, err = dc.Decompress(bufcomp, decompressed, 1)
+  	blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
 	dc.Close()
+	if blen != n-1{
+		fmt.Println("Warning: less bytes processed", blen)
+	}
+	blen=len(decompressed)
 	if debug {
 		fmt.Println("DEBUG: after decompressing")
 	}
@@ -115,13 +131,13 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
 		return
 	}
-  	fmt.Println("DEBUG: uncompressed len", blen) //9927 vs 9928-1 compressed? lol??? There might be something off
-  	//fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
+	fmt.Println("DEBUG: uncompressed bytes", blen)
+  	//fmt.Println("DEBUG: uncompressed buf 10", decompressed[blen+0:blen+10])
 	prcofferfiles(decompressed, conn, debug, blen)
   } else if protocol == 0xe3 {
 	prcofferfiles(bufcomp, conn, debug, n-1)
   } else {
-	  fmt.Println("Error: offerfiles: worong protocol")
+	  fmt.Println("Error: offerfiles: wrong protocol")
   }
 
 }
