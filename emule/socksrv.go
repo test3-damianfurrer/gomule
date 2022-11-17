@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"errors"
 
 	sam "github.com/eyedeekay/sam3/helper"
 )
