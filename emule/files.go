@@ -43,6 +43,15 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     str := fmt.Sprintf("%s",strbuf)
     	  
     fmt.Println("DEBUG: 1. Fname:", str)
+    //[3 1 0 2]
+    fsize := byteToUInt32(buf[36+strlen+4:36+strlen+8]
+    fmt.Println("DEBUG: 1. File size:", fsize)
+    //[2 1 0 3]
+    strlentype := byteToInt16(buf[36+strlen+12:36+strlen+14])
+    strbuf = buf[36+strlen+14:36+strlen+14+strlentype]
+    str = fmt.Sprintf("%s",strbuf)
+    fmt.Println("DEBUG: 1. File type:", str)
+			  
     fmt.Println("DEBUG: 30 bytes more:", buf[36+strlen:36+strlen+30])
   }
 }
