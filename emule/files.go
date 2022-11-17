@@ -94,6 +94,9 @@ fmt.Println("DEBUG: byte on offset", buf[byteoffset])
       fmt.Println("DEBUG: next iteration", iteration)
     }
   }
+  if debug {
+    fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
+  }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
