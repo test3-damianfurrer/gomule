@@ -54,12 +54,17 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     //[3 1 0 2]
     fsize := byteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
     fmt.Println("DEBUG: 1. File size:", fsize)
-    //[2 1 0 3]
-    strlentype := uint32(byteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
-    strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
-    str = fmt.Sprintf("%s",strbuf)
-    fmt.Println("DEBUG: 1. File type:", str)
-    byteoffset = byteoffset+32+strlen+14+strlentype
+    if itag > 2 {
+    	//[2 1 0 3]
+	strlentype := uint32(byteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
+    	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
+    	str = fmt.Sprintf("%s",strbuf)
+    	fmt.Println("DEBUG: 1. File type:", str)
+    	byteoffset = byteoffset+32+strlen+14+strlentype
+	    //in theory needs to be able to handle more tags
+    } else {
+	byteoffset = byteoffset+32+strlen+8
+    }
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
     iteration+=1
   }
