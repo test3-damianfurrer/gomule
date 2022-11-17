@@ -5,14 +5,10 @@ import (
 	"net"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
+func prconefile(){
+	
+}
 
-//type Mode int
-// The constants that specify a certain mode of compression/decompression
-//const (
-//	ModeDEFLATE Mode = iota
-//	ModeZlib
-//	ModeGzip
-//)
 func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
 	//30 bytes more: [2 1 0 1 15 0 66 111 100 121 98 117 105 108 100 101 114 46 109 112 52 3 1 0 2 104 11 112 0 2]
 	// =
@@ -24,35 +20,55 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
   if debug {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
-
+  }
+  iteration := 1
+  byteoffset := uint32(4)
+  for{
+    if byteoffset >= uint32(blen) {
+	    break;
+    }
+    if debug {
+      fmt.Println("DEBUG: byteoffset", byteoffset)
+      fmt.Println("DEBUG: iteration", iteration)
+    }
+    filehashbuf := buf[byteoffset+0:byteoffset+16]
     fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[4:6], buf[6:8], buf[8:10], buf[10:12], buf[12:14], buf[14:16], buf[16:18],
-		buf[18:20])
-    //fmt.Println("DEBUG: 1.  filehash:", buf[4:20])
+		filehashbuf[0:2], filehashbuf[2:4], 
+		filehashbuf[4:6], filehashbuf[6:8],
+		filehashbuf[8:10], filehashbuf[10:12], 
+		filehashbuf[12:14], filehashbuf[14:16])
     fmt.Println("DEBUG: 1.  filehash:", fuuid)
-    fmt.Println("DEBUG: 1. client id:", buf[20:24])
-    //cport := byteToInt16(buf[24:26])
-    fmt.Println("DEBUG: 1. client port:", buf[24:26])
-    //fmt.Println("DEBUG: 1. client port:", cport)
-    itag := byteToInt32(buf[26:30])
-    //fmt.Println("DEBUG: 1. tag count:", buf[26:30])
+    fmt.Println("DEBUG: 1. client id:", buf[byteoffset+16:byteoffset+20])
+    fmt.Println("DEBUG: 1. client port:", buf[byteoffset+20:byteoffset+22])
+    itag := byteToInt32(buf[byteoffset+22:byteoffset+26])
     fmt.Println("DEBUG: 1. tag count:", itag)
 	  //skip 4 [2 1 0 1] 
-    strlen := byteToInt16(buf[34:36])
-    strbuf := buf[36:36+strlen]
+    strlen := uint32(byteToInt16(buf[byteoffset+30:byteoffset+32]))
+    strbuf := buf[byteoffset+32:byteoffset+32+strlen]
     str := fmt.Sprintf("%s",strbuf)
     	  
     fmt.Println("DEBUG: 1. File name:", str)
     //[3 1 0 2]
-    fsize := byteToUint32(buf[36+strlen+4:36+strlen+8])
+    fsize := byteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
     fmt.Println("DEBUG: 1. File size:", fsize)
-    //[2 1 0 3]
-    strlentype := byteToInt16(buf[36+strlen+12:36+strlen+14])
-    strbuf = buf[36+strlen+14:36+strlen+14+strlentype]
-    str = fmt.Sprintf("%s",strbuf)
-    fmt.Println("DEBUG: 1. File type:", str)
-			  
-    fmt.Println("DEBUG: 30 bytes more:", buf[36+strlen+14+strlentype:36+strlen+14+strlentype+30])
+    if itag > 2 {
+    	//[2 1 0 3]
+	strlentype := uint32(byteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
+    	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
+    	str = fmt.Sprintf("%s",strbuf)
+    	fmt.Println("DEBUG: 1. File type:", str)
+    	byteoffset = byteoffset+32+strlen+14+strlentype
+	    //in theory needs to be able to handle more tags
+    } else {
+	byteoffset = byteoffset+32+strlen+8
+    }
+    //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
+    iteration+=1
+	  
+    if debug {
+      fmt.Println("DEBUG: new byteoffset", byteoffset)
+      fmt.Println("DEBUG: next iteration", iteration)
+    }
   }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
@@ -71,6 +87,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   	}
   	fmt.Println("DEBUG: decompressing")
   	blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
+	dc.Close()
 	  fmt.Println("DEBUG: after decompressing")
 	if err != nil {
 		fmt.Println("ERROR decompress:", err.Error())
@@ -86,60 +103,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   } else {
 	  fmt.Println("Error: offerfiles: worong protocol")
   }
-	
-	
-if 1 == 2 {
-//initial file offering seems to be always of size 9224 
-  var blen int = 0
-  var decompressed []byte
-  //[]byte decompressed = nil
-	//type=buf[0]
-//it's compressed ...
-  dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
-  if err != nil {
-	fmt.Println("ERROR libdeflate:", err.Error())
-	return
-  }
-  fmt.Println("DEBUG: decompressing")
-  //if 1 != 1 {
-  //blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
-	//libdeflate.Mode
-  bufcomp := buf[1:n]
-  blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
-  fmt.Println("DEBUG: after decompressing")
-  if err != nil {
-	fmt.Println("ERROR decompress:", err.Error())
-	fmt.Println("ERROR: uncompressed len", blen)
-  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
-	return
-  }
-  
-  fmt.Println("DEBUG: uncompressed len", blen)
-  fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
-  //}
-  if 1 != 1 {
-  count := byteToInt32(buf[1:5]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
-  if debug {
-    fmt.Println("DEBUG: type:", buf[0])
-    fmt.Println("DEBUG: files:", count)
-    //fmt.Println("DEBUG: metadata:", buf[5:n])
-    fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[5:7], buf[7:9], buf[9:11], buf[11:13], buf[13:15], buf[15:17], buf[17:19],
-		buf[19:21])
-    fmt.Println("DEBUG: 1.  filehash:", buf[5:21])
-    fmt.Println("DEBUG: 1.  filehash:", fuuid)
-    fmt.Println("DEBUG: 1. client id:", buf[21:25])
-    cport := byteToInt16(buf[25:27])
-    fmt.Println("DEBUG: 1. client port:", buf[25:27])
-    fmt.Println("DEBUG: 1. client port:", cport)
-    itag := byteToInt32(buf[27:31])
-    fmt.Println("DEBUG: 1. tag count:", buf[27:31])
-    fmt.Println("DEBUG: 1. tag count:", itag)
-    fmt.Println("DEBUG: 10 bytes more:", buf[31:41])
-  }
-  }
-  dc.Close()
-}
+
 }
 
 func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
