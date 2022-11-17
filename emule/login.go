@@ -24,6 +24,9 @@ import (
 )
 
 func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
+	if debug {
+		fmt.Println("DEBUG: Login")
+	}
 	high_id := highId(conn.RemoteAddr().String())
 	uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
