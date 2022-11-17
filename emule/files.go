@@ -17,7 +17,7 @@ import (
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
-	fmt.Println("DEBUG: File offering protocol 0x%02x", protocol)
+	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
   }
 if 1 == 2 {
 //initial file offering seems to be always of size 9224 
@@ -35,7 +35,7 @@ if 1 == 2 {
   //if 1 != 1 {
   //blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
 	//libdeflate.Mode
-  bufcomp = buf[1:n]
+  bufcomp := buf[1:n]
   blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
   fmt.Println("DEBUG: after decompressing")
   if err != nil {
