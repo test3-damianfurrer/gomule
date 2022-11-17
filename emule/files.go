@@ -52,7 +52,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     str = fmt.Sprintf("%s",strbuf)
     fmt.Println("DEBUG: 1. File type:", str)
 			  
-    fmt.Println("DEBUG: 30 bytes more:", buf[36+strlen:36+strlen+30])
+    fmt.Println("DEBUG: 30 bytes more:", buf[36+strlen+14+strlentype:36+strlen+14+strlentype+30])
   }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
