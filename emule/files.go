@@ -20,7 +20,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
 	
 	//30 bytes more: [2 1 0 1 50 0 116 104 101 46 115 105 109 112 115 111 110 115 46 115 48 50 101 49 48 46 105 110 116 101]
 	// [2 1 0 1] len 50 
-  count := byteToInt32(buf[0:4]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
+  count := byteToInt32(buf[0:4]) //cant be more than 200 by spec
   if debug {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
@@ -44,7 +44,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     	  
     fmt.Println("DEBUG: 1. File name:", str)
     //[3 1 0 2]
-    fsize := byteToUInt32(buf[36+strlen+4:36+strlen+8])
+    fsize := byteToUint32(buf[36+strlen+4:36+strlen+8])
     fmt.Println("DEBUG: 1. File size:", fsize)
     //[2 1 0 3]
     strlentype := byteToInt16(buf[36+strlen+12:36+strlen+14])
