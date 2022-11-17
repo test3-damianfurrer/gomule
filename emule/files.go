@@ -31,12 +31,13 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
   }
-  iteration := 1
+  iteration := 0
   byteoffset := uint32(4)
   //debugloop:=debug
   debugloop:=false
   for{
-    if byteoffset >= uint32(blen) {
+    //if byteoffset >= uint32(blen) {
+    if iteration >= 200{
 	    if debug {	
 		    fmt.Println("DEBUG: exiting, byteoffset >= bufferlength", blen)
 		    fmt.Println("byteoffset", byteoffset)
@@ -115,8 +116,8 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
 		return
 	}
-  	fmt.Println("DEBUG: uncompressed len", blen) //9927 vs 9928-1 compressed? lol??? There might be something off
-  	fmt.Println("DEBUG: uncompressed buf 10", decompressed[blen+0:blen+10])
+  	fmt.Println("DEBUG: uncompressing processed bytes", blen)
+  	//fmt.Println("DEBUG: uncompressed buf 10", decompressed[blen+0:blen+10])
 	prcofferfiles(decompressed, conn, debug, blen)
   } else if protocol == 0xe3 {
 	prcofferfiles(bufcomp, conn, debug, n-1)
