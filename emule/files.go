@@ -36,7 +36,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
   //debugloop:=debug
   debugloop:=false
   for{
-    if byteoffset >= uint32(blen) {
+    if byteoffset > uint32(blen) {
     //if iteration >= 201{
 	    if debug {	
 		    fmt.Println("DEBUG: exiting, byteoffset >= bufferlength", blen)
