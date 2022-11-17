@@ -35,6 +35,9 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
   byteoffset := uint32(4)
   for{
     if byteoffset >= uint32(blen) {
+	    if debug {
+		    fmt.Println("DEBUG: byteoffset >= bufferlength", blen)
+	    }
 	    break;
     }
     if debug {
@@ -61,13 +64,13 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
     	//str = fmt.Sprintf("%s",strbuf)
     	
-	prconefile(filehashbuf,fname, fsize,fmt.Sprintf("%s",strbuf), debug)
-    	//prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize, fmt.Sprintf("%s",strbuf), false)
+	//prconefile(filehashbuf,fname, fsize,fmt.Sprintf("%s",strbuf), debug)
+    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), false)
     	byteoffset = byteoffset+32+strlen+14+strlentype
 	    //in theory needs to be able to handle more tags
     } else {
-	prconefile(filehashbuf, fname, fsize,"", debug)
-    	//prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize, "", false)
+	//prconefile(filehashbuf, fname, fsize,"", debug)
+    	prconefile(filehashbuf, fname, fsize, "", false)
 	byteoffset = byteoffset+32+strlen+8
     }
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
