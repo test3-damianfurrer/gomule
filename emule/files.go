@@ -17,8 +17,10 @@ import (
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
+	fmt.Println("DEBUG: File offering protocol", protocol)
   }
-//initial file offering seems to be always of size 224 
+if 1 = 2 {
+//initial file offering seems to be always of size 9224 
   var blen int = 0
   var decompressed []byte
   //[]byte decompressed = nil
@@ -68,14 +70,15 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   }
   dc.Close()
 }
+}
 
 func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
-    fmt.Println("DEBUG: filehash:", buf[1:n])
-    fmt.Println("DEBUG: 16lehash:", buf[1:17])
-    fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
+    //fmt.Println("DEBUG: filehash:", buf[1:n])
+    //fmt.Println("DEBUG: 16lehash:", buf[1:17])
+    //fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
   }
 }
 
