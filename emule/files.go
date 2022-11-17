@@ -5,14 +5,10 @@ import (
 	"net"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
+func prconefile(){
+	
+}
 
-//type Mode int
-// The constants that specify a certain mode of compression/decompression
-//const (
-//	ModeDEFLATE Mode = iota
-//	ModeZlib
-//	ModeGzip
-//)
 func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
 	//30 bytes more: [2 1 0 1 15 0 66 111 100 121 98 117 105 108 100 101 114 46 109 112 52 3 1 0 2 104 11 112 0 2]
 	// =
@@ -35,11 +31,17 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
       fmt.Println("DEBUG: byteoffset", byteoffset)
       fmt.Println("DEBUG: iteration", iteration)
     }
+    filehashbuf = buf[byteoffset+0:byteoffset+16]
     fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		buf[byteoffset+0:byteoffset+2], buf[byteoffset+2:byteoffset+4], 
 		buf[byteoffset+4:byteoffset+6], buf[byteoffset+6:byteoffset+8],
 		buf[byteoffset+8:byteoffset+10], buf[byteoffset+10:byteoffset+12], 
 		buf[byteoffset+12:byteoffset+14], buf[byteoffset+14:byteoffset+16])
+    fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
+		buf[filehashbuf+0:filehashbuf+2], buf[filehashbuf+2:filehashbuf+4], 
+		buf[filehashbuf+4:filehashbuf+6], buf[filehashbuf+6:filehashbuf+8],
+		buf[filehashbuf+8:filehashbuf+10], buf[filehashbuf+10:filehashbuf+12], 
+		buf[filehashbuf+12:filehashbuf+14], buf[filehashbuf+14:filehashbuf+16])
     fmt.Println("DEBUG: 1.  filehash:", fuuid)
     fmt.Println("DEBUG: 1. client id:", buf[byteoffset+16:byteoffset+20])
     fmt.Println("DEBUG: 1. client port:", buf[byteoffset+20:byteoffset+22])
@@ -67,6 +69,11 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     }
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
     iteration+=1
+	  
+    if debug {
+      fmt.Println("DEBUG: new byteoffset", byteoffset)
+      fmt.Println("DEBUG: next iteration", iteration)
+    }
   }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
