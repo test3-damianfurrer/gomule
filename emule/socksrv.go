@@ -101,7 +101,7 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 			fmt.Println("WARNING: n (conn.Read) < 0, some problem")
 			n = 0
 		}
-		toread -= uint(n)
+		toread -= uint32(n)
 		if toread <= 0 {
 			if toread < 0 {
 				fmt.Println("WARNING: toread < 0, some problem")
@@ -115,7 +115,7 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 	//	fmt.Println("ERROR: on read to buf", err.Error())
 	//	//return
 	//}
-	n = size-toread
+	n = int(size-toread)
 	if this.Debug {
 		fmt.Printf("DEBUG: size %d, n %d\n", size, n)
 	}
