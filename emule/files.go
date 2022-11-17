@@ -31,7 +31,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
   }
-  iteration := 1
+  iteration := 0
   byteoffset := uint32(4)
   //debugloop:=debug
   debugloop:=false
