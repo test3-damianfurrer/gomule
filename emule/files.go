@@ -15,6 +15,9 @@ import (
 //)
 
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+  if debug {
+	fmt.Println("DEBUG: Client offers Files / Keep alive")
+  }
 //initial file offering seems to be always of size 224 
   var blen int = 0
   var decompressed []byte
@@ -69,6 +72,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
+    fmt.Println("DEBUG: Client looks for File Sources")
     fmt.Println("DEBUG: filehash:", buf[1:n])
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
     fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
@@ -79,7 +83,8 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: listservers")
+    fmt.Println("DEBUG: Get list of servers")
+    //fmt.Println("DEBUG: listservers")
   }
 }
 
@@ -89,7 +94,8 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   
   
   if debug {
-    fmt.Println("DEBUG: searchfiles")
+    fmt.Println("DEBUG: Client looks for Files")
+    //fmt.Println("DEBUG: searchfiles")
     fmt.Println("DEBUG: buf full query:", buf[1:n])
     if(buf[1] == 0x01) {
 	fmt.Println("DEBUG: simple search")
@@ -140,14 +146,14 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: requestcallback")
+    fmt.Println("DEBUG: Client looks for another to callback")
   }
 }
 
 func udpfilesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: udpfilesources")
+    fmt.Println("DEBUG: UDP Client looks for File Sources")
   }
 }
 
