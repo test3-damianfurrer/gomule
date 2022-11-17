@@ -19,7 +19,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
 	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
   }
-  if protocol = 0xd4 {
+  if protocol == 0xd4 {
 	var blen int = 0
  	var decompressed []byte
 	dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
