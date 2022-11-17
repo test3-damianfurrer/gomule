@@ -6,6 +6,15 @@ import (
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 
+type Mode int
+
+// The constants that specify a certain mode of compression/decompression
+const (
+	ModeDEFLATE Mode = iota
+	ModeZlib
+	ModeGzip
+)
+
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 //initial file offering seems to be always of size 224 
   var blen int = 0
