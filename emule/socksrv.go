@@ -84,6 +84,9 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 	}
 	buf = make([]byte, size)
 	n, err = conn.Read(buf)
+	if this.Debug {
+		fmt.Printf("DEBUG: size %d, n %d\n", size, n)
+	}
 	buflen = n
 	return
 }
