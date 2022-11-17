@@ -33,11 +33,6 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     }
     filehashbuf := buf[byteoffset+0:byteoffset+16]
     fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[byteoffset+0:byteoffset+2], buf[byteoffset+2:byteoffset+4], 
-		buf[byteoffset+4:byteoffset+6], buf[byteoffset+6:byteoffset+8],
-		buf[byteoffset+8:byteoffset+10], buf[byteoffset+10:byteoffset+12], 
-		buf[byteoffset+12:byteoffset+14], buf[byteoffset+14:byteoffset+16])
-    fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		filehashbuf[0:2], filehashbuf[2:4], 
 		filehashbuf[4:6], filehashbuf[6:8],
 		filehashbuf[8:10], filehashbuf[10:12], 
