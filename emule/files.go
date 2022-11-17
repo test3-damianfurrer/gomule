@@ -31,17 +31,12 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
       fmt.Println("DEBUG: byteoffset", byteoffset)
       fmt.Println("DEBUG: iteration", iteration)
     }
-    filehashbuf = buf[byteoffset+0:byteoffset+16]
+    filehashbuf := buf[byteoffset+0:byteoffset+16]
     fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[byteoffset+0:byteoffset+2], buf[byteoffset+2:byteoffset+4], 
-		buf[byteoffset+4:byteoffset+6], buf[byteoffset+6:byteoffset+8],
-		buf[byteoffset+8:byteoffset+10], buf[byteoffset+10:byteoffset+12], 
-		buf[byteoffset+12:byteoffset+14], buf[byteoffset+14:byteoffset+16])
-    fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[filehashbuf+0:filehashbuf+2], buf[filehashbuf+2:filehashbuf+4], 
-		buf[filehashbuf+4:filehashbuf+6], buf[filehashbuf+6:filehashbuf+8],
-		buf[filehashbuf+8:filehashbuf+10], buf[filehashbuf+10:filehashbuf+12], 
-		buf[filehashbuf+12:filehashbuf+14], buf[filehashbuf+14:filehashbuf+16])
+		filehashbuf[0:2], filehashbuf[2:4], 
+		filehashbuf[4:6], filehashbuf[6:8],
+		filehashbuf[8:10], filehashbuf[10:12], 
+		filehashbuf[12:14], filehashbuf[14:16])
     fmt.Println("DEBUG: 1.  filehash:", fuuid)
     fmt.Println("DEBUG: 1. client id:", buf[byteoffset+16:byteoffset+20])
     fmt.Println("DEBUG: 1. client port:", buf[byteoffset+20:byteoffset+22])
