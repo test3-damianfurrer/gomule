@@ -18,9 +18,11 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	fmt.Println("ERROR libdeflate:", err.Error())
 	return
   }
-  
+  fmt.Println("DEBUG: decompressing")
   //if 1 != 1 {
-  blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
+  //blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
+  blen, decompressed, err = dc.Decompress(buf[1:n], nil, ModeZlib)
+  fmt.Println("DEBUG: after decompressing")
   if err != nil {
 	fmt.Println("ERROR decompress:", err.Error())
 	return
