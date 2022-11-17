@@ -35,7 +35,7 @@ if 1 == 2 {
   //if 1 != 1 {
   //blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
 	//libdeflate.Mode
-  bufcomp = buf[1:n]
+  bufcomp := buf[1:n]
   blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
   fmt.Println("DEBUG: after decompressing")
   if err != nil {
