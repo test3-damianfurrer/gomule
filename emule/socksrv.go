@@ -95,9 +95,6 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			if this.Debug {
-				fmt.Println("DEBUG: Login")
-			}
 			login(buf, protocol, conn, this.Debug)
 		} else if buf[0] == 0x14 {
 			if this.Debug {
