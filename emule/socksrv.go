@@ -82,8 +82,40 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 	if this.Debug {
 		fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
 	}
-	buf = make([]byte, size)
-	n, err = conn.Read(buf)
+	buf = make([]byte, 0)
+	toread := size
+	var tmpbuf []byte
+	for{
+		if toread > 1024  {
+			tmpbuf = make([]byte, 1024)
+		} else {
+			tmpbuf = make([]byte, toread)
+		}
+		n, err = conn.Read(tmpbuf)
+		if err != nil {
+			fmt.Println("ERROR: on read to buf", err.Error())
+			//return
+		}
+		buf = append(buf, tmpbuf[0:n]...)
+		if n < 0 {
+			fmt.Println("WARNING: n (conn.Read) < 0, some problem")
+			n = 0
+		}
+		toread -= uint32(n)
+		if toread <= 0 {
+			if toread < 0 {
+				fmt.Println("WARNING: toread < 0, some problem")
+			}
+			break;
+		}
+	}
+	//buf = make([]byte, size)
+	//n, err = conn.Read(buf)
+	//if err != nil {
+	//	fmt.Println("ERROR: on read to buf", err.Error())
+	//	//return
+	//}
+	n = int(size-toread)
 	if this.Debug {
 		fmt.Printf("DEBUG: size %d, n %d\n", size, n)
 	}
