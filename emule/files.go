@@ -37,7 +37,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
   debugloop:=false
   for{
     //if byteoffset >= uint32(blen) {
-    if iteration >= 200{
+    if iteration >= 201{
 	    if debug {	
 		    fmt.Println("DEBUG: exiting, byteoffset >= bufferlength", blen)
 		    fmt.Println("byteoffset", byteoffset)
@@ -117,6 +117,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 		return
 	}
   	fmt.Println("DEBUG: uncompressing processed bytes", blen)
+	fmt.Println("DEBUG: uncompressed bytes", len(decompressed))
   	//fmt.Println("DEBUG: uncompressed buf 10", decompressed[blen+0:blen+10])
 	prcofferfiles(decompressed, conn, debug, blen)
   } else if protocol == 0xe3 {
