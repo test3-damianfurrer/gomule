@@ -19,6 +19,29 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
 	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
   }
+  if protocol == 0xd4 {
+	var blen int = 0
+ 	var decompressed []byte
+	dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
+  	if err != nil {
+		fmt.Println("ERROR libdeflate:", err.Error())
+		return
+  	}
+  	fmt.Println("DEBUG: decompressing")
+	bufcomp := buf[1:n]
+  	blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
+	  fmt.Println("DEBUG: after decompressing")
+	if err != nil {
+		fmt.Println("ERROR decompress:", err.Error())
+		fmt.Println("ERROR: uncompressed len", blen)
+	  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
+		return
+	}
+  	fmt.Println("DEBUG: uncompressed len", blen)
+  	fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
+  }
+	
+	
 if 1 == 2 {
 //initial file offering seems to be always of size 9224 
   var blen int = 0
