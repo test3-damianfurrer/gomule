@@ -25,8 +25,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
   }
-  iteration :=1
-  byteoffset := uint32(0)
+  iteration := 1
+  byteoffset := uint32(4)
   for{
     if byteoffset >= uint32(blen) {
 	    break;
@@ -36,31 +36,32 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
       fmt.Println("DEBUG: iteration", iteration)
     }
     fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[byteoffset+4:byteoffset+6], buf[byteoffset+6:byteoffset+8], 
-		buf[byteoffset+8:byteoffset+10], buf[byteoffset+10:byteoffset+12],
-		buf[byteoffset+12:byteoffset+14], buf[byteoffset+14:byteoffset+16], 
-		buf[byteoffset+16:byteoffset+18], buf[byteoffset+18:byteoffset+20])
+		buf[byteoffset+0:byteoffset+2], buf[byteoffset+2:byteoffset+4], 
+		buf[byteoffset+4:byteoffset+6], buf[byteoffset+6:byteoffset+8],
+		buf[byteoffset+8:byteoffset+10], buf[byteoffset+10:byteoffset+12], 
+		buf[byteoffset+12:byteoffset+14], buf[byteoffset+14:byteoffset+16])
     fmt.Println("DEBUG: 1.  filehash:", fuuid)
-    fmt.Println("DEBUG: 1. client id:", buf[byteoffset+20:byteoffset+24])
-    fmt.Println("DEBUG: 1. client port:", buf[byteoffset+24:byteoffset+26])
-    itag := byteToInt32(buf[byteoffset+26:byteoffset+30])
+    fmt.Println("DEBUG: 1. client id:", buf[byteoffset+16:byteoffset+20])
+    fmt.Println("DEBUG: 1. client port:", buf[byteoffset+20:byteoffset+22])
+    itag := byteToInt32(buf[byteoffset+22:byteoffset+26])
     fmt.Println("DEBUG: 1. tag count:", itag)
 	  //skip 4 [2 1 0 1] 
-    strlen := uint32(byteToInt16(buf[byteoffset+34:byteoffset+36]))
-    strbuf := buf[byteoffset+36:byteoffset+36+strlen]
+    strlen := uint32(byteToInt16(buf[byteoffset+30:byteoffset+32]))
+    strbuf := buf[byteoffset+32:byteoffset+32+strlen]
     str := fmt.Sprintf("%s",strbuf)
     	  
     fmt.Println("DEBUG: 1. File name:", str)
     //[3 1 0 2]
-    fsize := byteToUint32(buf[byteoffset+36+strlen+4:byteoffset+36+strlen+8])
+    fsize := byteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
     fmt.Println("DEBUG: 1. File size:", fsize)
     //[2 1 0 3]
-    strlentype := uint32(byteToInt16(buf[byteoffset+36+strlen+12:byteoffset+36+strlen+14]))
-    strbuf = buf[byteoffset+36+strlen+14:byteoffset+36+strlen+14+strlentype]
+    strlentype := uint32(byteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
+    strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
     str = fmt.Sprintf("%s",strbuf)
     fmt.Println("DEBUG: 1. File type:", str)
-    byteoffset = byteoffset+36+strlen+14+strlentype
+    byteoffset = byteoffset+32+strlen+14+strlentype
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
+    iteration+=1
   }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
