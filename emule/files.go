@@ -28,7 +28,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     cport := byteToInt16(buf[24:26])
     fmt.Println("DEBUG: 1. client port:", buf[24:26])
     fmt.Println("DEBUG: 1. client port:", cport)
-    itag := byteToInt32(buf[27:31])
+    itag := byteToInt32(buf[26:30])
     fmt.Println("DEBUG: 1. tag count:", buf[26:30])
     fmt.Println("DEBUG: 1. tag count:", itag)
     fmt.Println("DEBUG: 10 bytes more:", buf[30:40])
