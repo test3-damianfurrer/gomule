@@ -25,8 +25,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
   }
-  iteration=1
-  byteoffset := 0
+  iteration :=1
+  byteoffset := uint32(0)
   for{
     if byteoffset >= blen {
 	    break;
@@ -46,7 +46,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     itag := byteToInt32(buf[byteoffset+26:byteoffset+30])
     fmt.Println("DEBUG: 1. tag count:", itag)
 	  //skip 4 [2 1 0 1] 
-    strlen := byteToInt16(buf[byteoffset+34:byteoffset+36])
+    strlen := uint32(byteToInt16(buf[byteoffset+34:byteoffset+36]))
     strbuf := buf[byteoffset+36:byteoffset+36+strlen]
     str := fmt.Sprintf("%s",strbuf)
     	  
@@ -55,7 +55,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     fsize := byteToUint32(buf[byteoffset+36+strlen+4:byteoffset+36+strlen+8])
     fmt.Println("DEBUG: 1. File size:", fsize)
     //[2 1 0 3]
-    strlentype := byteToInt16(buf[byteoffset+36+strlen+12:byteoffset+36+strlen+14])
+    strlentype := uint32(byteToInt16(buf[byteoffset+36+strlen+12:byteoffset+36+strlen+14]))
     strbuf = buf[byteoffset+36+strlen+14:byteoffset+36+strlen+14+strlentype]
     str = fmt.Sprintf("%s",strbuf)
     fmt.Println("DEBUG: 1. File type:", str)
