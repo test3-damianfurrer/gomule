@@ -100,10 +100,15 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 		fmt.Println("ERROR libdeflate:", err.Error())
 		return
   	}
-  	fmt.Println("DEBUG: decompressing")
-  	blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
+	if debug {
+  		fmt.Println("DEBUG: decompressing")
+	}
+	//blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
+  	blen, decompressed, err = dc.Decompress(bufcomp, decompressed, 1)
 	dc.Close()
-	  fmt.Println("DEBUG: after decompressing")
+	if debug {
+		fmt.Println("DEBUG: after decompressing")
+	}
 	if err != nil {
 		fmt.Println("ERROR decompress:", err.Error())
 		fmt.Println("ERROR: uncompressed len", blen)
@@ -111,7 +116,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 		return
 	}
   	fmt.Println("DEBUG: uncompressed len", blen) //9927 vs 9928-1 compressed? lol??? There might be something off
-  	fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
+  	//fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
 	prcofferfiles(decompressed, conn, debug, blen)
   } else if protocol == 0xe3 {
 	prcofferfiles(bufcomp, conn, debug, n-1)
