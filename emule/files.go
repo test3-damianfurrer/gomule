@@ -33,14 +33,18 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
   }
   iteration := 1
   byteoffset := uint32(4)
+  //debugloop:=debug
+  debugloop:=false
   for{
     if byteoffset >= uint32(blen) {
-	    if debug {
-		    fmt.Println("DEBUG: byteoffset >= bufferlength", blen)
+	    if debug {	
+		    fmt.Println("DEBUG: exiting, byteoffset >= bufferlength", blen)
+		    fmt.Println("byteoffset", byteoffset)
+		    fmt.Println("iteration", iteration)
 	    }
 	    break;
     }
-    if debug {
+    if debugloop {
       fmt.Println("DEBUG: byteoffset", byteoffset)
       fmt.Println("DEBUG: iteration", iteration)
     }
@@ -50,7 +54,9 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     //fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
     //fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
     itag := byteToInt32(buf[byteoffset+22:byteoffset+26])
-    fmt.Println("DEBUG: 1. tag count:", itag)
+    if debugloop {
+    	fmt.Println("DEBUG: 1. tag count:", itag)
+    }
 	  //skip 4 [2 1 0 1] 
     strlen := uint32(byteToInt16(buf[byteoffset+30:byteoffset+32]))
     strbuf := buf[byteoffset+32:byteoffset+32+strlen]
@@ -64,19 +70,17 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
     	//str = fmt.Sprintf("%s",strbuf)
     	
-	//prconefile(filehashbuf,fname, fsize,fmt.Sprintf("%s",strbuf), debug)
-    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), false)
+    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop)
     	byteoffset = byteoffset+32+strlen+14+strlentype
 	    //in theory needs to be able to handle more tags
     } else {
-	//prconefile(filehashbuf, fname, fsize,"", debug)
-    	prconefile(filehashbuf, fname, fsize, "", false)
+    	prconefile(filehashbuf, fname, fsize, "", debugloop)
 	byteoffset = byteoffset+32+strlen+8
     }
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
     iteration+=1
 	  
-    if debug {
+    if debugloop {
       fmt.Println("DEBUG: new byteoffset", byteoffset)
       fmt.Println("DEBUG: next iteration", iteration)
     }
