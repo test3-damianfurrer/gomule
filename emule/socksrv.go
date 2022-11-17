@@ -97,34 +97,16 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		if buf[0] == 0x01 {
 			login(buf, protocol, conn, this.Debug)
 		} else if buf[0] == 0x14 {
-			if this.Debug {
-				fmt.Println("DEBUG: Get list of servers")
-			}
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
-			if this.Debug {
-				fmt.Println("DEBUG: Client offers Files / Keep alive")
-			}
 			offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
-			if this.Debug {
-				fmt.Println("DEBUG: Client looks for Files")
-			}
 			searchfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x19 {
-			if this.Debug {
-				fmt.Println("DEBUG: Client looks for File Sources")
-			}
 			filesources(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x1c {
-			if this.Debug {
-				fmt.Println("DEBUG: Client looks for another to callback")
-			}
 			requestcallback(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x9a {
-			if this.Debug {
-				fmt.Println("DEBUG: UDP Client looks for File Sources")
-			}
 			udpfilesources(buf, protocol, conn, this.Debug, buflen)
 		}
 	}
