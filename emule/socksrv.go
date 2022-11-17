@@ -72,7 +72,7 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		protocol = 0xC5
 	} else {
 		fmt.Printf("ERROR: unsuported protocol 0x%02x\n", protocol)
-		err := errors.New("unsuported protocol")
+		err = errors.New("unsuported protocol")
 		return
 	}
 	if this.Debug {
