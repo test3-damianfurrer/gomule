@@ -17,7 +17,7 @@ import (
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
-	fmt.Println("DEBUG: File offering protocol 0x%02x", protocol)
+	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
   }
 if 1 == 2 {
 //initial file offering seems to be always of size 9224 
