@@ -31,7 +31,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
   }
-  iteration := 1
+  iteration := 0
   byteoffset := uint32(4)
   //debugloop:=debug
   debugloop:=false
@@ -41,7 +41,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
 	    if byteoffset != uint32(blen){
 		    fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
 	    }
-	    if iteration != count{
+	    if int32(iteration) != count{
 		    fmt.Println("WARNING: iteration doesn't match filecount", iteration, count)
 	    }
 	    if debug {	
@@ -55,8 +55,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
       fmt.Println("DEBUG: byteoffset", byteoffset)
       fmt.Println("DEBUG: iteration", iteration)
     }
-fmt.Println("DEBUG: iteration", iteration)
-fmt.Println("DEBUG: byte on offset", buf[byteoffset])
+//fmt.Println("DEBUG: iteration", iteration)
+//fmt.Println("DEBUG: byte on offset", buf[byteoffset])
     filehashbuf := buf[byteoffset+0:byteoffset+16]
     
 	 //obfuscated
@@ -93,6 +93,9 @@ fmt.Println("DEBUG: byte on offset", buf[byteoffset])
       fmt.Println("DEBUG: new byteoffset", byteoffset)
       fmt.Println("DEBUG: next iteration", iteration)
     }
+  }
+  if debug {
+    fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
   }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
