@@ -34,6 +34,8 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   fmt.Println("DEBUG: after decompressing")
   if err != nil {
 	fmt.Println("ERROR decompress:", err.Error())
+	fmt.Println("ERROR: uncompressed len", blen)
+  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
 	return
   }
   
