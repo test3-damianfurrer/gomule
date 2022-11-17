@@ -18,6 +18,20 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
   if debug {
     fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
+
+    fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
+		buf[4:6], buf[6:8], buf[8:10], buf[10:12], buf[12:14], buf[14:16], buf[16:18],
+		buf[18:20])
+    fmt.Println("DEBUG: 1.  filehash:", buf[4:20])
+    fmt.Println("DEBUG: 1.  filehash:", fuuid)
+    fmt.Println("DEBUG: 1. client id:", buf[20:24])
+    cport := byteToInt16(buf[24:26])
+    fmt.Println("DEBUG: 1. client port:", buf[24:26])
+    fmt.Println("DEBUG: 1. client port:", cport)
+    itag := byteToInt32(buf[27:31])
+    fmt.Println("DEBUG: 1. tag count:", buf[26:30])
+    fmt.Println("DEBUG: 1. tag count:", itag)
+    fmt.Println("DEBUG: 10 bytes more:", buf[30:40])
   }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
