@@ -46,10 +46,10 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
 	    }
 	    break;
     }
-    if debugloop {
-      fmt.Println("DEBUG: byteoffset", byteoffset)
-      fmt.Println("DEBUG: iteration", iteration)
-    }
+    //if debugloop {
+      //fmt.Println("DEBUG: byteoffset", byteoffset)
+      //fmt.Println("DEBUG: iteration", iteration)
+    //}
 //fmt.Println("DEBUG: iteration", iteration)
 //fmt.Println("DEBUG: byte on offset", buf[byteoffset])
     filehashbuf := buf[byteoffset+0:byteoffset+16]
