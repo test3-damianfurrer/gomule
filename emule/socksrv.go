@@ -56,11 +56,14 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		}
 		return
 	}
+	if this.Debug {
+		fmt.Printf("DEBUG: protocol by byte: 0x%02x\n", buf[0])
+	}
 	if buf[0] == 0xE3 {
 		protocol = 0xE3
 	}
 	if this.Debug {
-		fmt.Printf("DEBUG: protocol 0x%02x\n", protocol)
+		fmt.Printf("DEBUG: selected protocol 0x%02x\n", protocol)
 	}
 	size := byteToUint32(buf[1:n])
 	if this.Debug {
