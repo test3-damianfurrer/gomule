@@ -51,6 +51,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
 	  //skip 4 [2 1 0 1] 
     strlen := uint32(byteToInt16(buf[byteoffset+30:byteoffset+32]))
     strbuf := buf[byteoffset+32:byteoffset+32+strlen]
+    fname := fmt.Sprintf("%s",strbuf)
     //[3 1 0 2]
     fsize := byteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
    
@@ -60,12 +61,12 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
     	//str = fmt.Sprintf("%s",strbuf)
     	
-	prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize,fmt.Sprintf("%s",strbuf), debug)
+	prconefile(filehashbuf,fname, fsize,fmt.Sprintf("%s",strbuf), debug)
     	//prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize, fmt.Sprintf("%s",strbuf), false)
     	byteoffset = byteoffset+32+strlen+14+strlentype
 	    //in theory needs to be able to handle more tags
     } else {
-	prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize,"", debug)
+	prconefile(filehashbuf, fname, fsize,"", debug)
     	//prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize, "", false)
 	byteoffset = byteoffset+32+strlen+8
     }
