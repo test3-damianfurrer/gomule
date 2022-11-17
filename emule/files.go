@@ -14,6 +14,12 @@ import (
 //	ModeGzip
 //)
 func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
+	//30 bytes more: [2 1 0 1 15 0 66 111 100 121 98 117 105 108 100 101 114 46 109 112 52 3 1 0 2 104 11 112 0 2]
+	// =
+	// [2 1 0 1] len[15 0 ] Bodybuilder.mp4 [3 1 0 2 104 11 112 0 2]
+	
+	//30 bytes more: [2 1 0 1 50 0 116 104 101 46 115 105 109 112 115 111 110 115 46 115 48 50 101 49 48 46 105 110 116 101]
+	// [2 1 0 1] len 50 
   count := byteToInt32(buf[0:4]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
   if debug {
     fmt.Println("DEBUG: prcofferfiles")
@@ -31,7 +37,13 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
     itag := byteToInt32(buf[26:30])
     //fmt.Println("DEBUG: 1. tag count:", buf[26:30])
     fmt.Println("DEBUG: 1. tag count:", itag)
-    fmt.Println("DEBUG: 30 bytes more:", buf[30:60])
+	  //skip 4 [2 1 0 1] 
+    strlen := byteToInt16(buf[34:36])
+    strbuf := buf[36:36+strlen]
+    str := fmt.Sprintf("%s",strbuf)
+    	  
+    fmt.Println("DEBUG: 1. Fname:", str)
+    fmt.Println("DEBUG: 30 bytes more:", buf[36+strlen:36+strlen+30])
   }
 }
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
