@@ -41,7 +41,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
 	    if byteoffset != uint32(blen){
 		    fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
 	    }
-	    if iteration != count{
+	    if int32(iteration) != count{
 		    fmt.Println("WARNING: iteration doesn't match filecount", iteration, count)
 	    }
 	    if debug {	
