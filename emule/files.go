@@ -28,7 +28,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
   iteration :=1
   byteoffset := uint32(0)
   for{
-    if byteoffset >= blen {
+    if byteoffset >= uint32(blen) {
 	    break;
     }
     if debug {
