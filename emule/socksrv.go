@@ -44,6 +44,10 @@ func NewSockSrv(host string, port int, debug bool) *SockSrv {
 }
 
 func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, buflen int) {
+	//possible protocols:
+	//0xe3 - ed2k
+	//0xc5 - emule
+	//0xd4 -zlib compressed
 	protocol = 0xE3
 	buf = make([]byte, 5)
 	err = nil
