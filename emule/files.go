@@ -5,8 +5,18 @@ import (
 	"net"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
-func prconefile(){
-	
+func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool){
+	fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
+		filehashbuf[0:2], filehashbuf[2:4], 
+		filehashbuf[4:6], filehashbuf[6:8],
+		filehashbuf[8:10], filehashbuf[10:12], 
+		filehashbuf[12:14], filehashbuf[14:16])
+	if debug {
+    		fmt.Println("DEBUG: File hash:", fuuid)  
+    		fmt.Println("DEBUG: File name:", filename)
+    		fmt.Println("DEBUG: File type:", filetype)
+		fmt.Println("DEBUG: File size:", fsize)
+	}
 }
 
 func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
@@ -32,34 +42,31 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
       fmt.Println("DEBUG: iteration", iteration)
     }
     filehashbuf := buf[byteoffset+0:byteoffset+16]
-    fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		filehashbuf[0:2], filehashbuf[2:4], 
-		filehashbuf[4:6], filehashbuf[6:8],
-		filehashbuf[8:10], filehashbuf[10:12], 
-		filehashbuf[12:14], filehashbuf[14:16])
-    fmt.Println("DEBUG: 1.  filehash:", fuuid)
-    fmt.Println("DEBUG: 1. client id:", buf[byteoffset+16:byteoffset+20])
-    fmt.Println("DEBUG: 1. client port:", buf[byteoffset+20:byteoffset+22])
+    
+	 //obfuscated
+    //fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
+    //fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
     itag := byteToInt32(buf[byteoffset+22:byteoffset+26])
     fmt.Println("DEBUG: 1. tag count:", itag)
 	  //skip 4 [2 1 0 1] 
     strlen := uint32(byteToInt16(buf[byteoffset+30:byteoffset+32]))
     strbuf := buf[byteoffset+32:byteoffset+32+strlen]
-    str := fmt.Sprintf("%s",strbuf)
-    	  
-    fmt.Println("DEBUG: 1. File name:", str)
     //[3 1 0 2]
     fsize := byteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
-    fmt.Println("DEBUG: 1. File size:", fsize)
+   
     if itag > 2 {
     	//[2 1 0 3]
 	strlentype := uint32(byteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
     	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
-    	str = fmt.Sprintf("%s",strbuf)
-    	fmt.Println("DEBUG: 1. File type:", str)
+    	//str = fmt.Sprintf("%s",strbuf)
+    	
+	prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize,fmt.Sprintf("%s",strbuf), debug)
+    	//prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize, fmt.Sprintf("%s",strbuf), false)
     	byteoffset = byteoffset+32+strlen+14+strlentype
 	    //in theory needs to be able to handle more tags
     } else {
+	prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize,"", debug)
+    	//prconefile(filehashbuf, fmt.Sprintf("%s",strbuf), fsize, "", false)
 	byteoffset = byteoffset+32+strlen+8
     }
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
