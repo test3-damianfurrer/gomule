@@ -42,7 +42,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
 		    fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
 	    }
 	    if int32(iteration) != count{
-		    fmt.Println("WARNING: iteration doesn't match filecount", iteration, count)
+		    fmt.Println("WARNING: offerfiles: last iteration doesn't match filecount", iteration, count)
 	    }
 	    break;
     }
@@ -126,7 +126,9 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
 		return
 	}
-	fmt.Println("DEBUG: uncompressed bytes", blen)
+	if debug {
+	  fmt.Println("DEBUG: uncompressed bytes", blen)
+	}
   	//fmt.Println("DEBUG: uncompressed buf 10", decompressed[blen+0:blen+10])
 	prcofferfiles(decompressed, conn, debug, blen)
   } else if protocol == 0xe3 {
