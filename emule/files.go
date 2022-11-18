@@ -101,7 +101,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   bufcomp := buf[1:n]
   if protocol == 0xd4 {
 	var blen int = 0
- 	var decompressed []byte
+ 	var decompressed []byte  //maybe move Decompressor creation to the creation of the connection
 	dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
   	if err != nil {
 		fmt.Println("ERROR libdeflate:", err.Error())
