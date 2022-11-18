@@ -76,4 +76,15 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
+	
+	data := []byte{protocol,
+		9, 0, 0, 0,
+		0x34,       //server status
+		1, 0, 0, 0, //user count
+		1, 0, 0, 0} //file count
+	if debug {
+		fmt.Println("DEBUG: login:", data)
+	}
+	conn.Write(data)
+	//0x41 server identification missing
 }
