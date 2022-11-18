@@ -61,9 +61,6 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		}
 		return
 	}
-	if this.Debug {
-		fmt.Printf("DEBUG: protocol by byte: 0x%02x\n", buf[0])
-	}
 	if buf[0] == 0xE3 {
 		protocol = 0xE3
 	} else if buf[0] == 0xD4 {
@@ -76,7 +73,7 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		return
 	}
 	if this.Debug {
-		fmt.Printf("DEBUG: selected protocol 0x%02x\n", protocol)
+		fmt.Printf("DEBUG: selected protocol 0x%02x(by byte 0x%02x)\n", protocol, buf[0])
 	}
 	size := byteToUint32(buf[1:n])
 	//if this.Debug {
