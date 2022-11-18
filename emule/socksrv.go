@@ -144,7 +144,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		} else if buf[0] == 0x16 {
 			searchfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x19 {
-			filesources(buf, protocol, conn, this.Debug, buflen)
+			filesources(buf, protocol, conn, false, buflen)
 		} else if buf[0] == 0x1c {
 			requestcallback(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x9a {
