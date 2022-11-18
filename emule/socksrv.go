@@ -79,9 +79,9 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		fmt.Printf("DEBUG: selected protocol 0x%02x\n", protocol)
 	}
 	size := byteToUint32(buf[1:n])
-	if this.Debug {
-		fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
-	}
+	//if this.Debug {
+	//	fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
+	//}
 	buf = make([]byte, 0)
 	toread := size
 	var tmpbuf []byte
