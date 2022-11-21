@@ -77,7 +77,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 	}
 	conn.Write(data)
 	
-	data := []byte{protocol,
+	data = []byte{protocol,
 		9, 0, 0, 0,
 		0x34,       //server status
 		1, 0, 0, 0, //user count
