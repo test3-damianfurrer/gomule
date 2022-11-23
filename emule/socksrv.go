@@ -224,9 +224,9 @@ func (this *SockSrv) Start() {
 }
 
 func (this *SockSrv) Stop() {
-	//if this.SQL {
+	if this.SQL {
 		defer this.db.Close()
-	//}
+	}
 	defer this.listener.Close()
 	return
 }
