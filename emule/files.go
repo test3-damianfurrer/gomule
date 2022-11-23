@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
-func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash [16]byte){
+func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash []byte){
 fmt.Println("DEBUG: user hash:", uhash) 
 	if debug {
 		fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
@@ -19,6 +19,7 @@ fmt.Println("DEBUG: user hash:", uhash)
     		fmt.Println("DEBUG: File type:", filetype)
 		fmt.Println("DEBUG: File size:", fsize)
 	}
+	//files
 	res, err := db.Exec("UPDATE files SET time_offer = CURRENT_TIMESTAMP WHERE hash = ?",filehashbuf[0:16])
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
@@ -35,15 +36,39 @@ fmt.Println("DEBUG: user hash:", uhash)
 	
 	if affectedRows == 0 {
 		res, err = db.Exec("INSERT INTO files(hash, size, time_creation, time_offer) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",filehashbuf[0:16],fsize)
+		if err != nil {
+			fmt.Println("ERROR: ",err.Error())
+			return
+    		}
 	}
+	
+	//sources
+	res, err = db.Exec("UPDATE sources SET time_offer = CURRENT_TIMESTAMP WHERE file_hash = ? AND user_hash = ?",filehashbuf[0:16],uhash)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
     	}
+	affectedRows, err = res.RowsAffected()
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	if debug {
+		fmt.Println("Updated source Rows: ",affectedRows)
+	}
+	//todo figure out ext (file extension e.g. zip)
+	if affectedRows == 0 {
+		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1)",filehashbuf[0:16],uhash,filename,"",filetype)
+		if err != nil {
+			fmt.Println("ERROR: ",err.Error())
+			panic("fuck")
+			return
+    		}
+	}
 
 }
 
-func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, uhash [16]byte) {
+func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, uhash []byte) {
 	//30 bytes more: [2 1 0 1 15 0 66 111 100 121 98 117 105 108 100 101 114 46 109 112 52 3 1 0 2 104 11 112 0 2]
 	// =
 	// [2 1 0 1] len[15 0 ] Bodybuilder.mp4 [3 1 0 2 104 11 112 0 2]
@@ -117,7 +142,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
   }
 }
-func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB, uhash [16]byte) {
+func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB, uhash []byte) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
 	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
