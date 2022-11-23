@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
-func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash [16]byte){
+func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash []byte){
 fmt.Println("DEBUG: user hash:", uhash) 
 	if debug {
 		fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
@@ -43,7 +43,7 @@ fmt.Println("DEBUG: user hash:", uhash)
 
 }
 
-func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, uhash [16]byte) {
+func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, uhash []byte) {
 	//30 bytes more: [2 1 0 1 15 0 66 111 100 121 98 117 105 108 100 101 114 46 109 112 52 3 1 0 2 104 11 112 0 2]
 	// =
 	// [2 1 0 1] len[15 0 ] Bodybuilder.mp4 [3 1 0 2 104 11 112 0 2]
@@ -117,7 +117,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
   }
 }
-func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB, uhash [16]byte) {
+func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB, uhash []byte) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
 	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
