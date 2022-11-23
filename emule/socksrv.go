@@ -128,6 +128,9 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 }
 
 func (this *SockSrv) respConn(conn net.Conn) {
+	var highid uint32
+	
+	
 	if this.Debug {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())
 	}
