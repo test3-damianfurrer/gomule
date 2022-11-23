@@ -165,7 +165,11 @@ func (this *SockSrv) yoursam() string {
 }
 
 func (this *SockSrv) Start() {
-	//if this.SQL {
+	if this.SQL {
+		fmt.Println("With SQL")	
+		fmt.Printf("String: %s:%s@tcp(%s:%d)/%s", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB)
+		fmt.Println("SQL DRIVER", this.SqlDriver)
+	}
 		
 		db, err := sql.Open(this.SqlDriver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB))
 		if err != nil {
