@@ -179,12 +179,12 @@ func (this *SockSrv) Start() {
 			return
 		}
 		this.db = db
-		res, err := db.Query("select * from clients")
-		if err != nil {
-			fmt.Println("ERROR:", err.Error())
-			return
-		}
-	        defer res.Close()
+		//res, err := db.Query("select * from clients")
+		//if err != nil {
+		//	fmt.Println("ERROR:", err.Error())
+		//	return
+		//}
+	        //defer res.Close()
 	}
 	if this.I2P {
 		ln, err := sam.I2PListener("go-imule-servr", this.yoursam(), "go-imule-server")
