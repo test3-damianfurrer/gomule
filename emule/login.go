@@ -23,13 +23,29 @@ import (
 	"net"
 	"database/sql"
 )
+func logout(high_id uint32, port int16, debug bool, db *sql.DB){
+	res, err := db.Exec("UPDATE clients SET online = 0 WHERE id_ed2k = ? AND port = ? ",high_id,port)
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	if debug {
+		affectedRows, err := res.RowsAffected()
+		if err != nil {
+			fmt.Println("ERROR: ",err.Error())
+			return
+	    	}
+		fmt.Println("Updated Rows: ",affectedRows)
+	}
+	
+}
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
-	high_id := highId(conn.RemoteAddr().String())
-	port := byteToInt16(buf[21:23])
+	high_id = highId(conn.RemoteAddr().String())
+	port = byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
 	if debug {
 		uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
