@@ -19,6 +19,7 @@ fmt.Println("DEBUG: user hash:", uhash)
     		fmt.Println("DEBUG: File type:", filetype)
 		fmt.Println("DEBUG: File size:", fsize)
 	}
+	//files
 	res, err := db.Exec("UPDATE files SET time_offer = CURRENT_TIMESTAMP WHERE hash = ?",filehashbuf[0:16])
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
@@ -35,11 +36,35 @@ fmt.Println("DEBUG: user hash:", uhash)
 	
 	if affectedRows == 0 {
 		res, err = db.Exec("INSERT INTO files(hash, size, time_creation, time_offer) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",filehashbuf[0:16],fsize)
+		if err != nil {
+			fmt.Println("ERROR: ",err.Error())
+			return
+    		}
 	}
+	
+	//sources
+	res, err = db.Exec("UPDATE sources SET time_offer = CURRENT_TIMESTAMP WHERE file_hash = ? AND user_hash = ?",filehashbuf[0:16],uhash)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
     	}
+	affectedRows, err = res.RowsAffected()
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	if debug {
+		fmt.Println("Updated source Rows: ",affectedRows)
+	}
+	//todo figure out ext (file extension e.g. zip)
+	if affectedRows == 0 {
+		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1)",filehashbuf[0:16],uhash,filename,"",filetype)
+		if err != nil {
+			fmt.Println("ERROR: ",err.Error())
+			panic("fuck")
+			return
+    		}
+	}
 
 }
 
