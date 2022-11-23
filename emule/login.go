@@ -126,4 +126,5 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (hi
 	}
 	conn.Write(data)
 	//0x41 server identification missing
+	return
 }
