@@ -58,12 +58,19 @@ func int32ToByte(data int32) (ret []byte) {
 	ret = buf.Bytes()
 	return
 }
+func uint32ToByte(data uint32) (ret []byte) {
+	ret = []byte{}
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, data)
+	ret = buf.Bytes()
+	return
+}
 
-func highId(addr string) (ret int32) {
+func highId(addr string) (ret uint32) {
 	ret = 0
-	var ip1, ip2, ip3, ip4, port int32
+	var ip1, ip2, ip3, ip4, port uint32
 	fmt.Sscanf(addr, "%d.%d.%d.%d:%d", &ip1, &ip2, &ip3, &ip4, &port)
-	ret = ip1 + int32(math.Pow(2, 8))*ip2 + int32(math.Pow(2, 16))*ip3 +
-		int32(math.Pow(2, 24))*ip4
+	ret = ip1 + uint32(math.Pow(2, 8))*ip2 + uint32(math.Pow(2, 16))*ip3 +
+		uint32(math.Pow(2, 24))*ip4
 	return
 }

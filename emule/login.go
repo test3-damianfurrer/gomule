@@ -80,7 +80,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 		0x40,
 		0, 0, 0, 0,
 		1, 0, 0, 0}
-	high_id_b := int32ToByte(high_id)
+	high_id_b := uint32ToByte(high_id)
 	for i := 0; i < len(high_id_b); i++ {
 		data[i+6] = high_id_b[i]
 	}
