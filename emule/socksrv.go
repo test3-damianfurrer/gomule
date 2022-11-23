@@ -25,6 +25,8 @@ import (
 	"errors"
 
 	sam "github.com/eyedeekay/sam3/helper"
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type SockSrv struct {
@@ -41,7 +43,7 @@ type SockSrv struct {
 	SqlAddr	 string
 	SqlPort	 int
 	SqlDB    string
-	DB       sql.DB
+	db       sql.DB
 	listener net.Listener
 }
 
@@ -163,6 +165,16 @@ func (this *SockSrv) yoursam() string {
 }
 
 func (this *SockSrv) Start() {
+	if this.SQL {
+		
+		db, err := sql.Open(this.SqlDriver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB))
+		if err != nil {
+			fmt.Println("ERROR:", err.Error())
+			return
+		}
+		this.db = db
+
+	}
 	if this.I2P {
 		ln, err := sam.I2PListener("go-imule-servr", this.yoursam(), "go-imule-server")
 		if err != nil {
@@ -201,6 +213,9 @@ func (this *SockSrv) Start() {
 }
 
 func (this *SockSrv) Stop() {
+	if this.SQL {
+		defer this.db.Close()
+	}
 	defer this.listener.Close()
 	return
 }
