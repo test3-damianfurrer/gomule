@@ -3,6 +3,7 @@ package emule
 import (
 	"fmt"
 	"net"
+	"database/sql"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool){
