@@ -44,8 +44,15 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (hi
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
-	uhash = make([]byte, 16)
-	uhash = buf[1:17]
+	//uhash = make([]byte, 16)
+	i := 0
+	for{
+	uhash[i] = buf[i+1]
+	i+=1
+		if i > 16{
+			break
+		}
+	}
 	//buf[1:17]
 	high_id = highId(conn.RemoteAddr().String())
 	port = byteToInt16(buf[21:23])
