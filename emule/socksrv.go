@@ -131,6 +131,8 @@ func (this *SockSrv) respConn(conn net.Conn) {
 	var chigh_id uint32
 	var cport int16
 	
+	uhash := make([]byte, 16)
+	
 	if this.Debug {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())
 	}
@@ -147,11 +149,11 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			chigh_id, cport = login(buf, protocol, conn, this.Debug, this.db)
+			chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
-			offerfiles(buf, protocol, conn, this.Debug, buflen, this.db)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
+			offerfiles(buf, protocol, conn, this.Debug, buflen, this.db ,uhash)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
 			searchfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x19 {
