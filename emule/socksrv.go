@@ -137,11 +137,11 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
-			offerfiles(buf, protocol, conn, false, buflen)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
+			offerfiles(buf, protocol, conn, this.Debug, buflen)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
 			searchfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x19 {
-			filesources(buf, protocol, conn, false, buflen)
+			filesources(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x1c {
 			requestcallback(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x9a {
