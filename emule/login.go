@@ -71,7 +71,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 	}
 	
 	//res, err := db.Exec(fmt.Sprintf("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (%s,%d, %d, %d, %d)",uuidsql,high_id,high_id,port,1))
-	res, err := db.Exec("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (?, ?, ?, ?, ?)",buf[1:17],high_id,high_id,port,1)
+	res, err = db.Exec("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (?, ?, ?, ?, ?)",buf[1:17],high_id,high_id,port,1)
 	fmt.Println("DEBUG: res: ",res)
 	fmt.Println("DEBUG: err: ",err)
 	if err != nil {
