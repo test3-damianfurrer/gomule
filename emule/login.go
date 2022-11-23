@@ -49,7 +49,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (hi
 	for{
 	uhash[i] = buf[i+1]
 	i+=1
-		if i > 16{
+		if i >= 16{
 			break
 		}
 	}
