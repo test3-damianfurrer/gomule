@@ -43,7 +43,7 @@ type SockSrv struct {
 	SqlAddr	 string
 	SqlPort	 int
 	SqlDB    string
-	db       sql.DB
+	db       *sql.DB
 	listener net.Listener
 }
 
