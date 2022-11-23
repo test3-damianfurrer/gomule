@@ -33,7 +33,7 @@ func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype stri
 	}
 	
 	if affectedRows == 0 {
-		res, err = db.Exec("INSERT INTO files(hash, size, time_creation, time_offer) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",buf[1:17],fsize)
+		res, err = db.Exec("INSERT INTO files(hash, size, time_creation, time_offer) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",filehashbuf[0:16],fsize)
 	}
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
@@ -101,7 +101,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB) 
     	byteoffset = byteoffset+32+strlen+14+strlentype
 	    //in theory needs to be able to handle more tags
     } else {
-    	prconefile(filehashbuf, fname, fsize, "", debugloop)
+    	prconefile(filehashbuf, fname, fsize, "", debugloop, db)
 	byteoffset = byteoffset+32+strlen+8
     }
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
