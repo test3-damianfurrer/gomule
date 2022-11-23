@@ -40,11 +40,20 @@ func logout(high_id uint32, port int16, debug bool, db *sql.DB){
 	
 }
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash [16]byte){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
-	uhash = buf[1:17]
+	//uhash = make([]byte, 16)
+	i := 0
+	for{
+	uhash[i] = buf[i+1]
+	i+=1
+		if i > 16{
+			break
+		}
+	}
+	//buf[1:17]
 	high_id = highId(conn.RemoteAddr().String())
 	port = byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
