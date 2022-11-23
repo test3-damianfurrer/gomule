@@ -23,11 +23,14 @@ import (
 	"net"
 )
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
 	high_id := highId(conn.RemoteAddr().String())
+	uuidsql := fmt.Sprintf("0x%x%x%x%x%x%x%x%x",
+		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
+		buf[13:15], buf[15:17])
 	uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
 		buf[13:15], buf[15:17])
@@ -52,6 +55,14 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		fmt.Println("DEBUG: flag tag:  ", buf[33+strlen+16:33+strlen+24])
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
+	
+	res, err := db.Exec(fmt.Sprintf("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (%s,%d, %d, %d, %d)",uuidsql,high_id,high_id,port,1))
+	fmt.Println("DEBUG: res: ",res)
+	fmt.Println("DEBUG: err: ",err)
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
 
 	data := []byte{protocol,
 		8, 0, 0, 0,
