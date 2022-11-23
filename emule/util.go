@@ -58,6 +58,13 @@ func int32ToByte(data int32) (ret []byte) {
 	ret = buf.Bytes()
 	return
 }
+func uint32ToByte(data uint32) (ret []byte) {
+	ret = []byte{}
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, data)
+	ret = buf.Bytes()
+	return
+}
 
 func highId(addr string) (ret uint32) {
 	ret = 0
