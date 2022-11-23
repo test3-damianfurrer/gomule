@@ -61,9 +61,6 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		}
 		return
 	}
-	if this.Debug {
-		fmt.Printf("DEBUG: protocol by byte: 0x%02x\n", buf[0])
-	}
 	if buf[0] == 0xE3 {
 		protocol = 0xE3
 	} else if buf[0] == 0xD4 {
@@ -76,12 +73,12 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		return
 	}
 	if this.Debug {
-		fmt.Printf("DEBUG: selected protocol 0x%02x\n", protocol)
+		fmt.Printf("DEBUG: selected protocol 0x%02x(by byte 0x%02x)\n", protocol, buf[0])
 	}
 	size := byteToUint32(buf[1:n])
-	if this.Debug {
-		fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
-	}
+	//if this.Debug {
+	//	fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
+	//}
 	buf = make([]byte, 0)
 	toread := size
 	var tmpbuf []byte
@@ -103,9 +100,6 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		}
 		toread -= uint32(n)
 		if toread <= 0 {
-			if toread < 0 {
-				fmt.Println("WARNING: toread < 0, some problem")
-			}
 			break;
 		}
 	}
@@ -143,11 +137,11 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
-			offerfiles(buf, protocol, conn, this.Debug, buflen)
+			offerfiles(buf, protocol, conn, false, buflen)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
 			searchfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x19 {
-			filesources(buf, protocol, conn, this.Debug, buflen)
+			filesources(buf, protocol, conn, false, buflen)
 		} else if buf[0] == 0x1c {
 			requestcallback(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x9a {
