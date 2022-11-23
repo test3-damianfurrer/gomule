@@ -5,73 +5,147 @@ import (
 	"net"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
+func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool){
+	fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
+		filehashbuf[0:2], filehashbuf[2:4], 
+		filehashbuf[4:6], filehashbuf[6:8],
+		filehashbuf[8:10], filehashbuf[10:12], 
+		filehashbuf[12:14], filehashbuf[14:16])
+	if debug {
+    		fmt.Println("DEBUG: File hash:", fuuid)  
+    		fmt.Println("DEBUG: File name:", filename)
+    		fmt.Println("DEBUG: File type:", filetype)
+		fmt.Println("DEBUG: File size:", fsize)
+	}
+}
 
-//type Mode int
-// The constants that specify a certain mode of compression/decompression
-//const (
-//	ModeDEFLATE Mode = iota
-//	ModeZlib
-//	ModeGzip
-//)
-
-func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
-//initial file offering seems to be always of size 224 
-  var blen int = 0
-  var decompressed []byte
-  //[]byte decompressed = nil
-	//type=buf[0]
-//it's compressed ...
-  dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
-  if err != nil {
-	fmt.Println("ERROR libdeflate:", err.Error())
-	return
-  }
-  fmt.Println("DEBUG: decompressing")
-  //if 1 != 1 {
-  //blen, decompressed, err = dc.DecompressZlib(buf[1:n], nil)
-	//libdeflate.Mode
-  blen, decompressed, err = dc.Decompress(buf[1:n], nil, 1)
-  fmt.Println("DEBUG: after decompressing")
-  if err != nil {
-	fmt.Println("ERROR decompress:", err.Error())
-	fmt.Println("ERROR: uncompressed len", blen)
-  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
-	return
-  }
-  
-  fmt.Println("DEBUG: uncompressed len", blen)
-  fmt.Println("DEBUG: uncompressed buf 10", decompressed[0:10])
-  //}
-  if 1 != 1 {
-  count := byteToInt32(buf[1:5]) //spec says, can't be more than 200, but is 4 bytes? The resulting number seems utter garbage
+func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int) {
+	//30 bytes more: [2 1 0 1 15 0 66 111 100 121 98 117 105 108 100 101 114 46 109 112 52 3 1 0 2 104 11 112 0 2]
+	// =
+	// [2 1 0 1] len[15 0 ] Bodybuilder.mp4 [3 1 0 2 104 11 112 0 2]
+	
+	//30 bytes more: [2 1 0 1 50 0 116 104 101 46 115 105 109 112 115 111 110 115 46 115 48 50 101 49 48 46 105 110 116 101]
+	// [2 1 0 1] len 50 
+  count := byteToInt32(buf[0:4]) //cant be more than 200 by spec
   if debug {
-    fmt.Println("DEBUG: type:", buf[0])
+    fmt.Println("DEBUG: prcofferfiles")
     fmt.Println("DEBUG: files:", count)
-    //fmt.Println("DEBUG: metadata:", buf[5:n])
-    fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[5:7], buf[7:9], buf[9:11], buf[11:13], buf[13:15], buf[15:17], buf[17:19],
-		buf[19:21])
-    fmt.Println("DEBUG: 1.  filehash:", buf[5:21])
-    fmt.Println("DEBUG: 1.  filehash:", fuuid)
-    fmt.Println("DEBUG: 1. client id:", buf[21:25])
-    cport := byteToInt16(buf[25:27])
-    fmt.Println("DEBUG: 1. client port:", buf[25:27])
-    fmt.Println("DEBUG: 1. client port:", cport)
-    itag := byteToInt32(buf[27:31])
-    fmt.Println("DEBUG: 1. tag count:", buf[27:31])
-    fmt.Println("DEBUG: 1. tag count:", itag)
-    fmt.Println("DEBUG: 10 bytes more:", buf[31:41])
   }
+  iteration := 0
+  byteoffset := uint32(4)
+  debugloop:=debug
+  
+  for{
+    if byteoffset >= uint32(blen) {
+    //if iteration > 202{
+	    if byteoffset != uint32(blen){
+		    fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
+	    }
+	    if int32(iteration) != count{
+		    fmt.Println("WARNING: offerfiles: last iteration doesn't match filecount", iteration, count)
+	    }
+	    break;
+    }
+    //if debugloop {
+      //fmt.Println("DEBUG: byteoffset", byteoffset)
+      //fmt.Println("DEBUG: iteration", iteration)
+    //}
+//fmt.Println("DEBUG: iteration", iteration)
+//fmt.Println("DEBUG: byte on offset", buf[byteoffset])
+    filehashbuf := buf[byteoffset+0:byteoffset+16]
+    
+	 //obfuscated
+    //fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
+    //fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
+    itag := byteToInt32(buf[byteoffset+22:byteoffset+26])
+    if debugloop {
+    	fmt.Println("DEBUG: 1. tag count:", itag)
+    }
+	  //skip 4 [2 1 0 1] 
+    strlen := uint32(byteToInt16(buf[byteoffset+30:byteoffset+32]))
+    strbuf := buf[byteoffset+32:byteoffset+32+strlen]
+    fname := fmt.Sprintf("%s",strbuf)
+    //[3 1 0 2]
+    fsize := byteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
+   
+    if itag > 2 {
+    	//[2 1 0 3]
+	strlentype := uint32(byteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
+    	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
+    	//str = fmt.Sprintf("%s",strbuf)
+    	
+    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop)
+    	byteoffset = byteoffset+32+strlen+14+strlentype
+	    //in theory needs to be able to handle more tags
+    } else {
+    	prconefile(filehashbuf, fname, fsize, "", debugloop)
+	byteoffset = byteoffset+32+strlen+8
+    }
+    //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
+    iteration+=1
+	  
+    if debugloop {
+      fmt.Println("DEBUG: new byteoffset", byteoffset)
+      fmt.Println("DEBUG: next iteration", iteration)
+    }
   }
-  dc.Close()
+  if debug {
+    fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
+  }
+}
+func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+  if debug {
+	fmt.Println("DEBUG: Client offers Files / Keep alive")
+	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
+  }
+  bufcomp := buf[1:n]
+  if protocol == 0xd4 {
+	var blen int = 0
+ 	var decompressed []byte  //maybe move Decompressor creation to the creation of the connection
+	dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
+  	if err != nil {
+		fmt.Println("ERROR libdeflate:", err.Error())
+		return
+  	}
+	if debug {
+  		fmt.Println("DEBUG: decompressing")
+	}
+	//blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
+  	blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
+	dc.Close()
+	if blen != n-1{
+		fmt.Println("Warning: less bytes processed", blen)
+	}
+	blen=len(decompressed)
+	if debug {
+		fmt.Println("DEBUG: after decompressing")
+	}
+	if err != nil {
+		fmt.Println("ERROR decompress:", err.Error())
+		fmt.Println("ERROR: uncompressed len", blen)
+	  	fmt.Println("ERROR: uncompressed buf 10", decompressed[0:10])
+		return
+	}
+	if debug {
+	  fmt.Println("DEBUG: uncompressed bytes", blen)
+	}
+  	//fmt.Println("DEBUG: uncompressed buf 10", decompressed[blen+0:blen+10])
+	prcofferfiles(decompressed, conn, debug, blen)
+  } else if protocol == 0xe3 {
+	prcofferfiles(bufcomp, conn, debug, n-1)
+  } else {
+	  fmt.Println("Error: offerfiles: wrong protocol")
+  }
+
 }
 
 func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: filehash:", buf[1:n])
-    fmt.Println("DEBUG: 16lehash:", buf[1:17])
-    fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
+    fmt.Println("DEBUG: Client looks for File Sources")
+    //fmt.Println("DEBUG: filehash:", buf[1:n])
+    //fmt.Println("DEBUG: 16lehash:", buf[1:17])
+    //fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
   }
 }
 
@@ -79,7 +153,8 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: listservers")
+    fmt.Println("DEBUG: Get list of servers")
+    //fmt.Println("DEBUG: listservers")
   }
 }
 
@@ -88,8 +163,10 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   
   
   
-  if debug {
-    fmt.Println("DEBUG: searchfiles")
+  //if debug {
+if 1==2 {
+    fmt.Println("DEBUG: Client looks for Files")
+    //fmt.Println("DEBUG: searchfiles")
     fmt.Println("DEBUG: buf full query:", buf[1:n])
     if(buf[1] == 0x01) {
 	fmt.Println("DEBUG: simple search")
@@ -140,14 +217,14 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: requestcallback")
+    fmt.Println("DEBUG: Client looks for another to callback")
   }
 }
 
 func udpfilesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
   if debug {
-    fmt.Println("DEBUG: udpfilesources")
+    fmt.Println("DEBUG: UDP Client looks for File Sources")
   }
 }
 

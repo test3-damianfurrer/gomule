@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"errors"
 
 	sam "github.com/eyedeekay/sam3/helper"
 )
@@ -44,6 +45,10 @@ func NewSockSrv(host string, port int, debug bool) *SockSrv {
 }
 
 func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, buflen int) {
+	//possible protocols:
+	//0xe3 - ed2k
+	//0xc5 - emule
+	//0xd4 -zlib compressed
 	protocol = 0xE3
 	buf = make([]byte, 5)
 	err = nil
@@ -56,21 +61,58 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		}
 		return
 	}
-	if this.Debug {
-		fmt.Printf("DEBUG: protocol by byte: 0x%02x\n", buf[0])
-	}
 	if buf[0] == 0xE3 {
 		protocol = 0xE3
+	} else if buf[0] == 0xD4 {
+		protocol = 0xD4
+	} else if buf[0] == 0xC5 {
+		protocol = 0xC5
+	} else {
+		fmt.Printf("ERROR: unsuported protocol 0x%02x\n", protocol)
+		err = errors.New("unsuported protocol")
+		return
 	}
 	if this.Debug {
-		fmt.Printf("DEBUG: selected protocol 0x%02x\n", protocol)
+		fmt.Printf("DEBUG: selected protocol 0x%02x(by byte 0x%02x)\n", protocol, buf[0])
 	}
 	size := byteToUint32(buf[1:n])
-	if this.Debug {
-		fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
+	//if this.Debug {
+	//	fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
+	//}
+	buf = make([]byte, 0)
+	toread := size
+	var tmpbuf []byte
+	for{
+		if toread > 1024  {
+			tmpbuf = make([]byte, 1024)
+		} else {
+			tmpbuf = make([]byte, toread)
+		}
+		n, err = conn.Read(tmpbuf)
+		if err != nil {
+			fmt.Println("ERROR: on read to buf", err.Error())
+			//return
+		}
+		buf = append(buf, tmpbuf[0:n]...)
+		if n < 0 {
+			fmt.Println("WARNING: n (conn.Read) < 0, some problem")
+			n = 0
+		}
+		toread -= uint32(n)
+		if toread <= 0 {
+			break;
+		}
 	}
-	buf = make([]byte, size)
-	n, err = conn.Read(buf)
+	//buf = make([]byte, size)
+	//n, err = conn.Read(buf)
+	//if err != nil {
+	//	fmt.Println("ERROR: on read to buf", err.Error())
+	//	//return
+	//}
+	n = int(size-toread)
+	if this.Debug {
+		fmt.Printf("DEBUG: size %d, n %d\n", size, n)
+	}
 	buflen = n
 	return
 }
@@ -91,39 +133,18 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			if this.Debug {
-				fmt.Println("DEBUG: Login")
-			}
 			login(buf, protocol, conn, this.Debug)
 		} else if buf[0] == 0x14 {
-			if this.Debug {
-				fmt.Println("DEBUG: Get list of servers")
-			}
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
-			if this.Debug {
-				fmt.Println("DEBUG: Client offers Files / Keep alive")
-			}
-			offerfiles(buf, protocol, conn, this.Debug, buflen)
+			offerfiles(buf, protocol, conn, this.Debug, buflen)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
-			if this.Debug {
-				fmt.Println("DEBUG: Client looks for Files")
-			}
 			searchfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x19 {
-			if this.Debug {
-				fmt.Println("DEBUG: Client looks for File Sources")
-			}
 			filesources(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x1c {
-			if this.Debug {
-				fmt.Println("DEBUG: Client looks for another to callback")
-			}
 			requestcallback(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x9a {
-			if this.Debug {
-				fmt.Println("DEBUG: UDP Client looks for File Sources")
-			}
 			udpfilesources(buf, protocol, conn, this.Debug, buflen)
 		}
 	}
