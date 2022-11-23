@@ -21,19 +21,36 @@ package emule
 import (
 	"fmt"
 	"net"
+	"database/sql"
 )
+func logout(high_id uint32, port int16, debug bool, db *sql.DB){
+	res, err := db.Exec("UPDATE clients SET online = 0 WHERE id_ed2k = ? AND port = ? ",high_id,port)
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	if debug {
+		affectedRows, err := res.RowsAffected()
+		if err != nil {
+			fmt.Println("ERROR: ",err.Error())
+			return
+	    	}
+		fmt.Println("Updated Rows: ",affectedRows)
+	}
+	
+}
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
-	high_id := highId(conn.RemoteAddr().String())
-	uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
-		buf[13:15], buf[15:17])
-	port := byteToInt16(buf[21:23])
+	high_id = highId(conn.RemoteAddr().String())
+	port = byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
 	if debug {
+		uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
+		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
+		buf[13:15], buf[15:17])
 		fmt.Println("DEBUG: highid:", high_id)
 		fmt.Println("DEBUG: uuid:  ", uuid)
 		fmt.Println("DEBUG: port:  ", port)
@@ -52,6 +69,28 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		fmt.Println("DEBUG: flag tag:  ", buf[33+strlen+16:33+strlen+24])
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
+	
+	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1, time_login = CURRENT_TIMESTAMP WHERE hash = ?",high_id,high_id,port,buf[1:17])
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	if debug {
+		fmt.Println("Updated Rows: ",affectedRows)
+	}
+	
+	if affectedRows == 0 {
+		res, err = db.Exec("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (?, ?, ?, ?, ?)",buf[1:17],high_id,high_id,port,1)
+	}
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
 
 	data := []byte{protocol,
 		8, 0, 0, 0,
@@ -68,7 +107,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 		0x40,
 		0, 0, 0, 0,
 		1, 0, 0, 0}
-	high_id_b := int32ToByte(high_id)
+	high_id_b := uint32ToByte(high_id)
 	for i := 0; i < len(high_id_b); i++ {
 		data[i+6] = high_id_b[i]
 	}
@@ -87,4 +126,5 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool) {
 	}
 	conn.Write(data)
 	//0x41 server identification missing
+	return
 }
