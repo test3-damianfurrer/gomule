@@ -34,6 +34,7 @@ type SockSrv struct {
 	I2P      bool
 	SAM      string
 	SAMPort  int
+	SQL      bool
 	SqlDriver string
 	SqlUser  string
 	SqlPW    string
