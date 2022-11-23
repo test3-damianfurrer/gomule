@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
-func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB){
+func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash byte[]){
 	if debug {
 		fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		filehashbuf[0:2], filehashbuf[2:4], 
@@ -42,7 +42,7 @@ func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype stri
 
 }
 
-func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB) {
+func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, uhash byte[]) {
 	//30 bytes more: [2 1 0 1 15 0 66 111 100 121 98 117 105 108 100 101 114 46 109 112 52 3 1 0 2 104 11 112 0 2]
 	// =
 	// [2 1 0 1] len[15 0 ] Bodybuilder.mp4 [3 1 0 2 104 11 112 0 2]
@@ -97,11 +97,11 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB) 
     	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
     	//str = fmt.Sprintf("%s",strbuf)
     	
-    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop, db)
+    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop, db, uhash)
     	byteoffset = byteoffset+32+strlen+14+strlentype
 	    //in theory needs to be able to handle more tags
     } else {
-    	prconefile(filehashbuf, fname, fsize, "", debugloop, db)
+    	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
 	byteoffset = byteoffset+32+strlen+8
     }
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
@@ -116,7 +116,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB) 
     fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
   }
 }
-func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
+func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB, uhash byte[]) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
 	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
@@ -153,9 +153,9 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 	  fmt.Println("DEBUG: uncompressed bytes", blen)
 	}
   	//fmt.Println("DEBUG: uncompressed buf 10", decompressed[blen+0:blen+10])
-	prcofferfiles(decompressed, conn, debug, blen, db)
+	prcofferfiles(decompressed, conn, debug, blen, db, uhash)
   } else if protocol == 0xe3 {
-	prcofferfiles(bufcomp, conn, debug, n-1, db)
+	prcofferfiles(bufcomp, conn, debug, n-1, db, uhash)
   } else {
 	  fmt.Println("Error: offerfiles: wrong protocol")
   }
