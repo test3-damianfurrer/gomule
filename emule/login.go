@@ -21,6 +21,7 @@ package emule
 import (
 	"fmt"
 	"net"
+	"database/sql"
 )
 
 func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
