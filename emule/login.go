@@ -55,6 +55,21 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
 	
+	//db.Query("SELECT * FROM clients WHERE hash = ? LIMIT 1",buf[1:17])
+	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1 WHERE hash = ?",high_id,high_id,port,buf[1:17])
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	if debug {
+		fmt.Println("Updated Rows: ",affectedRows)
+	}
+	
 	//res, err := db.Exec(fmt.Sprintf("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (%s,%d, %d, %d, %d)",uuidsql,high_id,high_id,port,1))
 	res, err := db.Exec("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (?, ?, ?, ?, ?)",buf[1:17],high_id,high_id,port,1)
 	fmt.Println("DEBUG: res: ",res)
