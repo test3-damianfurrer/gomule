@@ -21,6 +21,7 @@ package emule
 import (
 	"fmt"
 	"net"
+	"database/sql"
 )
 
 func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
@@ -56,7 +57,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
 	
-	res, err := db.Exec(fmt.Sprintf("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (%s,%d, %d, %d, %d)",uuidsql,high_id,high_id,port,1))
+	res, err := db.Exec(fmt.Sprintf("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (%s,%d, %d, %d, %d)",uuidsql,12,12,port,1))
 	fmt.Println("DEBUG: res: ",res)
 	fmt.Println("DEBUG: err: ",err)
 	if err != nil {
