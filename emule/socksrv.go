@@ -179,13 +179,11 @@ func (this *SockSrv) Start() {
 			return
 		}
 		this.db = db
-		res, err = db.Query("select * from clients")
+		res, err := db.Query("select * from clients")
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
 			return
 		}
-		fmt.Println("res", res)
-		fmt.Println("err", err)
 	        defer res.Close()
 	}
 	if this.I2P {
