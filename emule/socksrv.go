@@ -100,9 +100,6 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		}
 		toread -= uint32(n)
 		if toread <= 0 {
-			if toread < 0 {
-				fmt.Println("WARNING: toread < 0, some problem")
-			}
 			break;
 		}
 	}
