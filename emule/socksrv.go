@@ -165,7 +165,7 @@ func (this *SockSrv) yoursam() string {
 }
 
 func (this *SockSrv) Start() {
-	if this.SQL {
+	//if this.SQL {
 		
 		db, err := sql.Open(this.SqlDriver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB))
 		if err != nil {
@@ -174,7 +174,7 @@ func (this *SockSrv) Start() {
 		}
 		this.db = db
 
-	}
+	//}
 	if this.I2P {
 		ln, err := sam.I2PListener("go-imule-servr", this.yoursam(), "go-imule-server")
 		if err != nil {
@@ -213,9 +213,9 @@ func (this *SockSrv) Start() {
 }
 
 func (this *SockSrv) Stop() {
-	if this.SQL {
+	//if this.SQL {
 		defer this.db.Close()
-	}
+	//}
 	defer this.listener.Close()
 	return
 }
