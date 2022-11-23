@@ -179,7 +179,7 @@ func (this *SockSrv) Start() {
 			return
 		}
 		this.db = db
-		res, err db.Query("select * from clients")
+		res, err = db.Query("select * from clients")
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
 			return
