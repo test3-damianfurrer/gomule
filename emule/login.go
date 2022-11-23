@@ -56,7 +56,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 	}
 	
 	//db.Query("SELECT * FROM clients WHERE hash = ? LIMIT 1",buf[1:17])
-	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1 WHERE hash = ?",high_id,high_id,port,buf[1:17])
+	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1 WHERE HEX(hash) = ?",high_id,high_id,port,buf[1:17])
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
@@ -71,7 +71,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 	}
 	
 	//res, err := db.Exec(fmt.Sprintf("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (%s,%d, %d, %d, %d)",uuidsql,high_id,high_id,port,1))
-	res, err := db.Exec("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (?, ?, ?, ?, ?)",buf[1:17],high_id,high_id,port,1)
+	res, err = db.Exec("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (?, ?, ?, ?, ?)",buf[1:17],high_id,high_id,port,1)
 	fmt.Println("DEBUG: res: ",res)
 	fmt.Println("DEBUG: err: ",err)
 	if err != nil {
