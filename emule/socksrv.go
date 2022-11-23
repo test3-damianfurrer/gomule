@@ -184,8 +184,6 @@ func (this *SockSrv) Start() {
 			fmt.Println("ERROR:", err.Error())
 			return
 		}
-		fmt.Println("res", res)
-		fmt.Println("err", err)
 	        defer res.Close()
 	}
 	if this.I2P {
