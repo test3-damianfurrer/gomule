@@ -29,13 +29,12 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 		fmt.Println("DEBUG: Login")
 	}
 	high_id := highId(conn.RemoteAddr().String())
-	uuidsql := fmt.Sprintf("0x%x",buf[1:17])
-	uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
-		buf[13:15], buf[15:17])
 	port := byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
 	if debug {
+		uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
+		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
+		buf[13:15], buf[15:17])
 		fmt.Println("DEBUG: highid:", high_id)
 		fmt.Println("DEBUG: uuid:  ", uuid)
 		fmt.Println("DEBUG: port:  ", port)
@@ -55,9 +54,23 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
 	
-	res, err := db.Exec(fmt.Sprintf("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (%s,%d, %d, %d, %d)",uuidsql,high_id,high_id,port,1))
-	fmt.Println("DEBUG: res: ",res)
-	fmt.Println("DEBUG: err: ",err)
+	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1, time_login = CURRENT_TIMESTAMP WHERE hash = ?",high_id,high_id,port,buf[1:17])
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	if debug {
+		fmt.Println("Updated Rows: ",affectedRows)
+	}
+	
+	if affectedRows == 0 {
+		res, err = db.Exec("INSERT INTO clients(hash, id_ed2k, ipv4, port, online) VALUES (?, ?, ?, ?, ?)",buf[1:17],high_id,high_id,port,1)
+	}
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
