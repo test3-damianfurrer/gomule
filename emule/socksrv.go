@@ -166,10 +166,12 @@ func (this *SockSrv) yoursam() string {
 
 func (this *SockSrv) Start() {
 	if this.SQL {
+		if this.Debug {
 		fmt.Println("With SQL")	
-		fmt.Printf("String: %s:%s@tcp(%s:%d)/%s", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB)
+		fmt.Printf("String: %s:%s@tcp(%s:%d)/%s\n", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB)
 		fmt.Println("SQL DRIVER", this.SqlDriver)
-	}
+		}
+	
 		
 		db, err := sql.Open(this.SqlDriver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB))
 		if err != nil {
@@ -177,8 +179,15 @@ func (this *SockSrv) Start() {
 			return
 		}
 		this.db = db
-
-	//}
+		res, err db.Query("select * from clients")
+		if err != nil {
+			fmt.Println("ERROR:", err.Error())
+			return
+		}
+		fmt.Println("res", res)
+		fmt.Println("err", err)
+	        defer res.Close()
+	}
 	if this.I2P {
 		ln, err := sam.I2PListener("go-imule-servr", this.yoursam(), "go-imule-server")
 		if err != nil {
