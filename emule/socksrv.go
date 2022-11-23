@@ -130,7 +130,8 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 func (this *SockSrv) respConn(conn net.Conn) {
 	var chigh_id uint32
 	var cport int16
-	var uhash [16]byte
+	
+	uhash := make([]byte, 16)
 	
 	if this.Debug {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())
