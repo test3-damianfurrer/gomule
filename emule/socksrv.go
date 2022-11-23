@@ -100,9 +100,6 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 		}
 		toread -= uint32(n)
 		if toread <= 0 {
-			if toread < 0 {
-				fmt.Println("WARNING: toread < 0, some problem")
-			}
 			break;
 		}
 	}
@@ -144,7 +141,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		} else if buf[0] == 0x16 {
 			searchfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x19 {
-			filesources(buf, protocol, conn, this.Debug, buflen)
+			filesources(buf, protocol, conn, false, buflen)
 		} else if buf[0] == 0x1c {
 			requestcallback(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x9a {
