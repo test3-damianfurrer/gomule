@@ -7,17 +7,39 @@ import (
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB){
-	fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
+	if debug {
+		fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		filehashbuf[0:2], filehashbuf[2:4], 
 		filehashbuf[4:6], filehashbuf[6:8],
 		filehashbuf[8:10], filehashbuf[10:12], 
 		filehashbuf[12:14], filehashbuf[14:16])
-	if debug {
     		fmt.Println("DEBUG: File hash:", fuuid)  
     		fmt.Println("DEBUG: File name:", filename)
     		fmt.Println("DEBUG: File type:", filetype)
 		fmt.Println("DEBUG: File size:", fsize)
 	}
+	res, err := db.Exec("UPDATE files SET time_offer = CURRENT_TIMESTAMP WHERE hash = ?",filehashbuf[0:16])
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	affectedRows, err := res.RowsAffected()
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+	if debug {
+		fmt.Println("Updated file Rows: ",affectedRows)
+	}
+	
+	if affectedRows == 0 {
+		res, err = db.Exec("INSERT INTO files(hash, size, time_creation, time_offer) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",buf[1:17],fsize)
+	}
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+    	}
+
 }
 
 func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB) {
