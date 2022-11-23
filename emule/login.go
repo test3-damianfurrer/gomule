@@ -57,7 +57,9 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) {
 	
 	//db.Query("SELECT * FROM clients WHERE hash = ? LIMIT 1",buf[1:17])
 	//res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1 WHERE HEX(hash) = ?",high_id,high_id,port,buf[1:17])
-	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1 WHERE 1 = 1",high_id,high_id,port)
+	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1, time_login = CURRENT_TIMESTAMP WHERE 1 = 1",high_id,high_id,port)
+	mt.Println("DEBUG: res: ",res)
+	fmt.Println("DEBUG: err: ",err)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
