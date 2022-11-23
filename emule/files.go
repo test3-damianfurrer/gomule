@@ -43,12 +43,12 @@ fmt.Println("DEBUG: user hash:", uhash)
 	}
 	
 	//sources
-	res, err := db.Exec("UPDATE sources SET time_offer = CURRENT_TIMESTAMP WHERE file_hash = ? AND user_hash = ?",filehashbuf[0:16],uhash)
+	res, err = db.Exec("UPDATE sources SET time_offer = CURRENT_TIMESTAMP WHERE file_hash = ? AND user_hash = ?",filehashbuf[0:16],uhash)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
     	}
-	affectedRows, err := res.RowsAffected()
+	affectedRows, err = res.RowsAffected()
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
@@ -58,7 +58,7 @@ fmt.Println("DEBUG: user hash:", uhash)
 	}
 	//todo figure out ext (file extension e.g. zip)
 	if affectedRows == 0 {
-		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1, )",filehashbuf[0:16],uhash,filename,'',filetype)
+		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1, )",filehashbuf[0:16],uhash,filename,"",filetype)
 		if err != nil {
 			fmt.Println("ERROR: ",err.Error())
 			panic("fuck")
