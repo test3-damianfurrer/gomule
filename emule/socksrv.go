@@ -34,6 +34,13 @@ type SockSrv struct {
 	I2P      bool
 	SAM      string
 	SAMPort  int
+	SqlDriver string
+	SqlUser  string
+	SqlPW    string
+	SqlAddr	 string
+	SqlPort	 int
+	SqlDB    string
+	DB       sql.DB
 	listener net.Listener
 }
 
