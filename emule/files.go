@@ -203,7 +203,7 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	  
     //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
-	data := make([]byte, 0)
+data := make([]byte, 0)
   listitems, srcdata:=queryfilesources(buf[1:17],debug,db) //valid hash
   if debug {
     fmt.Println("DEBUG: found sources: ",listitems)
@@ -214,10 +214,10 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
   msgsize := uint32(listitems)*uint32(6)
   msgsize += uint32(17)
   data = append(data,protocol,uint32ToByte(msgsize)...)
-  data = append(data,0x42,buf[1:17]...
+	data = append(data,0x42,buf[1:17]...)
   data = append(data,srcdata...)
   if debug {
-    fmt.Println("DEBUG: sources answer: ",srcdata) //fmt.Println("DEBUG: sources answer: ",data[1:30])
+    fmt.Println("DEBUG: sources answer: ",data) //fmt.Println("DEBUG: sources answer: ",data[1:30])
   }
 }
 
