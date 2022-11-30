@@ -128,8 +128,8 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 }
 
 func (this *SockSrv) respConn(conn net.Conn) {
-	var chigh_id uint32
-	var cport int16
+	//var chigh_id uint32
+	//var cport int16
 	
 	uhash := make([]byte, 16)
 	
@@ -141,7 +141,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		if err != nil {
 			if err == io.EOF {
 				fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
-				logout(chigh_id, cport, this.Debug, this.db)
+				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
 			}
 			return
 		}
@@ -149,7 +149,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
+			uhash = login(buf, protocol, conn, this.Debug, this.db)//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
