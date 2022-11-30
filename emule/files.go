@@ -195,16 +195,16 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
     fmt.Println("DEBUG: Client looks for File Sources")
     //fmt.Println("DEBUG: filehash:", buf[1:n])
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
-    filesources(buf[1:17],db)
+    queryfilesources(buf[1:17],db)
 
     fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
-    filesources(buf[n-16:n],db)
+    queryfilesources(buf[n-16:n],db)
 	  
     fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
 }
 
-func filesources(filehash []byte, db *sql.DB) {
+func queryfilesources(filehash []byte, db *sql.DB) {
     //var srcuhash []byte //make 16
     srcuhash := make([]byte, 16)
     rows, err := db.Query("select user_hash from sources where file_hash = ?", filehash)
