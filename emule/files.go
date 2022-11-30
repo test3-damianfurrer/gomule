@@ -213,7 +213,9 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
   //protocol 0xE3, found sources type 0x42
   msgsize := uint32(listitems)*uint32(6)
   msgsize += uint32(17)
-  data = append(data,protocol,uint32ToByte(msgsize)...,protocol,buf[1:17]...,srcdata...)
+  data = append(data,protocol,uint32ToByte(msgsize)...)
+  data = append(data,0x42,buf[1:17]...
+  data = append(data,srcdata...)
   if debug {
     fmt.Println("DEBUG: sources answer: ",data)
   }
