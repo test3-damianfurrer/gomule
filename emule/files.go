@@ -193,8 +193,9 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
     //fmt.Println("DEBUG: filehash:", buf[1:n])
-    //fmt.Println("DEBUG: 16lehash:", buf[1:17])
-    //fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
+    fmt.Println("DEBUG: 16lehash:", buf[1:17])
+    fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
+    fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
 }
 
