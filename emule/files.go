@@ -232,7 +232,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, s
 	listitems+=1
 	bytes:=uint32ToByte(ed2kid)
 	append(srcdata,bytes[0:4]...)
-	bytes:=int16ToByte(port)
+	bytes=int16ToByte(port)
 	append(srcdata,bytes[0:2]...)
 	    if debug {
 		    fmt.Println("DEBUG: SOURCE: HASH: ",srcuhash)
