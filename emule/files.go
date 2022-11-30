@@ -188,11 +188,12 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 
 }
 
-func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
+func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//type=buf[0]
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
+    fmt.Printf("DEBUG: file hash: %x\n",buf[1:17])
     fmt.Println("DEBUG: size bytes after hash:", buf[17:n],byteToUint32(buf[17:n])) 
 	  //current db layout doesn't allow for the same hash with differing sizes (unique key)
 	  //thus I ignore it until I decide on a new db layout.
@@ -203,26 +204,60 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	  
     //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
-  queryfilesources(buf[1:17],debug,db) //valid hash
+  data := make([]byte, 0)
+  listitems, srcdata:=queryfilesources(buf[1:17],uhash,debug,db) //valid hash
+  if listitems > 0 {
+    if debug {
+      fmt.Println("DEBUG: found sources: ",listitems)
+      fmt.Println("DEBUG: found sources bytes: ",listitems*6)
+      fmt.Println("DEBUG: found sources data: ",srcdata) //+18 (16+type+sources count) = full answersize
+    }
+    //protocol 0xE3, found sources type 0x42
+    msgsize := uint32(listitems)*uint32(6)
+    msgsize += uint32(18) //Type0x42 + file hash + sources count(1byte)
+    data = append(data,protocol)
+    data = append(data,uint32ToByte(msgsize)...)
+    data = append(data,0x42)
+    data = append(data,buf[1:17]...) //file hash
+    data = append(data,byte(listitems))   // count of sources, just one byte? - limit 255 in sql querry
+    data = append(data,srcdata...)
+    if debug {
+      fmt.Println("DEBUG: sources answer: ",data) //fmt.Println("DEBUG: sources answer: ",data[1:30])
+    }
+    conn.Write(data)
+  } else {
+    fmt.Println("DEBUG: found sources: None found ")
+  }
 }
 
-func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
+func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (listitems int, srcdata []byte){
+    srcdata = make([]byte, 0)
+    listitems = 0
     srcuhash := make([]byte, 16)
     var ed2kid uint32
-    rows, err := db.Query("select sources.user_hash,clients.id_ed2k from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ?", filehash)
+    var port int16 //var port uint16
+    rows, err := db.Query("select sources.user_hash,clients.id_ed2k,clients.port from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ? AND sources.user_hash <> ? LIMIT 255", filehash, uhash)
 	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
 	return
     }
     for rows.Next() {
-	err := rows.Scan(&srcuhash,&ed2kid)
+	err := rows.Scan(&srcuhash,&ed2kid,&port)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
+		return
 	}
+	listitems+=1
+	bytes:=uint32ToByte(ed2kid)
+	//srcdata = append(srcdata,byte(192),byte(168),byte(1),byte(249))//
+	srcdata = append(srcdata,bytes[0:4]...)
+	bytes=int16ToByte(port)
+	srcdata = append(srcdata,bytes[0:2]...)
 	    if debug {
 		    fmt.Println("DEBUG: SOURCE: HASH: ",srcuhash)
 		    fmt.Println("DEBUG: SOURCE: ed2kid: ",ed2kid)
+		    fmt.Println("DEBUG: SOURCE: port: ",port)
 	    }
     }
     err = rows.Err()
@@ -238,6 +273,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
 	fmt.Println("ERROR: ",err.Error())
     }
     }
+    return
 }
 
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
