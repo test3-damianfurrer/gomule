@@ -217,7 +217,7 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
   data = append(data,0x42,buf[1:17]...
   data = append(data,srcdata...)
   if debug {
-    fmt.Println("DEBUG: sources answer: ",data)
+    fmt.Println("DEBUG: sources answer: ",data[1:30])
   }
 }
 
