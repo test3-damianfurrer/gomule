@@ -209,20 +209,22 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
     srcuhash := make([]byte, 16)
     var ed2kid uint32
-    rows, err := db.Query("select sources.user_hash,clients.id_ed2k from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ?", filehash)
+    var port uint16
+    rows, err := db.Query("select sources.user_hash,clients.id_ed2k,clients.port from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ?", filehash)
 	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
 	return
     }
     for rows.Next() {
-	err := rows.Scan(&srcuhash,&ed2kid)
+	err := rows.Scan(&srcuhash,&ed2kid,&port)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 	}
 	    if debug {
 		    fmt.Println("DEBUG: SOURCE: HASH: ",srcuhash)
 		    fmt.Println("DEBUG: SOURCE: ed2kid: ",ed2kid)
+		    fmt.Println("DEBUG: SOURCE: port: ",port)
 	    }
     }
     err = rows.Err()
