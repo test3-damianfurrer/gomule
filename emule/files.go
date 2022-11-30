@@ -208,11 +208,11 @@ data := make([]byte, 0)
   if debug {
     fmt.Println("DEBUG: found sources: ",listitems)
     fmt.Println("DEBUG: found sources bytes: ",listitems*6)
-    fmt.Println("DEBUG: found sources data: ",srcdata) //+17 (16+type) = full answersize
+    fmt.Println("DEBUG: found sources data: ",srcdata) //+18 (16+type+sources count) = full answersize
   }
   //protocol 0xE3, found sources type 0x42
   msgsize := uint32(listitems)*uint32(6)
-  msgsize += uint32(17)
+  msgsize += uint32(18) //Type0x42 + file hash + sources count(1byte)
   data = append(data,protocol)
   data = append(data,uint32ToByte(msgsize)...)
   data = append(data,0x42)
