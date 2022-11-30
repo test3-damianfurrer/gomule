@@ -203,7 +203,7 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	  
     //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
-  data = make([]byte, 0)
+	data := make([]byte, 0)
   listitems, srcdata:=queryfilesources(buf[1:17],debug,db) //valid hash
   if debug {
     fmt.Println("DEBUG: found sources: ",listitems)
