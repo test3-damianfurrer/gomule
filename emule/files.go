@@ -213,8 +213,10 @@ data := make([]byte, 0)
   //protocol 0xE3, found sources type 0x42
   msgsize := uint32(listitems)*uint32(6)
   msgsize += uint32(17)
-  data = append(data,protocol,uint32ToByte(msgsize)...)
-	data = append(data,0x42,buf[1:17]...)
+  data = append(data,protocol)
+  data = append(data,uint32ToByte(msgsize)...)
+  data = append(data,0x42)
+  data = append(data,buf[1:17]...)
   data = append(data,srcdata...)
   if debug {
     fmt.Println("DEBUG: sources answer: ",data) //fmt.Println("DEBUG: sources answer: ",data[1:30])
