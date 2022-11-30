@@ -189,7 +189,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 }
 
 func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
-	//type=buf[0] //we have 4 bytes too much
+	//type=buf[0]
   queryfilesources(buf[1:17],debug,db) //valid hash
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
