@@ -7,8 +7,8 @@ import (
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash []byte){
-fmt.Println("DEBUG: user hash:", uhash) 
 	if debug {
+		fmt.Println("DEBUG: user hash:", uhash) 
 		fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		filehashbuf[0:2], filehashbuf[2:4], 
 		filehashbuf[4:6], filehashbuf[6:8],
