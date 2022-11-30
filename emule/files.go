@@ -210,6 +210,7 @@ data := make([]byte, 0)
     fmt.Println("DEBUG: found sources bytes: ",listitems*6)
     fmt.Println("DEBUG: found sources data: ",srcdata) //+18 (16+type+sources count) = full answersize
   }
+  if listitems > 0 {
   //protocol 0xE3, found sources type 0x42
   msgsize := uint32(listitems)*uint32(6)
   msgsize += uint32(18) //Type0x42 + file hash + sources count(1byte)
@@ -223,6 +224,7 @@ data := make([]byte, 0)
     fmt.Println("DEBUG: sources answer: ",data) //fmt.Println("DEBUG: sources answer: ",data[1:30])
   }
   //conn.Write(data)
+  }
 }
 
 func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, srcdata []byte){
