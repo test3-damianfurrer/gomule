@@ -188,17 +188,59 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 
 }
 
-func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
+func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//type=buf[0]
+  queryfilesources(buf[1:17],debug,db) //valid hash
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
     //fmt.Println("DEBUG: filehash:", buf[1:n])
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
-    fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
-    fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
+    fmt.Println("DEBUG: size bytes after hash:", buf[17:n],byteToUint32(buf[17:n])) 
+	  //current db layout doesn't allow for the same hash with differing sizes (unique key)
+	  //thus I ignore it until I decide on a new db layout.
+    
+
+    //fmt.Println("DEBUG: 16revhas:", buf[n-16:n]) //not a valid hash
+    //queryfilesources(buf[n-16:n],debug,db)
+	  
+    //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
 }
 
+func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
+    //var srcuhash []byte //make 16
+    srcuhash := make([]byte, 16)
+    var ed2kid uint32
+    rows, err := db.Query("select sources.user_hash,clients.id_ed2k from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ?", filehash)
+	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
+    if err != nil {
+	fmt.Println("ERROR: ",err.Error())
+	return
+    }
+    for rows.Next() {
+	err := rows.Scan(&srcuhash,&ed2kid)
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+	}
+	    if debug {
+		    fmt.Println("DEBUG SRC HASH: ",srcuhash)
+		    fmt.Println("DEBUG ed2kid: ",ed2kid)
+	    }
+    }
+    err = rows.Err()
+    if err != nil {
+	fmt.Println("ERROR: ",err.Error())
+    }
+    rows.Close()
+    if debug {
+    var fsize uint32
+    err = db.QueryRow("select size from files where hash = ?", filehash).Scan(&fsize)
+    fmt.Println("DEBUG src file size: ",uint32ToByte(fsize))
+    if err != nil {
+	fmt.Println("ERROR: ",err.Error())
+    }
+    }
+}
 
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
