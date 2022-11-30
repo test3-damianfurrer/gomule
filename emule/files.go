@@ -247,7 +247,8 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, s
 	}
 	listitems+=1
 	bytes:=uint32ToByte(ed2kid)
-	srcdata = append(srcdata,byte(192),byte(168),byte(1),byte(249))//srcdata = append(srcdata,bytes[0:4]...)
+	//srcdata = append(srcdata,byte(192),byte(168),byte(1),byte(249))//
+	srcdata = append(srcdata,bytes[0:4]...)
 	bytes=int16ToByte(port)
 	srcdata = append(srcdata,bytes[0:2]...)
 	    if debug {
