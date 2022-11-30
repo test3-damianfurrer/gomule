@@ -233,7 +233,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
     if debug {
     var fsize uint32
     err = db.QueryRow("select size from files where hash = ?", filehash).Scan(&fsize)
-    fmt.Println("DEBUG src file size: ",fsize)
+    fmt.Println("DEBUG src file size: ",uint32ToByte(fsize))
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
     }
