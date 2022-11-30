@@ -231,9 +231,9 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, s
 	}
 	listitems+=1
 	bytes:=uint32ToByte(ed2kid)
-	append(srcdata,bytes[0:4]...)
-	bytes:=int16ToByte(port)
-	append(srcdata,bytes[0:2]...)
+	srcdata = append(srcdata,bytes[0:4]...)
+	bytes=int16ToByte(port)
+	srcdata = append(srcdata,bytes[0:2]...)
 	    if debug {
 		    fmt.Println("DEBUG: SOURCE: HASH: ",srcuhash)
 		    fmt.Println("DEBUG: SOURCE: ed2kid: ",ed2kid)
@@ -253,6 +253,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, s
 	fmt.Println("ERROR: ",err.Error())
     }
     }
+    return
 }
 
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
