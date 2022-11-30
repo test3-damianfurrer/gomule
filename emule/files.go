@@ -188,17 +188,42 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 
 }
 
-func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
-	//type=buf[0]
+func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
+	//type=buf[0] //we have 4 bytes too much
+  
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
     //fmt.Println("DEBUG: filehash:", buf[1:n])
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
+    filesources(buf[1:17],db)
+
     fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
+    filesources(buf[n-16:n],db)
+	  
     fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
 }
 
+func filesources(filehash []byte, db *sql.DB) {
+    var srcuhash []byte //make 16
+    rows, err := db.Query("select user_hash from sources where file_hash = ?", filehash)
+    if err != nil {
+	fmt.Println("ERROR: ",err.Error())
+	return
+    }
+    for rows.Next() {
+	err := rows.Scan(&srcuhash)
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+	}
+	fmt.Println("DEBUG SRC HASH: ",srcuhash)
+    }
+    err = rows.Err()
+    if err != nil {
+	fmt.Println("ERROR: ",err.Error())
+    }
+    rows.Close()
+}
 
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
