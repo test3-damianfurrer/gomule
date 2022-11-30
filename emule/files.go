@@ -203,10 +203,17 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	  
     //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
-  queryfilesources(buf[1:17],debug,db) //valid hash
+  listitems, srcdata:=queryfilesources(buf[1:17],debug,db) //valid hash
+  if debug {
+    fmt.Println("DEBUG: found sources: ",listitems)
+    fmt.Println("DEBUG: found sources bytes: ",listitems*6)
+    fmt.Println("DEBUG: found sources data: ",srcdata) //+17 (16+type) = full answersize
+  }
 }
 
-func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
+func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, srcdata []byte){
+    srcdata = make([]byte, 0)
+    listitems = 0
     srcuhash := make([]byte, 16)
     var ed2kid uint32
     var port uint16
@@ -220,7 +227,11 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
 	err := rows.Scan(&srcuhash,&ed2kid,&port)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
+		return
 	}
+	listitems+=1
+	append(srcdata,uint32ToByte(ed2kid))
+	append(srcdata,uint16ToByte(port))
 	    if debug {
 		    fmt.Println("DEBUG: SOURCE: HASH: ",srcuhash)
 		    fmt.Println("DEBUG: SOURCE: ed2kid: ",ed2kid)
