@@ -203,11 +203,24 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	  
     //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
+data := make([]byte, 0)
   listitems, srcdata:=queryfilesources(buf[1:17],debug,db) //valid hash
   if debug {
     fmt.Println("DEBUG: found sources: ",listitems)
     fmt.Println("DEBUG: found sources bytes: ",listitems*6)
-    fmt.Println("DEBUG: found sources data: ",srcdata) //+17 (16+type) = full answersize
+    fmt.Println("DEBUG: found sources data: ",srcdata) //+18 (16+type+sources count) = full answersize
+  }
+  //protocol 0xE3, found sources type 0x42
+  msgsize := uint32(listitems)*uint32(6)
+  msgsize += uint32(18) //Type0x42 + file hash + sources count(1byte)
+  data = append(data,protocol)
+  data = append(data,uint32ToByte(msgsize)...)
+  data = append(data,0x42)
+  data = append(data,buf[1:17]...) //file hash
+  data = append(data,byte(listitems))   // count of sources, just one byte? - limit 255 in sql querry
+  data = append(data,srcdata...)
+  if debug {
+    fmt.Println("DEBUG: sources answer: ",data) //fmt.Println("DEBUG: sources answer: ",data[1:30])
   }
 }
 
@@ -217,7 +230,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, s
     srcuhash := make([]byte, 16)
     var ed2kid uint32
     var port int16 //var port uint16
-    rows, err := db.Query("select sources.user_hash,clients.id_ed2k,clients.port from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ?", filehash)
+    rows, err := db.Query("select sources.user_hash,clients.id_ed2k,clients.port from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ? LIMIT 255", filehash)
 	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
