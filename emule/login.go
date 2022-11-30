@@ -56,8 +56,8 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	//	}
 	//}
 	//buf[1:17]
-	high_id = highId(conn.RemoteAddr().String())
-	port = byteToInt16(buf[21:23])
+	high_id := highId(conn.RemoteAddr().String())
+	port := byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
 	if debug {
 		uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
