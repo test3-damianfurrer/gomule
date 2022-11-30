@@ -205,7 +205,8 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 }
 
 func filesources(filehash []byte, db *sql.DB) {
-    var srcuhash []byte //make 16
+    //var srcuhash []byte //make 16
+    srcuhash := make([]byte, 16)
     rows, err := db.Query("select user_hash from sources where file_hash = ?", filehash)
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
