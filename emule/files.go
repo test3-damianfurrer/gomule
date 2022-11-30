@@ -192,7 +192,6 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	//type=buf[0]
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
-    //fmt.Println("DEBUG: filehash:", buf[1:n])
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
     fmt.Println("DEBUG: size bytes after hash:", buf[17:n],byteToUint32(buf[17:n])) 
 	  //current db layout doesn't allow for the same hash with differing sizes (unique key)
@@ -208,7 +207,6 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 }
 
 func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
-    //var srcuhash []byte //make 16
     srcuhash := make([]byte, 16)
     var ed2kid uint32
     rows, err := db.Query("select sources.user_hash,clients.id_ed2k from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ?", filehash)
