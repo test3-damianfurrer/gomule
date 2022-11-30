@@ -23,7 +23,7 @@ import (
 	"net"
 	"database/sql"
 )
-//https://damianfurrer.ch/share/
+
 func logout(uhash []byte, debug bool, db *sql.DB){
 	res, err := db.Exec("UPDATE clients SET online = 0 WHERE hash = ?",uhash)
 	if err != nil {
@@ -41,7 +41,7 @@ func logout(uhash []byte, debug bool, db *sql.DB){
 	
 }
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
@@ -56,8 +56,8 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (hi
 	//	}
 	//}
 	//buf[1:17]
-	high_id = highId(conn.RemoteAddr().String())
-	port = byteToInt16(buf[21:23])
+	high_id := highId(conn.RemoteAddr().String())
+	port := byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
 	if debug {
 		uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
