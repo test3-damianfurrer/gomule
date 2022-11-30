@@ -190,21 +190,22 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 
 func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//type=buf[0] //we have 4 bytes too much
-  
+  queryfilesources(buf[1:17],debug,db) //valid hash
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
     //fmt.Println("DEBUG: filehash:", buf[1:n])
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
-    queryfilesources(buf[1:17],db)
+    fmt.Println("DEBUG: unknown bytes after hash:", buf[17:n])
+    
 
-    fmt.Println("DEBUG: 16revhas:", buf[n-16:n])
-    queryfilesources(buf[n-16:n],db)
+    //fmt.Println("DEBUG: 16revhas:", buf[n-16:n]) //not a valid hash
+    //queryfilesources(buf[n-16:n],debug,db)
 	  
-    fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
+    //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
 }
 
-func queryfilesources(filehash []byte, db *sql.DB) {
+func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
     //var srcuhash []byte //make 16
     srcuhash := make([]byte, 16)
     rows, err := db.Query("select user_hash from sources where file_hash = ?", filehash)
@@ -217,7 +218,9 @@ func queryfilesources(filehash []byte, db *sql.DB) {
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 	}
-	fmt.Println("DEBUG SRC HASH: ",srcuhash)
+	    if debug {
+		    fmt.Println("DEBUG SRC HASH: ",srcuhash)
+	    }
     }
     err = rows.Err()
     if err != nil {
