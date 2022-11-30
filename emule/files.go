@@ -209,7 +209,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
     //var srcuhash []byte //make 16
     srcuhash := make([]byte, 16)
     var ed2kid uint32
-    rows, err := db.Query("select sources.user_hash,clients.id_ed2k from sources where sources.file_hash = ? left join clients on sources.user_hash=clients.hash", filehash)
+    rows, err := db.Query("select sources.user_hash,clients.id_ed2k from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ?", filehash)
 	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
