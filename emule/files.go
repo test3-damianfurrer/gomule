@@ -208,18 +208,21 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
     //var srcuhash []byte //make 16
     srcuhash := make([]byte, 16)
-    rows, err := db.Query("select user_hash from sources where file_hash = ?", filehash)
+    var ed2kid uint32
+    rows, err := db.Query("select sources.user_hash,clients.id_ed2k from sources where sources.file_hash = ? left join clients on sources.user_hash=clients.hash", filehash)
+	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
 	return
     }
     for rows.Next() {
-	err := rows.Scan(&srcuhash)
+	err := rows.Scan(&srcuhash,&ed2kid)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 	}
 	    if debug {
 		    fmt.Println("DEBUG SRC HASH: ",srcuhash)
+		    fmt.Println("DEBUG ed2kid: ",ed2kid)
 	    }
     }
     err = rows.Err()
@@ -227,6 +230,14 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
 	fmt.Println("ERROR: ",err.Error())
     }
     rows.Close()
+    if debug {
+    var fsize uint32
+    err = db.QueryRow("select size from files where hash = ?", filehash).Scan(&fsize)
+    fmt.Println("DEBUG src file size: ",fsize)
+    if err != nil {
+	fmt.Println("ERROR: ",err.Error())
+    }
+    }
 }
 
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
