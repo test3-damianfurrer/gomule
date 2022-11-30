@@ -193,7 +193,7 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
-    fmt.Printf("DEBUG: file hash: %x",buf[1:17])
+    fmt.Printf("DEBUG: file hash: %x\n",buf[1:17])
     fmt.Println("DEBUG: size bytes after hash:", buf[17:n],byteToUint32(buf[17:n])) 
 	  //current db layout doesn't allow for the same hash with differing sizes (unique key)
 	  //thus I ignore it until I decide on a new db layout.
