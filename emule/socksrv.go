@@ -141,7 +141,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		if err != nil {
 			if err == io.EOF {
 				fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
-				logout(chigh_id, cport, this.Debug, this.db)
+				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
 			}
 			return
 		}
