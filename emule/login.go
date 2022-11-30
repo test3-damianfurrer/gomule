@@ -25,7 +25,7 @@ import (
 )
 //https://damianfurrer.ch/share/
 func logout(uhash []byte, debug bool, db *sql.DB){
-	res, err := db.Exec("UPDATE clients SET online = 0 WHERE id_ed2k = ? AND port = ? ",high_id,port)
+	res, err := db.Exec("UPDATE clients SET online = 0 WHERE hash = ?",uhash)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
