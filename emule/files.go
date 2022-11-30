@@ -224,6 +224,8 @@ data := make([]byte, 0)
     fmt.Println("DEBUG: sources answer: ",data) //fmt.Println("DEBUG: sources answer: ",data[1:30])
   }
   conn.Write(data)
+  } else {
+    fmt.Println("DEBUG: sources: None found ")
   }
 }
 
