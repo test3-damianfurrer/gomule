@@ -190,7 +190,6 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 
 func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//type=buf[0]
-  queryfilesources(buf[1:17],debug,db) //valid hash
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
     //fmt.Println("DEBUG: filehash:", buf[1:n])
@@ -205,6 +204,7 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	  
     //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
+  queryfilesources(buf[1:17],debug,db) //valid hash
 }
 
 func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
@@ -223,8 +223,8 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
 		fmt.Println("ERROR: ",err.Error())
 	}
 	    if debug {
-		    fmt.Println("DEBUG SRC HASH: ",srcuhash)
-		    fmt.Println("DEBUG ed2kid: ",ed2kid)
+		    fmt.Println("DEBUG: SOURCE: HASH: ",srcuhash)
+		    fmt.Println("DEBUG: SOURCE: ed2kid: ",ed2kid)
 	    }
     }
     err = rows.Err()
@@ -235,7 +235,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) {
     if debug {
     var fsize uint32
     err = db.QueryRow("select size from files where hash = ?", filehash).Scan(&fsize)
-    fmt.Println("DEBUG src file size: ",uint32ToByte(fsize))
+    fmt.Println("DEBUG: SOURCE: file size: ",uint32ToByte(fsize))
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
     }
