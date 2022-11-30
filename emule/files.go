@@ -188,7 +188,7 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 
 }
 
-func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
+func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//type=buf[0]
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
@@ -204,7 +204,7 @@ func filesources(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
     //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
 data := make([]byte, 0)
-  listitems, srcdata:=queryfilesources(buf[1:17],debug,db) //valid hash
+  listitems, srcdata:=queryfilesources(buf[1:17],uhash,debug,db) //valid hash
   if debug {
     fmt.Println("DEBUG: found sources: ",listitems)
     fmt.Println("DEBUG: found sources bytes: ",listitems*6)
@@ -227,13 +227,13 @@ data := make([]byte, 0)
   }
 }
 
-func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, srcdata []byte){
+func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (listitems int, srcdata []byte){
     srcdata = make([]byte, 0)
     listitems = 0
     srcuhash := make([]byte, 16)
     var ed2kid uint32
     var port int16 //var port uint16
-    rows, err := db.Query("select sources.user_hash,clients.id_ed2k,clients.port from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ? LIMIT 255", filehash)
+    rows, err := db.Query("select sources.user_hash,clients.id_ed2k,clients.port from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ? AND sources.user_hash <> ? LIMIT 255", filehash, uhash)
 	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
