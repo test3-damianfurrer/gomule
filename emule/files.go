@@ -253,6 +253,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, s
 	fmt.Println("ERROR: ",err.Error())
     }
     }
+    return
 }
 
 func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
