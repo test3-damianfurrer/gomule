@@ -223,7 +223,7 @@ data := make([]byte, 0)
   if debug {
     fmt.Println("DEBUG: sources answer: ",data) //fmt.Println("DEBUG: sources answer: ",data[1:30])
   }
-  //conn.Write(data)
+  conn.Write(data)
   }
 }
 
