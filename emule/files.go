@@ -216,7 +216,7 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, s
     listitems = 0
     srcuhash := make([]byte, 16)
     var ed2kid uint32
-    var port uint16
+    var port int16 //var port uint16
     rows, err := db.Query("select sources.user_hash,clients.id_ed2k,clients.port from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ?", filehash)
 	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     if err != nil {
@@ -230,8 +230,10 @@ func queryfilesources(filehash []byte, debug bool, db *sql.DB) (listitems int, s
 		return
 	}
 	listitems+=1
-	append(srcdata,uint32ToByte(ed2kid)...)
-	append(srcdata,uint16ToByte(port)...)
+	bytes:=uint32ToByte(ed2kid)
+	append(srcdata,bytes[0:4]...)
+	bytes:=int16ToByte(port)
+	append(srcdata,bytes[0:2]...)
 	    if debug {
 		    fmt.Println("DEBUG: SOURCE: HASH: ",srcuhash)
 		    fmt.Println("DEBUG: SOURCE: ed2kid: ",ed2kid)
