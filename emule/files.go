@@ -303,6 +303,7 @@ if 1==1 {
     	strbuf := buf[4:4+strlen]
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
+        fmt.Println("DEBUG: buf other:", buf[4+strlen:n])
     } else {
 	fmt.Println("DEBUG: complex search")
 	strlen := byteToInt16(buf[4:6])
