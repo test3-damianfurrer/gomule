@@ -285,10 +285,31 @@ func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 }
 
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
-	//type=buf[0]
+	//select name, ext, type, rating from sources WHERE name like "%a%" and name like "%three%" and name like "%10%" LIMIT 100
+	/*//type=buf[0]
+	[1 4 0 116 101 115 116] //simple
+	[0 0 1 4 0 116 101 115 116 2 5 0 73 109 97 103 101 1 0 3] //typ image
+	[0 0 1 4 0 116 101 115 116 0 0 2 5 0 73 109 97 103 101 1 0 3 2 3 0 106 112 103 1 0 4] //image + endung jpg
+	[0 0 1 4 0 116 101 115 116 2 3 0 106 112 103 1 0 4] // endung jpg
+  //max search	
+	
+	[0 0 1 ]
+	[4 0] [116 101 115 116] 
+	[0 0 2]
+	[5 0] [73 109 97 103 101] [1 0 3] 
+	[0 0 3] 0 0 16 0 1 1 0 2 0 0 3 0 0 160 0 2 1 
+	0 2 0 0 3 1 0 0 0 1 1 0 21 2 
+	[3 0] [106 112 103] [1 0 4]
   
-  
-  
+        [0 0 1] 
+	[4 0] [116 101 115 116] 
+	[0 0 2] 
+	[5 0] [73 109 97 103 101] [1 0 3]
+	[0 0 3] 0 0 16 0 1 1 0 2 0 0 3 0 0 160 0 2 1 
+	[0 2 2]
+	[3 0] [106 112 103] [1 0 4]
+	
+	*/
   //if debug {
 if 1==1 {
     fmt.Println("DEBUG: Client looks for Files")
