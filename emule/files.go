@@ -290,7 +290,7 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   
   
   //if debug {
-if 1==2 {
+if 1==1 {
     fmt.Println("DEBUG: Client looks for Files")
     //fmt.Println("DEBUG: searchfiles")
     fmt.Println("DEBUG: buf full query:", buf[1:n])
