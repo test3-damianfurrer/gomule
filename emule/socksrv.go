@@ -140,7 +140,9 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		buf, protocol, err, buflen := this.read(conn)
 		if err != nil {
 			if err == io.EOF {
-				fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
+				if this.Debug {
+				    fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
+				}
 				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
 			}
 			return
