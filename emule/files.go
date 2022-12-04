@@ -226,7 +226,9 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
     }
     conn.Write(data)
   } else {
-    fmt.Println("DEBUG: found sources: None found ")
+    if debug {
+	    fmt.Println("DEBUG: found sources: None found ")
+    }
   }
 }
 
