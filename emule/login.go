@@ -130,16 +130,16 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	serverip_b:=uint32ToByte(shighid)
 	serverport_b:=uint16ToByte(sport)
 	serverguid_b := make([]byte,16)
-	tagcount_b := uint32ToByte(uint32(1))
+	tagcount_b := uint32ToByte(uint32(2)) //maybe not acctually honored
 	iddata := make([]byte,0)
 	
 	iddata=append(iddata,serverguid_b...)
 	iddata=append(iddata,serverip_b...)
 	iddata=append(iddata,serverport_b...)
 	iddata=append(iddata,tagcount_b...)
-	//servname := encodeByteTagString(encodeByteTagNameInt(0x1),"Servername")
+	servname := encodeByteTagString(encodeByteTagNameInt(0x1),"Servername")
 	servdesc := encodeByteTagString(encodeByteTagNameInt(0xb),"Serverdesc")
-	//iddata=append(iddata,servname...)
+	iddata=append(iddata,servname...)
 	iddata=append(iddata,servdesc...)
 	if debug {
 		fmt.Println("DEBUG: serverguid_b:", serverguid_b)
