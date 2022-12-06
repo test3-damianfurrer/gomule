@@ -136,7 +136,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	conn.Write(data)
 	
 	fcount_b := uint32ToByte(readRowUint32("select count(*) from files",db))
-	ucount_b := uint32ToByte(readRowUint32("select count(*) from files",db))
+	ucount_b := uint32ToByte(readRowUint32("select count(*) from clients",db))
 		
 	
 	data = encodeByteMsg(protocol,0x34,[]byte{ucount_b[0], ucount_b[1], ucount_b[2], ucount_b[3], fcount_b[0], fcount_b[1], fcount_b[2], fcount_b[3]})
