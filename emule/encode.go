@@ -65,7 +65,7 @@ func encodeByteTagNameInt(val byte) []byte {
 func stringToByte(val string) []byte {
 	strlen:=len(val)
 	buf := make([]byte,strlen)
-	for int i = 0; i < strlen; i++ {
+	for i := 0; i < strlen; i++ {
 		buf[i] = val[i]
 	}
 	return buf
