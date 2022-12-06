@@ -129,7 +129,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	//0x41 server identification missing
 	
 	serverip_b:=uint32ToByte(highId(conn.RemoteAddr().String()))
-	serverport_b:=uint16ToBytes(uint16(7111)) //test
+	serverport_b:=uint16ToByte(uint16(7111)) //test
 	serverguid_b := make([]byte,16)
 	tagcount_b := uint32ToByte(uint32(0))
 	iddata := make([]byte,0)
