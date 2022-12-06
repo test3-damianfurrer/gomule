@@ -52,9 +52,29 @@ func encodeByteTag(ttype byte, tagname []byte, tagvalue []byte) []byte {
 	//buflen=len(tagname)+len(tagvalue)+1
 	buf := make([]byte,0)
 	buf = append(buf, ttype)
-	buf = append(buf, tagvalue...)
 	buf = append(buf, tagname...)
+	buf = append(buf, tagvalue...)
 	return buf
+	
+	/*
+	Login example: 
+	vers tag:   [3 1 0 17 60 0 0 0]
+	port tag:   [3 1 0 32 29 3 0 0] -> 0x20 (port should be 0x0f, 15)
+	flag tag:   [3 1 0 251 128 13 4 3] //seems to be some other tag (should be 0x20)
+	name tag: [2 1 0 1 (strlen)(string) ]
+	2/3 = type string/int
+	[1 0] = bytes for tag name
+	17(0x11) = tag name value for Version Tag
+
+	Offer files example(somehow reversed?):
+	[1 4 0 116 101 115 116] //simple
+	[0 0 1 4 0 116 101 115 116 2 5 0 73 109 97 103 101 1 0 3]
+	initial 0 0 - not sure, marking complex search and maybe something else
+	type, value(len, str), tagname
+	string type, 1 0 3 = Filtype tag name
+	value = "Image"(5)
+	
+	*/
 }
 
 func encodeByteTagNameInt(val byte) []byte {
