@@ -19,7 +19,7 @@ func encodeByteMsg(protocol byte,msgcode byte,body []byte) []byte {
 	return buf
 }
 
-func encodeByteString(string str) []byte {
+func encodeByteString(str string) []byte {
 	slen:=len(str)
 	buf := make([]byte,slen+2)
 	sizebytes := uint16ToByte(uint16(slen))
