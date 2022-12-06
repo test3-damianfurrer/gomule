@@ -13,6 +13,7 @@ type OneTag struct {
 }
 
 func readString(pos int, buf []byte)(bread int, ret string) {
+  fmt.Println("readstring!",buf[pos:len(buf)])
   bread=2
   bread += int(byteToUint16(buf[pos:pos+2]))
   ret = fmt.Sprintf("%s",buf[pos+2:bread])
@@ -40,7 +41,7 @@ func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
       ret.ValueLen = byteToUint16(buf[pos+bread:pos+bread+2])
       bread += 2
       ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
-			bread+=int(ret.ValueLen)
+      bread+=int(ret.ValueLen)
     case byte(3): //uint32
       ret.ValueLen = 4
       ret.Value = buf[pos+bread:pos+bread+4]
