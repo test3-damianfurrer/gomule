@@ -41,7 +41,7 @@ func logout(uhash []byte, debug bool, db *sql.DB){
 	
 }
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16, ssname string, ssdesc string, ssmsg string) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
@@ -105,7 +105,8 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
     	}
 
 
-	data := encodeByteMsg(protocol,0x38,encodeByteString("server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
+	data := encodeByteMsg(protocol,0x38,encodeByteString(ssname))
+		//"server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
@@ -137,8 +138,10 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	iddata=append(iddata,serverip_b...)
 	iddata=append(iddata,serverport_b...)
 	iddata=append(iddata,tagcount_b...)
-	servname := encodeByteTagString(encodeByteTagNameInt(0x1),"Servername")
-	servdesc := encodeByteTagString(encodeByteTagNameInt(0xb),"Serverdesc")
+	servname := encodeByteTagString(encodeByteTagNameInt(0x1),ssname)
+					//"Servername")
+	servdesc := encodeByteTagString(encodeByteTagNameInt(0xb),ssdesc)
+					//"Serverdesc")
 	iddata=append(iddata,servname...)
 	iddata=append(iddata,servdesc...)
 	if debug {
