@@ -14,17 +14,16 @@ type OneTag struct {
 
 func readString(pos int, buf []byte)(bread int, ret string) {
   bread=2
-  bread += int(byteToInt16(buf[pos:pos+2]))
+  bread += int(byteToUint16(buf[pos:pos+2]))
   ret = fmt.Sprintf("%s",buf[pos+2:bread])
   return
 }
 
 func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
   ret = &OneTag{Type: buf[pos], NameString: ""}
-  //byteToUint16
   bread=3
   readname:=0
-  namelen := byteToInt16(buf[pos+1:pos+bread])
+  namelen := byteToUint16(buf[pos+1:pos+bread])
   
   if namelen == uint16(1) {
     ret.NameByte = buf[pos+3]
@@ -38,16 +37,18 @@ func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
   
   switch ret.Type {
     case byte(2): //varstring
-      ret.ValueLen = uint16(byteToInt16(buf[pos+bread:pos+bread+2]))
+      ret.ValueLen = byteToUint16(buf[pos+bread:pos+bread+2])
       bread += 2
       ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
       bread+=ret.ValueLen
     case byte(3): //uint32
       ret.ValueLen = 4
-      buf[pos+bread:pos+bread+4]
+      ret.Value = buf[pos+bread:pos+bread+4]
       bread += 4
     case byte(4): //float
-      ret.ValueLen = 4 //implemented?
+      ret.ValueLen = 4
+      ret.Value = buf[pos+bread:pos+bread+4]
+      bread += 4
     default:
       fmt.Println("Error decoding Tag, unknown tag datatype!",ret.Type)
     }
