@@ -56,6 +56,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	//	}
 	//}
 	//buf[1:17]
+	
 	high_id := highId(conn.RemoteAddr().String())
 	port := byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
@@ -81,6 +82,19 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 		fmt.Println("DEBUG: flag tag:  ", buf[33+strlen+16:33+strlen+24])
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
+	
+	//(pos int, buf []byte, tags int)(totalread int, ret []*OneTag)
+	
+	totalread, tags := readTags(27,buf,4)
+	for i := 0; i < len(tags); i++ {
+		fmt.Println("DEBUG: test val len:  ",tags[i].ValueLen)
+		if tags[i].Type == byte(2) {
+			fmt.Printf("Debug %s",tags[i].Value)
+		}
+	}
+	
+	fmt.Println("DEBUG: after loop")
+	
 	index:=27
 	tstbread, tstres := readTag(index,buf)
 	index+=tstbread
