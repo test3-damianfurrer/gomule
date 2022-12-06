@@ -1,3 +1,5 @@
+package emule
+
 import (
 	"fmt"
 )
