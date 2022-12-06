@@ -37,7 +37,7 @@ func encodeByteString(str string) []byte {
 //}
 
 func encodeByteTagString(tagname []byte, tagvalue string) []byte {
-	return encodeByteTag(2,tagname,stringToByte(tagvalue))
+	return encodeByteTag(2,tagname,encodeByteString(tagvalue))
 }
 
 func encodeByteTagInt(tagname []byte, tagvalue uint32) []byte {
