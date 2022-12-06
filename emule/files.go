@@ -342,7 +342,8 @@ if 1==1 {
 	querystr, strarr := search2query(str)
 	fmt.Println("DEBUG: qry:", querystr)
     }
-    //fmt.Println("DEBUG: buf query:", buf[1:n])
+	fmt.Println("DEBUG: strarr:", querystr)
+    //fmt.Println("DEBUG: buf query:", strarr)
 	  
 	  //buf query: [1 5 0 101 109 117 108 101]
 	  //emule, len 5
