@@ -21,7 +21,8 @@ func readString(pos int, buf []byte)(bread int, ret string) {
 }
 
 func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
-  fmt.Println("readtag!",buf[pos:len(buf)])
+  fmt.Println("readtag! at",post)	
+  fmt.Println("data",buf[pos:len(buf)])
   ret = &OneTag{Type: buf[pos], NameString: ""}
   bread=3
   readname:=0
