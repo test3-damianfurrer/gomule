@@ -81,9 +81,9 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 		fmt.Println("DEBUG: flag tag:  ", buf[33+strlen+16:33+strlen+24])
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
-	
+	strlen := byteToInt16(buf[31:33])
 	tstbread, tstres := readTag(33+strlen,buf)
-	fmt.Println("DEBUG: test read vers:  ",tstres.Value)
+	fmt.Println("DEBUG: test read vers:  ",tstres.Value,tstbread)
 	fmt.Println("DEBUG: test read vers:  ",tstres)
 	tstbread, tstres = readTag(31,buf)
 	
