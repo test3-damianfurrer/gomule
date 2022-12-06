@@ -105,7 +105,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
     	}
 
 
-	data := encodeByteMsg(protocol,0x38,encodeByteString("version - 0.0.1\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
+	data := encodeByteMsg(protocol,0x38,encodeByteString("server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
