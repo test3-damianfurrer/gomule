@@ -3,7 +3,7 @@ package emule
 import (
 	"fmt"
 	//"net"
-	//"database/sql"
+	"database/sql"
   	"strings"
 )
 
@@ -40,4 +40,13 @@ func search2query(search string)(sqlquery string, strarr []string){
   }
   fmt.Println("query: ",strarr)
   return
+}
+
+func readRowUint32(query string,db *sql.DB) uint32 {
+	var value uint32
+	err := db.QueryRow(query).Scan(&value)
+    	if err != nil {
+		fmt.Println("ERROR(readRowUint32): ",err.Error())
+	}
+	return value
 }
