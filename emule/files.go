@@ -291,6 +291,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
   var sext string
   var stype string
   var srating int
+  var sfilehash []byte
   //params := make([]any,len(strarr)) ///test
   //for i:=0;i < len(strarr);i++ {
 //	  params=append(params,strarr[i])
@@ -306,12 +307,13 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
     return
   }
   for rows.Next() {
-	err := rows.Scan(&sname,&sext,&stype,&srating)
+	err := rows.Scan(&sname,&sext,&stype,&srating,&sfilehash)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
 	}
 	fmt.Println("Debug: file found: ",sname)
+	fmt.Printf("Debug file hash: %x\n",sfilehash)
   }
 }
 
