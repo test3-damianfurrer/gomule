@@ -329,6 +329,7 @@ if 1==1 {
         fmt.Println("DEBUG: buf other:", buf[4+strlen:n])
 	querystr, strarr := search2query(str)
 	fmt.Println("DEBUG: qry:", querystr)
+	fmt.Println("DEBUG: strarr:", strarr)
     } else {
 	fmt.Println("DEBUG: complex search")
 	strlen := byteToInt16(buf[4:6])
@@ -341,8 +342,9 @@ if 1==1 {
 	    fmt.Println("DEBUG: buf other:", buf[6+strlen:n])
 	querystr, strarr := search2query(str)
 	fmt.Println("DEBUG: qry:", querystr)
+	fmt.Println("DEBUG: strarr:", strarr)
     }
-	fmt.Println("DEBUG: strarr:", querystr)
+	
     //fmt.Println("DEBUG: buf query:", strarr)
 	  
 	  //buf query: [1 5 0 101 109 117 108 101]
