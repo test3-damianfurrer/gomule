@@ -292,7 +292,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
   var stype string
   var srating int
   params := make([]any,len(strarr)) ///test
-  for(i:=0;i < len(strarr);i++){
+  for i:=0;i < len(strarr);i++ {
 	  params=append(params,strarr[i])
   }
   rows, err := db.Query(query,params...)
@@ -306,7 +306,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
 		fmt.Println("ERROR: ",err.Error())
 		return
 	}
-	  fmt.Println("Debug: file found: ",sname)
+	fmt.Println("Debug: file found: ",sname)
   }
 }
 
