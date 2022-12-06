@@ -104,32 +104,16 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 		return
     	}
 
-	//data := encodeByteMsg(protocol,0x38,[]byte{5,0,'h', 'e', 'l', 'l', 'o'})
+
 	data := encodeByteMsg(protocol,0x38,encodeByteString("version - 0.0.1\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
-	
-	/*data := []byte{protocol,
-		8, 0, 0, 0,
-		0x38,
-		5, 0,
-		'h', 'e', 'l', 'l', 'o'}
-		*/
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 
-	/*data = []byte{protocol,
-		9, 0, 0, 0,
-		0x40,
-		0, 0, 0, 0,
-		1, 0, 0, 0} */
+
 	high_id_b := uint32ToByte(high_id)
 	data = encodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],1, 0, 0, 0})
-	
-	/*high_id_b := uint32ToByte(high_id)
-	for i := 0; i < len(high_id_b); i++ {
-		data[i+6] = high_id_b[i]
-	}*/
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
@@ -137,15 +121,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	
 	fcount_b := uint32ToByte(readRowUint32("select count(*) from files",db))
 	ucount_b := uint32ToByte(readRowUint32("select count(*) from clients",db))
-		
-	
 	data = encodeByteMsg(protocol,0x34,[]byte{ucount_b[0], ucount_b[1], ucount_b[2], ucount_b[3], fcount_b[0], fcount_b[1], fcount_b[2], fcount_b[3]})
-	/*data = []byte{protocol,
-		9, 0, 0, 0,
-		0x34,       //server status
-		1, 0, 0, 0, //user count
-		1, 0, 0, 0} //file count
-		*/
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
