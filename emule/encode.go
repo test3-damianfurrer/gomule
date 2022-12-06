@@ -36,6 +36,18 @@ func encodeByteString(str string) []byte {
 //	
 //}
 
+func encodeByteTagString(tagname []byte, tagvalue string) []byte {
+	return encodeByteTag(2,tagname,stringToByte(tagvalue))
+}
+
+func encodeByteTagInt(tagname []byte, tagvalue uint32) []byte {
+	return encodeByteTag(3,tagname,uint32ToByte(tagvalue))
+}
+
+/*func encodeByteTagInt(tagname []byte, tagvalue float) []byte {
+	return encodeByteTag(4,tagname,uint32ToByte(tagvalue))
+}*/
+
 func encodeByteTag(ttype byte, tagname []byte, tagvalue []byte) []byte {
 	//buflen=len(tagname)+len(tagvalue)+1
 	buf := make([]byte,0)
@@ -45,20 +57,21 @@ func encodeByteTag(ttype byte, tagname []byte, tagvalue []byte) []byte {
 	return buf
 }
 
-
 func encodeByteTagNameInt(val byte) []byte {
 	buf := make([]byte,1)
 	buf[0]=val
 	return encodeByteTagName(buf)
 }
-
-func encodeByteTagNameStr(val string) []byte {
+func stringToByte(val string) []byte {
 	strlen:=len(val)
 	buf := make([]byte,strlen)
 	for int i = 0; i < strlen; i++ {
 		buf[i] = val[i]
 	}
-	return encodeByteTagName(buf)
+	return buf
+}
+func encodeByteTagNameStr(val string) []byte {
+	return encodeByteTagName(stringToByte(val))
 }
 
 func encodeByteTagName(nbuf []byte) []byte {
