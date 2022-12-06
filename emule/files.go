@@ -327,6 +327,8 @@ if 1==1 {
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
         fmt.Println("DEBUG: buf other:", buf[4+strlen:n])
+	querystr := search2query(str)
+	fmt.Println("DEBUG: qry:", querystr)
     } else {
 	fmt.Println("DEBUG: complex search")
 	strlen := byteToInt16(buf[4:6])
@@ -337,6 +339,8 @@ if 1==1 {
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
 	    fmt.Println("DEBUG: buf other:", buf[6+strlen:n])
+	querystr := search2query(str)
+	fmt.Println("DEBUG: qry:", querystr)
     }
     //fmt.Println("DEBUG: buf query:", buf[1:n])
 	  
