@@ -96,11 +96,11 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 			case 0x11:
 				fmt.Printf("Debug Version Tag: %d\n",byteToUint32(tagarr[i].Value))
 			case 0x20:
-				fmt.Printf("Debug Flags Tag(or port?): %d\n",byteToUint32(tagarr[i].Value))
+				fmt.Printf("Debug Flags Tag: %b\n",byteToUint32(tagarr[i].Value))
 			case 0x0f:
-				fmt.Printf("Debug Port Tag(or port?): %d\n",byteToUint32(tagarr[i].Value))
+				fmt.Printf("Debug Port Tag: %d\n",byteToUint32(tagarr[i].Value))
 			default:
-				fmt.Printf("Warning: unknown tag %d\n",tagarr[i].NameByte)
+				fmt.Printf("Warning: unknown tag %x\n",tagarr[i].NameByte)
 		}
 		/*fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
 		if tagarr[i].Type == byte(2) {
