@@ -15,7 +15,7 @@ type OneTag struct {
 func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
 	index := pos
 	totalread = 0
-	for i := 0; i <= tags; i++ {
+	for i := 0; i < tags; i++ {
 		bread, tag := readTag(index,buf)
 		totalread += bread
 		index += bread
