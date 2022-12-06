@@ -12,6 +12,17 @@ type OneTag struct {
   ValueLen uint16
 }
 
+func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
+	index := pos
+	totalread = 0
+	for i := 0; i <= tags; i++ {
+		bread, tag := readTag(index,buf)
+		totalread += bread
+		index += bread
+		ret = append(ret,tag)
+	}
+}
+
 func readString(pos int, buf []byte)(bread int, ret string) {
   fmt.Println("readstring!",buf[pos-3:len(buf)])
   bread=2
