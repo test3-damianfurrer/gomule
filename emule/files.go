@@ -291,7 +291,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
   var sext string
   var stype string
   var srating int
-  rows, err := db.Query(query,strarr...)
+  rows, err := db.Query(query,strarr[:]...)
   if err != nil {
     fmt.Println("ERROR: ",err.Error())
     return
