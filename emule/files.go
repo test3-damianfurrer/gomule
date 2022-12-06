@@ -291,7 +291,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
   var sext string
   var stype string
   var srating int
-  params := make([]any,len(strarr))
+  params := make([]any,len(strarr)) ///test
   for(i:=0;i < len(strarr);i++){
 	  params=append(params,strarr[i])
   }
