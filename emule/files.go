@@ -286,6 +286,26 @@ func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   }
 }
 
+func dbsearchfiles(query string,strarr []string, db *sql.DB){
+  var sname string
+  var sext string
+  var stype string
+  var srating int
+  rows, err := db.Query(query,strarr...)
+  if err != nil {
+    fmt.Println("ERROR: ",err.Error())
+    return
+  }
+  for rows.Next() {
+	err := rows.Scan(&sname,&sext,&stype,&srating)
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+	}
+	  fmt.Println("Debug: file found: ",sname)
+  }
+}
+
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//select name, ext, type, rating from sources WHERE name like "%a%" and name like "%three%" and name like "%10%" LIMIT 100
 	/*//type=buf[0]
@@ -330,6 +350,7 @@ if 1==1 {
 	querystr, strarr := search2query(str)
 	fmt.Println("DEBUG: qry:", querystr)
 	fmt.Println("DEBUG: strarr:", strarr)
+	dbsearchfiles(querystr,strarr,db)
     } else {
 	fmt.Println("DEBUG: complex search")
 	strlen := byteToInt16(buf[4:6])
@@ -343,7 +364,9 @@ if 1==1 {
 	querystr, strarr := search2query(str)
 	fmt.Println("DEBUG: qry:", querystr)
 	fmt.Println("DEBUG: strarr:", strarr)
+	dbsearchfiles(querystr,strarr,db)
     }
+    
 	
     //fmt.Println("DEBUG: buf query:", strarr)
 	  
