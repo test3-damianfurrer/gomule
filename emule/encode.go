@@ -13,7 +13,7 @@ func encodeByteMsg(protocol byte,msgcode byte,body []byte) []byte {
 	buf[3] = size[2]
 	buf[4] = size[3]
 	buf[5] = msgcode
-	for i := 0; i < len(size); i++ {
+	for i := 0; i < len(bodysize); i++ {
 		buf[i+6] = body[i]
 	}
 	return buf
