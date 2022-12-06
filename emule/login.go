@@ -118,20 +118,39 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	}
 	conn.Write(data)
 
-	data = []byte{protocol,
+	/*data = []byte{protocol,
 		9, 0, 0, 0,
 		0x40,
 		0, 0, 0, 0,
-		1, 0, 0, 0}
+		1, 0, 0, 0} */
 	high_id_b := uint32ToByte(high_id)
+	data = encodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],1, 0, 0, 0})
+	
+	/*high_id_b := uint32ToByte(high_id)
 	for i := 0; i < len(high_id_b); i++ {
 		data[i+6] = high_id_b[i]
-	}
+	}*/
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 	
+	var fcount uint32
+	var ucount uint32
+	
+	/*err = db.QueryRow("select count(*) from files", filehash).Scan(&fcount)
+    	fmt.Println("DEBUG: SOURCE: file size: ",uint32ToByte(fsize))
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+	}
+	err = db.QueryRow("select count(*) from files", filehash).Scan(&fcount)
+    	fmt.Println("DEBUG: SOURCE: file size: ",uint32ToByte(fsize))
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+	}*/
+	
+	
+	data = encodeByteMsg(protocol,0x34,[]byte{1, 0, 0, 0,1, 0, 0, 0})
 	data = []byte{protocol,
 		9, 0, 0, 0,
 		0x34,       //server status
