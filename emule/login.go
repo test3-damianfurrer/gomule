@@ -105,7 +105,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
     	}
 
 	//data := encodeByteMsg(protocol,0x38,[]byte{5,0,'h', 'e', 'l', 'l', 'o'})
-	data := encodeByteMsg(protocol,0x38,encodeByteString("HeLlo Brother in christ"))
+	data := encodeByteMsg(protocol,0x38,encodeByteString("HeLlo Brother in christ\n->New Line"))
 	
 	/*data := []byte{protocol,
 		8, 0, 0, 0,
