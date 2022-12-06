@@ -42,11 +42,11 @@ func search2query(search string)(sqlquery string, strarr []string){
   return
 }
 
-func readRowUint32(query string,Sql.db db) uint32 {
+func readRowUint32(query string,db *sql.DB) uint32 {
 	var value uint32
-	err := db.QueryRow(query, filehash).Scan(&value)
+	err := db.QueryRow(query).Scan(&value)
     	if err != nil {
-		fmt.Println("ERROR: ",err.Error())
+		fmt.Println("ERROR(readRowUint32): ",err.Error())
 	}
 	return value
 }
