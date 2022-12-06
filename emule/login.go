@@ -41,7 +41,7 @@ func logout(uhash []byte, debug bool, db *sql.DB){
 	
 }
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
@@ -127,9 +127,8 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	}
 	conn.Write(data)
 	//0x41 server identification missing
-	
-	serverip_b:=uint32ToByte(highId(conn.RemoteAddr().String()))
-	serverport_b:=uint16ToByte(uint16(7111)) //test
+	serverip_b:=uint32ToByte(shighid)
+	serverport_b:=uint16ToByte(sport)
 	serverguid_b := make([]byte,16)
 	tagcount_b := uint32ToByte(uint32(0))
 	iddata := make([]byte,0)
