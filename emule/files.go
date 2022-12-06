@@ -296,7 +296,11 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
 //	  params=append(params,strarr[i])
   //}
   //rows, err := db.Query(query,params...)
-  rows, err := db.Query(query,strarr)
+  params := make([]interface{}, 0)
+  for i:=0;i < len(strarr);i++ {
+	  params=append(params,strarr[i])
+  }
+  rows, err := db.Query(query,params...)
   if err != nil {
     fmt.Println("ERROR: ",err.Error())
     return
