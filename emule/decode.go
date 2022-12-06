@@ -21,6 +21,7 @@ func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
 		index += bread
 		ret = append(ret,tag)
 	}
+	return
 }
 
 func readString(pos int, buf []byte)(bread int, ret string) {
