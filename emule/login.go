@@ -134,15 +134,19 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	iddata := make([]byte,0)
 	
 	iddata=append(iddata,serverguid_b...)
-	fmt.Println("DEBUG: serverguid_b:", serverguid_b)
 	iddata=append(iddata,serverip_b...)
-	fmt.Println("DEBUG: serverip_b:", serverip_b)
 	iddata=append(iddata,serverport_b...)
-	fmt.Println("DEBUG: serverport_b:", serverport_b)
 	iddata=append(iddata,tagcount_b...)
-	fmt.Println("DEBUG: tagcount_b:", tagcount_b)
+	if debug {
+		fmt.Println("DEBUG: serverguid_b:", serverguid_b)
+		fmt.Println("DEBUG: serverip_b:", serverip_b)
+		fmt.Println("DEBUG: serverport_b:", serverport_b)
+		fmt.Println("DEBUG: tagcount_b:", tagcount_b)
+	}
 	
 	data = encodeByteMsg(protocol,0x41,iddata)
-	fmt.Println("DEBUG: data:", data)
+	if debug {
+		fmt.Println("DEBUG: data:", data)
+	}
 	return
 }
