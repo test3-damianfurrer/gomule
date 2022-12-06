@@ -40,7 +40,7 @@ func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
       ret.ValueLen = byteToUint16(buf[pos+bread:pos+bread+2])
       bread += 2
       ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
-      bread+=ret.ValueLen
+			bread+=int(ret.ValueLen)
     case byte(3): //uint32
       ret.ValueLen = 4
       ret.Value = buf[pos+bread:pos+bread+4]
@@ -53,5 +53,5 @@ func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
       fmt.Println("Error decoding Tag, unknown tag datatype!",ret.Type)
     }
   
-  
+  return
 }
