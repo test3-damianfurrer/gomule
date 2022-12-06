@@ -341,6 +341,15 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	[3 0] [106 112 103] [1 0 4]
 	
 	*/
+	//max emule 
+	//[0 0 1 6 0 116 101 115 116 32 50 0 0 2 4 0 120 50 54 53 1 0 213 0 0 3 20 0 0 0 3 1 0 212 0 0 3 1 0 0 0 3 1 0 48 
+	//0 0 2 3 0 80 114 111 1 0 3 0 0 3 0 0 16 0 3 1 0 2 0 0 3 0 0 144 0 4 1 0 2 0 0 3 1 0 0 0 3 1 0 21 2 3 0 106 112 103 1 0 4]
+	//("test 2" type: cdimage, min size 1, max size 9, avialbility 1, complete sources 2, ext jpg, )
+	
+	//[0 0 1 6 0 116 101 115 116 32 50 0 0 2 4 0 120 50 54 53 1 0 213 0 0 3 90 0 0 0 3 1 0 211 
+	//0 0 3 20 0 0 0 3 1 0 212 0 0 3 1 0 0 0 3 1 0 48 0 0 3 0 0 16 0 3 1 0 2 
+	//0 0 3 0 0 144 0 4 1 0 2 0 0 3 1 0 0 0 3 1 0 21 2 3 0 106 112 103 1 0 4]
+	//("test 2" type: any, min size 1, max size 9, avialbility 1, complete sources 2, ext jpg, codec x265, min bitrate 20, min len 00:01:30)
   //if debug {
 if 1==1 {
     fmt.Println("DEBUG: Client looks for Files")
