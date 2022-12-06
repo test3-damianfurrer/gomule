@@ -3,7 +3,7 @@ package emule
 import (
 	"fmt"
 	//"net"
-	//"database/sql"
+	"database/sql"
   	"strings"
 )
 
