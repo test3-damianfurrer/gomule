@@ -41,3 +41,12 @@ func search2query(search string)(sqlquery string, strarr []string){
   fmt.Println("query: ",strarr)
   return
 }
+
+func readRowUint32(query string,Sql.db db) uint32 {
+	var value uint32
+	err := db.QueryRow(query, filehash).Scan(&value)
+    	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+	}
+	return value
+}
