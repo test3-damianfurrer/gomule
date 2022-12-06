@@ -85,7 +85,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	tstbread, tstres := readTag(33+int(strlen),buf)
 	fmt.Println("DEBUG: test read vers:  ",tstres.Value,tstbread)
 	fmt.Println("DEBUG: test read vers:  ",tstres)
-	tstbread, tstres := readTag(33+int(strlen)+int(tstres.Value),buf)
+	tstbread, tstres = readTag(33+int(strlen)+tstbread,buf)
 	fmt.Println("DEBUG: test read port:  ",tstres.Value,tstbread)
 	fmt.Println("DEBUG: test read port:  ",tstres)
 	tstbread, tstres = readTag(27,buf)
