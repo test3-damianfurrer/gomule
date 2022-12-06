@@ -226,7 +226,9 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
     }
     conn.Write(data)
   } else {
-    fmt.Println("DEBUG: found sources: None found ")
+    if debug {
+	    fmt.Println("DEBUG: found sources: None found ")
+    }
   }
 }
 
@@ -284,11 +286,73 @@ func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
   }
 }
 
-func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
-	//type=buf[0]
+func dbsearchfiles(query string,strarr []string, db *sql.DB){
+  var sname string
+  var sext string
+  var stype string
+  var srating int
+  var sfilehash []byte
+  var sfilesize uint
+  //params := make([]any,len(strarr)) ///test
+  //for i:=0;i < len(strarr);i++ {
+//	  params=append(params,strarr[i])
+  //}
+  //rows, err := db.Query(query,params...)
+  params := make([]interface{}, 0)
+  for i:=0;i < len(strarr);i++ {
+	  params=append(params,strarr[i])
+  }
+  rows, err := db.Query(query,params...)
+  if err != nil {
+    fmt.Println("ERROR: ",err.Error())
+    return
+  }
+  for rows.Next() {
+	err := rows.Scan(&sname,&sext,&stype,&srating,&sfilehash,&sfilesize)
+	if err != nil {
+		fmt.Println("ERROR: ",err.Error())
+		return
+	}
+	fmt.Println("Debug: file found: ",sname)
+	fmt.Printf("Debug file hash: %x, size: %d\n",sfilehash,sfilesize)
+  }
+}
+
+func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
+	//select name, ext, type, rating from sources WHERE name like "%a%" and name like "%three%" and name like "%10%" LIMIT 100
+	/*//type=buf[0]
+	[1 4 0 116 101 115 116] //simple
+	[0 0 1 4 0 116 101 115 116 2 5 0 73 109 97 103 101 1 0 3] //typ image
+	[0 0 1 4 0 116 101 115 116 0 0 2 5 0 73 109 97 103 101 1 0 3 2 3 0 106 112 103 1 0 4] //image + endung jpg
+	[0 0 1 4 0 116 101 115 116 2 3 0 106 112 103 1 0 4] // endung jpg
+  //max search	
+	
+	[0 0 1 ]
+	[4 0] [116 101 115 116] 
+	[0 0 2]
+	[5 0] [73 109 97 103 101] [1 0 3] 
+	[0 0 3] 0 0 16 0 1 1 0 2 0 0 3 0 0 160 0 2 1 
+	0 2 0 0 3 1 0 0 0 1 1 0 21 2 
+	[3 0] [106 112 103] [1 0 4]
   
-  
-  
+        [0 0 1] 
+	[4 0] [116 101 115 116] 
+	[0 0 2] 
+	[5 0] [73 109 97 103 101] [1 0 3]
+	[0 0 3] 0 0 16 0 1 1 0 2 0 0 3 0 0 160 0 2 1 
+	[0 2 2]
+	[3 0] [106 112 103] [1 0 4]
+	
+	*/
+	//max emule 
+	//[0 0 1 6 0 116 101 115 116 32 50 0 0 2 4 0 120 50 54 53 1 0 213 0 0 3 20 0 0 0 3 1 0 212 0 0 3 1 0 0 0 3 1 0 48 
+	//0 0 2 3 0 80 114 111 1 0 3 0 0 3 0 0 16 0 3 1 0 2 0 0 3 0 0 144 0 4 1 0 2 0 0 3 1 0 0 0 3 1 0 21 2 3 0 106 112 103 1 0 4]
+	//("test 2" type: cdimage, min size 1, max size 9, avialbility 1, complete sources 2, ext jpg, )
+	
+	//[0 0 1 6 0 116 101 115 116 32 50 0 0 2 4 0 120 50 54 53 1 0 213 0 0 3 90 0 0 0 3 1 0 211 
+	//0 0 3 20 0 0 0 3 1 0 212 0 0 3 1 0 0 0 3 1 0 48 0 0 3 0 0 16 0 3 1 0 2 
+	//0 0 3 0 0 144 0 4 1 0 2 0 0 3 1 0 0 0 3 1 0 21 2 3 0 106 112 103 1 0 4]
+	//("test 2" type: any, min size 1, max size 9, avialbility 1, complete sources 2, ext jpg, codec x265, min bitrate 20, min len 00:01:30)
   //if debug {
 if 1==1 {
     fmt.Println("DEBUG: Client looks for Files")
@@ -304,6 +368,10 @@ if 1==1 {
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
         fmt.Println("DEBUG: buf other:", buf[4+strlen:n])
+	querystr, strarr := search2query(str)
+	fmt.Println("DEBUG: qry:", querystr)
+	fmt.Println("DEBUG: strarr:", strarr)
+	dbsearchfiles(querystr,strarr,db)
     } else {
 	fmt.Println("DEBUG: complex search")
 	strlen := byteToInt16(buf[4:6])
@@ -314,8 +382,14 @@ if 1==1 {
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
 	    fmt.Println("DEBUG: buf other:", buf[6+strlen:n])
+	querystr, strarr := search2query(str)
+	fmt.Println("DEBUG: qry:", querystr)
+	fmt.Println("DEBUG: strarr:", strarr)
+	dbsearchfiles(querystr,strarr,db)
     }
-    //fmt.Println("DEBUG: buf query:", buf[1:n])
+    
+	
+    //fmt.Println("DEBUG: buf query:", strarr)
 	  
 	  //buf query: [1 5 0 101 109 117 108 101]
 	  //emule, len 5

@@ -140,7 +140,9 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		buf, protocol, err, buflen := this.read(conn)
 		if err != nil {
 			if err == io.EOF {
-				fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
+				if this.Debug {
+				    fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
+				}
 				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
 			}
 			return
@@ -155,7 +157,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		} else if buf[0] == 0x15 {
 			offerfiles(buf, protocol, conn, false, buflen, this.db ,uhash)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
-			searchfiles(buf, protocol, conn, this.Debug, buflen)
+			searchfiles(buf, protocol, conn, this.Debug, buflen, this.db)
 		} else if buf[0] == 0x19 {
 			filesources(buf, uhash, protocol, conn, false, buflen, this.db)
 		} else if buf[0] == 0x1c {
