@@ -127,5 +127,23 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	}
 	conn.Write(data)
 	//0x41 server identification missing
+	
+	serverip_b:=uint32ToByte(highId(conn.RemoteAddr().String()))
+	serverport_b:=uint16ToBytes(uint16(7111)) //test
+	serverguid_b := make([]byte,16)
+	tagcount_b := uint32ToByte(uint32(0))
+	iddata := make([]byte,0)
+	
+	iddata=append(iddata,serverguid_b...)
+	fmt.Println("DEBUG: serverguid_b:", serverguid_b)
+	iddata=append(iddata,serverip_b...)
+	fmt.Println("DEBUG: serverip_b:", serverip_b)
+	iddata=append(iddata,serverport_b...)
+	fmt.Println("DEBUG: serverport_b:", serverport_b)
+	iddata=append(iddata,tagcount_b...)
+	fmt.Println("DEBUG: tagcount_b:", tagcount_b)
+	
+	data = encodeByteMsg(protocol,0x41,iddata)
+	fmt.Println("DEBUG: data:", data)
 	return
 }
