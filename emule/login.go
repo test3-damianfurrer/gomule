@@ -81,18 +81,22 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 		fmt.Println("DEBUG: flag tag:  ", buf[33+strlen+16:33+strlen+24])
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
-	strlen := byteToInt16(buf[31:33])
-	tstbread, tstres := readTag(33+int(strlen),buf)
-	fmt.Println("DEBUG: test read vers:  ",tstres.Value,tstbread)
-	fmt.Println("DEBUG: test read vers:  ",tstres)
-	tstbread, tstres = readTag(33+int(strlen)+tstbread,buf)
-	fmt.Println("DEBUG: test read port:  ",tstres.Value,tstbread)
-	fmt.Println("DEBUG: test read port:  ",tstres)
-	tstbread, tstres = readTag(27,buf)
+	index:=27
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
 	fmt.Println("DEBUG: test read name:  ",tstres.Value,tstbread)
-	fmt.Println("DEBUG: test read name:  ",tstres)
-	fmt.Println("DEBUG: test index orig:  ",33+int(strlen))
-	fmt.Println("DEBUG: test index new:  ",27+tstbread)
+
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read vers:  ",tstres.Value,tstbread)
+	
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read port:  ",tstres.Value,tstbread)
+	
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read flag:  ",tstres.Value,tstbread)
 	
 	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1, time_login = CURRENT_TIMESTAMP WHERE hash = ?",high_id,high_id,port,uhash)
 	if err != nil {
