@@ -21,14 +21,12 @@ func readString(pos int, buf []byte)(bread int, ret string) {
 }
 
 func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
-  fmt.Println("readtag! at",pos)	
-  fmt.Println("data",buf[pos:len(buf)])
+  fmt.Println("readtag! at",pos)	)
   ret = &OneTag{Type: buf[pos], NameString: ""}
   bread=3
   readname:=0
-  fmt.Println("readtag2",buf[pos+1:pos+bread])
   namelen := byteToUint16(buf[pos+1:pos+bread])
-  fmt.Println("readtag3",namelen)
+  fmt.Println("name tag len",namelen)
   
   if namelen == uint16(1) {
     ret.NameByte = buf[pos+3]
