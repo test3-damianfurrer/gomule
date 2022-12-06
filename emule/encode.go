@@ -80,7 +80,7 @@ func encodeByteTagName(nbuf []byte) []byte {
 	sizebytes := uint16ToByte(uint16(blen))
 	buf[0] = sizebytes[0]
 	buf[1] = sizebytes[1]
-	for i := 0; i < slen; i++ {
+	for i := 0; i < blen; i++ {
 		buf[i+2] = nbuf[i]
 	}
 	return buf
