@@ -7,7 +7,7 @@ import (
   	"strings"
 )
 
-func search2query(string search)(string sqlquery){
+func search2query(search string)(sqlquery string){
   //sqlquery = "test"
   strarr := strings.Split(search)
   fmt.Println("query: ",strarr)
