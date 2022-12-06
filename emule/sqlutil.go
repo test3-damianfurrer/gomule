@@ -27,14 +27,14 @@ import (
 
 
 func search2query(search string)(sqlquery string, strarr []string){
-  sqlquery = "select name, ext, type, rating, file_hash from sources WHERE "
+  sqlquery = "select sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size from sources left join files on sources.file_hash=files.hash WHERE "
   strarr = strings.Split(search," ")
   for i := 0; i < len(strarr); i++ {
 	  strarr[i] = "%"+strarr[i]+"%"
 	  if i < len(strarr)-1 {
-	  	sqlquery += "name like ? AND "
+	  	sqlquery += "sources.name like ? AND "
 	  } else {
-		sqlquery += "name like ?"
+		sqlquery += "sources.name like ?"
 	  }
 	  fmt.Println("String: ",i,strarr[i])
   }
