@@ -135,20 +135,9 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	}
 	conn.Write(data)
 	
-	var fcount uint32
-	var ucount uint32
-	
-	/*err = db.QueryRow("select count(*) from files", filehash).Scan(&fcount)
-    	fmt.Println("DEBUG: SOURCE: file size: ",uint32ToByte(fsize))
-	if err != nil {
-		fmt.Println("ERROR: ",err.Error())
-	}
-	err = db.QueryRow("select count(*) from files", filehash).Scan(&fcount)
-    	fmt.Println("DEBUG: SOURCE: file size: ",uint32ToByte(fsize))
-	if err != nil {
-		fmt.Println("ERROR: ",err.Error())
-	}*/
-	
+	fcount := readRowUint32("select count(*) from files",db)
+	ucount := readRowUint32("select count(*) from files",db)
+		
 	
 	data = encodeByteMsg(protocol,0x34,[]byte{1, 0, 0, 0,1, 0, 0, 0})
 	data = []byte{protocol,
