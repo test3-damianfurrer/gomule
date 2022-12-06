@@ -82,6 +82,11 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
 	
+	tstbread, tstres := readTag(33+strlen,buf)
+	fmt.Println("DEBUG: test read vers:  ",tstres.Value)
+	fmt.Println("DEBUG: test read vers:  ",tstres)
+	tstbread, tstres = readTag(31,buf)
+	
 	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1, time_login = CURRENT_TIMESTAMP WHERE hash = ?",high_id,high_id,port,uhash)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
