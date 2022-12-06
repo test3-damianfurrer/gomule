@@ -28,4 +28,5 @@ func encodeByteString(str string) []byte {
 	for i := 0; i < slen; i++ {
 		buf[i+2] = str[i]
 	}
+	return buf
 }
