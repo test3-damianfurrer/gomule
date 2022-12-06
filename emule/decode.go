@@ -32,7 +32,7 @@ func readString(pos int, buf []byte)(bread int, ret string) {
 }
 
 func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
-  fmt.Println("readtag! at",pos)	)
+  fmt.Println("readtag! at ",pos)
   ret = &OneTag{Type: buf[pos], NameString: ""}
   bread=3
   readname:=0
