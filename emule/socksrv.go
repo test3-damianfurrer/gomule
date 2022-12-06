@@ -33,6 +33,9 @@ type SockSrv struct {
 	Host     string
 	Port     int
 	Debug    bool
+	Ssname   string
+	Ssdesc	 string
+	Ssmsg	 string
 	I2P      bool
 	SAM      string
 	SAMPort  int
@@ -151,7 +154,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			uhash = login(buf, protocol, conn, this.Debug, this.db,highId(this.Host),uint16(this.Port))//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
+			uhash = login(buf, protocol, conn, this.Debug, this.db,highId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg)//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
