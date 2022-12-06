@@ -56,6 +56,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	//	}
 	//}
 	//buf[1:17]
+	
 	high_id := highId(conn.RemoteAddr().String())
 	port := byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
@@ -81,11 +82,53 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 		fmt.Println("DEBUG: flag tag:  ", buf[33+strlen+16:33+strlen+24])
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
-	strlen := byteToInt16(buf[31:33])
-	tstbread, tstres := readTag(33+int(strlen),buf)
+	
+	//(pos int, buf []byte, tags int)(totalread int, ret []*OneTag)
+	
+	totalread, tagarr := readTags(27,buf,4)
+	fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+	for i := 0; i < len(tagarr); i++ {
+		switch tagarr[i].NameByte {
+			case 0x1:
+				if tagarr[i].Type == byte(2) {
+					fmt.Printf("Debug Name Tag: %s\n",tagarr[i].Value)
+				}
+			case 0x11:
+				fmt.Printf("Debug Version Tag: %d\n",byteToUint32(tagarr[i].Value))
+			case 0x20:
+				fmt.Printf("Debug Flags Tag: %b\n",byteToUint32(tagarr[i].Value))
+			case 0x0f:
+				fmt.Printf("Debug Port Tag: %d\n",byteToUint32(tagarr[i].Value))
+			default:
+				fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+		}
+		/*fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
+		if tagarr[i].Type == byte(2) {
+			fmt.Printf("Debug %s",tagarr[i].Value)
+		}
+		*/
+	}
+	fmt.Println("DEBUG: totalread:  ",totalread)
+	
+	fmt.Println("DEBUG: after loop")
+	
+	/*index:=27
+	tstbread, tstres := readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read name:  ",tstres.Value,tstbread)
+
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
 	fmt.Println("DEBUG: test read vers:  ",tstres.Value,tstbread)
-	fmt.Println("DEBUG: test read vers:  ",tstres)
-	tstbread, tstres = readTag(31,buf)
+	
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read port:  ",tstres.Value,tstbread)
+	
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read flag:  ",tstres.Value,tstbread)
+	*/
 	
 	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1, time_login = CURRENT_TIMESTAMP WHERE hash = ?",high_id,high_id,port,uhash)
 	if err != nil {
