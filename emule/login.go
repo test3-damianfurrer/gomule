@@ -89,9 +89,10 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	for i := 0; i < len(tags); i++ {
 		fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
 		if tagarr[i].Type == byte(2) {
-			fmt.Printf("Debug %s",tags[i].Value)
+			fmt.Printf("Debug %s",tagarr[i].Value)
 		}
 	}
+	fmt.Println("DEBUG: totalread:  ",totalread)
 	
 	fmt.Println("DEBUG: after loop")
 	
