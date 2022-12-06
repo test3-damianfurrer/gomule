@@ -42,8 +42,33 @@ func byteToInt16(data []byte) (ret int16) {
 	binary.Read(buf, binary.LittleEndian, &ret)
 	return
 }
+func byteToUint16(data []byte) (ret uint16) {
+	buf := bytes.NewBuffer(data)
+	binary.Read(buf, binary.LittleEndian, &ret)
+	return
+}
+
+func byteToFloat32(data []byte) (ret float32) {
+	buf := bytes.NewBuffer(data)
+	binary.Read(buf, binary.LittleEndian, &ret)
+	return
+}
+func float32ToByte(data float32) (ret []byte) {
+	ret = []byte{}
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, data)
+	ret = buf.Bytes()
+	return
+}
 
 func int16ToByte(data int16) (ret []byte) {
+	ret = []byte{}
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, data)
+	ret = buf.Bytes()
+	return
+}
+func uint16ToByte(data uint16) (ret []byte) {
 	ret = []byte{}
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, data)

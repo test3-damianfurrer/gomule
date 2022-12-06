@@ -41,7 +41,7 @@ func logout(uhash []byte, debug bool, db *sql.DB){
 	
 }
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16, ssname string, ssdesc string, ssmsg string) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
@@ -56,6 +56,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 	//	}
 	//}
 	//buf[1:17]
+	
 	high_id := highId(conn.RemoteAddr().String())
 	port := byteToInt16(buf[21:23])
 	tags := byteToInt32(buf[23:27])
@@ -82,6 +83,53 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
 	
+	//(pos int, buf []byte, tags int)(totalread int, ret []*OneTag)
+	
+	totalread, tagarr := readTags(27,buf,4)
+	fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+	for i := 0; i < len(tagarr); i++ {
+		switch tagarr[i].NameByte {
+			case 0x1:
+				if tagarr[i].Type == byte(2) {
+					fmt.Printf("Debug Name Tag: %s\n",tagarr[i].Value)
+				}
+			case 0x11:
+				fmt.Printf("Debug Version Tag: %d\n",byteToUint32(tagarr[i].Value))
+			case 0x20:
+				fmt.Printf("Debug Flags Tag: %b\n",byteToUint32(tagarr[i].Value))
+			case 0x0f:
+				fmt.Printf("Debug Port Tag: %d\n",byteToUint32(tagarr[i].Value))
+			default:
+				fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+		}
+		/*fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
+		if tagarr[i].Type == byte(2) {
+			fmt.Printf("Debug %s",tagarr[i].Value)
+		}
+		*/
+	}
+	fmt.Println("DEBUG: totalread:  ",totalread)
+	
+	fmt.Println("DEBUG: after loop")
+	
+	/*index:=27
+	tstbread, tstres := readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read name:  ",tstres.Value,tstbread)
+
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read vers:  ",tstres.Value,tstbread)
+	
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read port:  ",tstres.Value,tstbread)
+	
+	tstbread, tstres = readTag(index,buf)
+	index+=tstbread
+	fmt.Println("DEBUG: test read flag:  ",tstres.Value,tstbread)
+	*/
+	
 	res, err := db.Exec("UPDATE clients SET id_ed2k = ?, ipv4 = ?, port = ?, online = 1, time_login = CURRENT_TIMESTAMP WHERE hash = ?",high_id,high_id,port,uhash)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
@@ -104,39 +152,58 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 		return
     	}
 
-	data := []byte{protocol,
-		8, 0, 0, 0,
-		0x38,
-		5, 0,
-		'h', 'e', 'l', 'l', 'o'}
+
+	data := encodeByteMsg(protocol,0x38,encodeByteString(ssmsg))
+		//"server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 
-	data = []byte{protocol,
-		9, 0, 0, 0,
-		0x40,
-		0, 0, 0, 0,
-		1, 0, 0, 0}
+
 	high_id_b := uint32ToByte(high_id)
-	for i := 0; i < len(high_id_b); i++ {
-		data[i+6] = high_id_b[i]
-	}
+	data = encodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],1, 0, 0, 0})
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 	
-	data = []byte{protocol,
-		9, 0, 0, 0,
-		0x34,       //server status
-		1, 0, 0, 0, //user count
-		1, 0, 0, 0} //file count
+	fcount_b := uint32ToByte(readRowUint32("select count(*) from files",db))
+	ucount_b := uint32ToByte(readRowUint32("select count(*) from clients",db))
+	data = encodeByteMsg(protocol,0x34,[]byte{ucount_b[0], ucount_b[1], ucount_b[2], ucount_b[3], fcount_b[0], fcount_b[1], fcount_b[2], fcount_b[3]})
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 	//0x41 server identification missing
+	serverip_b:=uint32ToByte(shighid)
+	serverport_b:=uint16ToByte(sport)
+	serverguid_b := make([]byte,16)
+	tagcount_b := uint32ToByte(uint32(2)) //maybe not acctually honored
+	iddata := make([]byte,0)
+	
+	iddata=append(iddata,serverguid_b...)
+	iddata=append(iddata,serverip_b...)
+	iddata=append(iddata,serverport_b...)
+	iddata=append(iddata,tagcount_b...)
+	servname := encodeByteTagString(encodeByteTagNameInt(0x1),ssname)
+					//"Servername")
+	servdesc := encodeByteTagString(encodeByteTagNameInt(0xb),ssdesc)
+					//"Serverdesc")
+	iddata=append(iddata,servname...)
+	iddata=append(iddata,servdesc...)
+	if debug {
+		fmt.Println("DEBUG: serverguid_b:", serverguid_b)
+		fmt.Println("DEBUG: serverip_b:", serverip_b)
+		fmt.Println("DEBUG: serverport_b:", serverport_b)
+		fmt.Println("DEBUG: tagcount_b:", tagcount_b)
+		fmt.Println("DEBUG: servdesc:", servdesc)
+	}
+	
+	data = encodeByteMsg(protocol,0x41,iddata)
+	if debug {
+		fmt.Println("DEBUG: data:", data)
+	}
+	conn.Write(data)
 	return
 }
