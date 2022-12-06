@@ -104,11 +104,13 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (uh
 		return
     	}
 
-	data := []byte{protocol,
+	data := encodeByteMsg(protocol,0x38,[]byte{5,0,'h', 'e', 'l', 'l', 'o'})
+	/*data := []byte{protocol,
 		8, 0, 0, 0,
 		0x38,
 		5, 0,
 		'h', 'e', 'l', 'l', 'o'}
+		*/
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
