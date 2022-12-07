@@ -481,7 +481,7 @@ func stringifyConstraint(in *Constraint)(ret string){
 			ret = "("+stringifyConstraint(in.Left)+") OR ("+stringifyConstraint(in.Right)+")"
 		case C_NOT:
 			ret = "("+stringifyConstraint(in.Left)+") NOT ("+stringifyConstraint(in.Right)+")"
-		case C_CODECTYPE:
+		case C_CODEC:
 		case C_MINSIZE:
 		case C_MAXSIZE:
 		case C_FILETYPE:
@@ -491,6 +491,7 @@ func stringifyConstraint(in *Constraint)(ret string){
 		default:
 			fmt.Println("ERROR: undefined Constraint Type", in.Type)
 	}
+	return
 }
 		
 func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
