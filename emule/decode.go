@@ -12,6 +12,122 @@ type OneTag struct {
   ValueLen uint16
 }
 
+const (
+	C_MAIN constrainttype = iota
+	C_NONE
+	C_AND
+	C_OR
+	C_NOT
+	C_CODECTYPE
+	C_MINSIZE
+	C_MAXSIZE
+	C_FILETYPE
+	C_FILEEXT
+)
+
+type Constraint struct {
+	Type constrainttype
+	Value []byte
+	Left *Constraint
+	Right *Constraint
+}
+func enumNumberConstraint(one byte, two byte, three byte, four byte) constrainttype {
+	switch one {
+		case 3:
+			switch two {
+				case 1:
+					switch three {
+						case 0:
+							switch four {
+								case 211:
+									return C_MAXSIZE
+								default:
+									return C_NONE
+							}
+						default:
+							return C_NONE
+					}
+				default:
+					return C_NONE
+			}
+	}
+}
+
+func enumStringConstraint(one byte, two byte, three byte) constrainttype {
+	switch one {
+		case 1:
+			switch two {
+				case 0:
+					switch three {
+						case 213:
+							return C_CODEC
+						case 4:
+							return C_FILEEXT
+						default:
+							return C_NONE
+					}
+				default:
+					return C_NONE
+			}
+		default:
+			return C_NONE
+	}
+}
+
+func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
+	readb=pos
+	var main Constraint
+	switch buf[readb] {
+		case 0x0:
+			readb+=1
+			switch buf[readb] {
+				case 0x0:
+					main = Constraint{Type: C_AND}
+				case 0x100:
+					main = Constraint{Type: C_OR}
+				case 0x200:
+					main = Constraint{Type: C_NOT}
+				default:
+					fmt.Println("ERROR expected either AND/OR/NOT identifier")
+			}
+			readb+=1
+			readsub, subret := readConstraints(readb,buf)
+			readb+=readsub
+			main.Left = subret
+			readsub, subret = readConstraints(readb,buf)
+			main.Right = subret
+			readb+=readsub
+		case 0x1:
+			readb+=1
+			main = Constraint{Type: C_MAIN}
+		case 0x2: //string value
+			readb+=1
+			strlen:=byteToUint16(buf[readb:readb+2])
+			readb+=2
+			main = Constraint{Value: buf[readb:readb+strlen]}
+			readb+=strlen
+			main.Type = enumStringConstraint(buf[readb:readb+3]...)
+			if main.Type == C_NONE {
+				fmt.Println("ERRROR unrecognized string constraint type!",[readb:readb+3])
+			}
+			readb+=3
+			
+		case 0x3: //int value
+			readb+=1
+			main = Constraint{Value: buf[readb:readb+4]}
+			readb+=4
+			main.Type = enumNumberConstraint(buf[readb:readb+4]...)
+			if main.Type == C_NONE {
+				fmt.Println("ERRROR unrecognized number constraint type!",[readb:readb+4])
+			}
+			readb+=4
+		default:
+			fmt.Println("ERROR: unexpected byte! ",buf[readb])
+			readb+=1
+	}
+
+}
+
 func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
 	index := pos
 	totalread = 0
