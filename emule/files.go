@@ -416,10 +416,10 @@ if 1==1 {
 	fmt.Println("constraint 2nd AND value",constraints.Right.Value)
 	    
 	fmt.Println("constraint 2nd AND left value",constraints.Right.Left.Value)
-	fmt.Println("constraint 2nd AND left value",constraints.Right.Right.Value)
+	fmt.Println("constraint 2nd AND right value",constraints.Right.Right.Value)
 	    
 	fmt.Println("constraint 2nd AND left type",constraints.Right.Left.Type)
-	fmt.Println("constraint 2nd AND left type",constraints.Right.Right.Type)
+	fmt.Println("constraint 2nd AND right type",constraints.Right.Right.Type)
 	
 	    /*
 	strlen := byteToInt16(buf[4:6])
