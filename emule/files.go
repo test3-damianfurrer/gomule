@@ -404,12 +404,18 @@ if 1==1 {
 	readbytes, constraints := readConstraints(1, buf)
 	fmt.Println("read bytes:",readbytes)
 	if constraints == nil {
-		fmt.Println("DEBUG: Nil pointer")
+		fmt.Println("ERROR: No Contrainsts could be parsed")
+		return
 	}
 	fmt.Println("constrain: ",constraints)
 	fmt.Println("constraint type(should be and):",constraints.Type)
 	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
-	    
+	fmt.Println("sub constraint left type(could be something likeFileext):",constraints.Right.Type)
+	fmt.Println("constraint root value",constraints.Value)
+	fmt.Println("constraint Main value",constraints.Left.Value)
+	fmt.Println("constraint 2nd AND value",constraints.Right.Value)
+	
+	    /*
 	strlen := byteToInt16(buf[4:6])
     	fmt.Println("DEBUG: strlen:", strlen)
     	fmt.Println("DEBUG: strlen buf:", buf[4:6])
@@ -422,6 +428,7 @@ if 1==1 {
 	fmt.Println("DEBUG: qry:", querystr)
 	fmt.Println("DEBUG: strarr:", strarr)
 	dbsearchfiles(querystr,strarr,db)
+	*/
     }
     
 	
