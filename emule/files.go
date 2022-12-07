@@ -321,7 +321,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//select name, ext, type, rating from sources WHERE name like "%a%" and name like "%three%" and name like "%10%" LIMIT 100
 	/*//type=buf[0]
-	[1 4 0 116 101 115 116] //simple
+	//[1 4 0 116 101 115 116] //simple
 	
 	//starts with and (0x0 0x0) 
 	//0x0 0x0 = AND
