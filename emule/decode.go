@@ -12,6 +12,7 @@ type OneTag struct {
   ValueLen uint16
 }
 
+type constrainttype byte
 const (
 	C_MAIN constrainttype = iota
 	C_NONE
@@ -51,6 +52,7 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 					return C_NONE
 			}
 	}
+	return
 }
 
 func enumStringConstraint(one byte, two byte, three byte) constrainttype {
@@ -83,10 +85,12 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			switch buf[readb] {
 				case 0x0:
 					main = Constraint{Type: C_AND}
+				/* 2 bytes, ignore so far [ 0x01 0x00 ] [ 0x02 0x00 ] .. how to differenciate from [1/2] 0 1 [mutiple of 10 byte string]
 				case 0x100:
-					main = Constraint{Type: C_OR}
+[					main = Constraint{Type: C_OR}
 				case 0x200:
 					main = Constraint{Type: C_NOT}
+					*/
 				default:
 					fmt.Println("ERROR expected either AND/OR/NOT identifier")
 			}
@@ -125,6 +129,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			fmt.Println("ERROR: unexpected byte! ",buf[readb])
 			readb+=1
 	}
+	return
 
 }
 
