@@ -6,6 +6,24 @@ import (
 	"database/sql"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
+
+/*
+type constrainttype byte
+const (
+	C_NONE constrainttype = iota
+	C_MAIN
+	C_AND
+	C_OR
+	C_NOT
+	C_CODEC
+	C_TYPE
+	C_MINSIZE
+	C_MAXSIZE
+	C_FILETYPE
+	C_FILEEXT
+)
+*/
+
 func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: user hash:", uhash) 
@@ -409,6 +427,11 @@ if 1==1 {
 	}
 	fmt.Println("constrain: ",constraints)
 	fmt.Println("constraint type(should be and):",constraints.Type)
+	if constraints.Type == C_NONE {
+		fmt.Println("Type IS C_NONE")
+	} else {
+		fmt.Println("Type IS NOT C_NONE")
+	}
 	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
 	fmt.Println("sub constraint left type(could be something likeFileext):",constraints.Right.Type)
 	fmt.Println("constraint root value",constraints.Value)
