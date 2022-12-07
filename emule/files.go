@@ -322,7 +322,21 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	//select name, ext, type, rating from sources WHERE name like "%a%" and name like "%three%" and name like "%10%" LIMIT 100
 	/*//type=buf[0]
 	[1 4 0 116 101 115 116] //simple
+	
+	//starts with and (0x0 0x0) 
+	//0x0 0x0 = AND
+	//0x100 = OR
+	//0x200 = NOT
+	and (1 4 0 116 101 115 116)(2 5 0 73 109 97 103 101)
+	[0 0 1 4 0 116 101 115 116 2 5 0 73 109 97 103 101 1 0 3
+	
+	
 	[0 0 1 4 0 116 101 115 116 2 5 0 73 109 97 103 101 1 0 3] //typ image
+	
+	
+	AND ( 1 4 0 116 101 115 116)( AND (2 5 0 73 109 97 103 101 1 0 3) (2 3 0 106 112 103 1 0 4)) -> 
+	( 1 4 0 116 101 115 116) AND ( (2 5 0 73 109 97 103 101 1 0 3) AND (2 3 0 106 112 103 1 0 4) 7)
+	
 	[0 0 1 4 0 116 101 115 116 0 0 2 5 0 73 109 97 103 101 1 0 3 2 3 0 106 112 103 1 0 4] //image + endung jpg
 	[0 0 1 4 0 116 101 115 116 2 3 0 106 112 103 1 0 4] // endung jpg
   //max search	
