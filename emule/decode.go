@@ -81,6 +81,8 @@ func enumStringConstraint(one byte, two byte, three byte) constrainttype {
 
 func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 	readb=pos
+	fmt.Println("Const read pos:", pos)
+	fmt.Println("Const read buf:", buf)
 	//var main Constraint
 	switch buf[readb] {
 		case 0x0:
@@ -97,6 +99,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 					*/
 				default:
 					fmt.Println("ERROR expected either AND/OR/NOT identifier")
+					readb-=pos
 					return
 			}
 			readb+=1
@@ -138,6 +141,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			fmt.Printf("ERROR: unexpected byte: 0x%x \n",buf[readb])
 			readb+=1
 	}
+	readb-=pos
 	return
 
 }
