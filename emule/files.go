@@ -319,6 +319,14 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
 }
 
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
+	
+	//readConstraints(pos int, buf []byte)(readb int,ret *Constraint)
+	readbytes, constraints := readConstraints(0, buf)
+	fmt.Println("read bytes:",readbytes)
+	fmt.Println("constraint type(should be and):",constraints.Type)
+	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
+	
+	
 	//select name, ext, type, rating from sources WHERE name like "%a%" and name like "%three%" and name like "%10%" LIMIT 100
 	/*//type=buf[0]
 	[1 4 0 116 101 115 116] //simple
