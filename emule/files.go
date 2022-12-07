@@ -403,6 +403,10 @@ if 1==1 {
 	 //readConstraints(pos int, buf []byte)(readb int,ret *Constraint)
 	readbytes, constraints := readConstraints(1, buf)
 	fmt.Println("read bytes:",readbytes)
+	if constraints == nil {
+		fmt.Println("DEBUG: Nil pointer")
+	}
+	fmt.Println("constrain: ",constraints)
 	fmt.Println("constraint type(should be and):",constraints.Type)
 	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
 	    
