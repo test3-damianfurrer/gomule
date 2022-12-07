@@ -67,6 +67,8 @@ func enumStringConstraint(one byte, two byte, three byte) constrainttype {
 							return C_CODEC
 						case 4:
 							return C_FILEEXT
+						case 3:
+							return C_FILETYPE
 						default:
 							return C_NONE
 					}
