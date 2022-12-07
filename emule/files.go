@@ -414,6 +414,12 @@ if 1==1 {
 	fmt.Println("constraint root value",constraints.Value)
 	fmt.Println("constraint Main value",constraints.Left.Value)
 	fmt.Println("constraint 2nd AND value",constraints.Right.Value)
+	    
+	fmt.Println("constraint 2nd AND left value",constraints.Right.Left.Value)
+	fmt.Println("constraint 2nd AND left value",constraints.Right.Right.Value)
+	    
+	fmt.Println("constraint 2nd AND left type",constraints.Right.Left.Type)
+	fmt.Println("constraint 2nd AND left type",constraints.Right.Right.Type)
 	
 	    /*
 	strlen := byteToInt16(buf[4:6])
