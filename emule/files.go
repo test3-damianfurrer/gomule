@@ -367,7 +367,19 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	//0 0 3 20 0 0 0 3 1 0 212 0 0 3 1 0 0 0 3 1 0 48 0 0 3 0 0 16 0 3 1 0 2 
 	//0 0 3 0 0 144 0 4 1 0 2 0 0 3 1 0 0 0 3 1 0 21 2 3 0 106 112 103 1 0 4]
 	//("test 2" type: any, min size 1, max size 9, avialbility 1, complete sources 2, ext jpg, codec x265, min bitrate 20, min len 00:01:30)
-  //if debug {
+  /*constraint types
+	1 0 213 = codec
+	3 1 0 211 = max size
+	3 1 0 212 = bitrate?
+	3 1 0 48 = min size? /avail
+	3 1 0 2 = ?
+	4 1 0 2 = duration ?
+	3 1 0 21 = avail ? / min size?
+	1 0 4 = file ending ?
+	string constriant -> 3 byte designator
+	number constriant -> 4 byte desginator
+*/
+	//if debug {
 if 1==1 {
     fmt.Println("DEBUG: Client looks for Files")
     //fmt.Println("DEBUG: searchfiles")
