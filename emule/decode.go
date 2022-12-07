@@ -102,9 +102,9 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			readb+=1
 			readsub, subret := readConstraints(readb,buf)
 			readb+=readsub
-			main.Left = subret
+			ret.Left = subret
 			readsub, subret = readConstraints(readb,buf)
-			main.Right = subret
+			ret.Right = subret
 			readb+=readsub
 		case 0x1:
 			readb+=1
