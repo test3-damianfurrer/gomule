@@ -101,12 +101,17 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			readsub, subret := readConstraints(readb,buf)
 			readb+=readsub
 			main.Left = subret
-			readsub, subret = readConstraints(readb,buf)
+			/*readsub, subret = readConstraints(readb,buf)
 			main.Right = subret
 			readb+=readsub
+			*/
 		case 0x1:
 			readb+=1
-			main = Constraint{Type: C_MAIN}
+			strlen:=int(byteToUint16(buf[readb:readb+2]))
+			readb+=2
+			main = Constraint{Type: C_MAIN, Value: buf[readb:readb+strlen])
+			readb+=strlen
+			fmt.Println("Debug Main Constraint")
 		case 0x2: //string value
 			readb+=1
 			strlen:=int(byteToUint16(buf[readb:readb+2]))
@@ -129,7 +134,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			}
 			readb+=4
 		default:
-			fmt.Println("ERROR: unexpected byte! ",buf[readb])
+			fmt.Printf("ERROR: unexpected byte: %x \n",buf[readb])
 			readb+=1
 	}
 	return
