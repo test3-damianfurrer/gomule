@@ -134,7 +134,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			}
 			readb+=4
 		default:
-			fmt.Printf("ERROR: unexpected byte: %x \n",buf[readb])
+			fmt.Printf("ERROR: unexpected byte: 0x%x \n",buf[readb])
 			readb+=1
 	}
 	return
