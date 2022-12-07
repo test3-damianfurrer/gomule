@@ -14,8 +14,8 @@ type OneTag struct {
 
 type constrainttype byte
 const (
-	C_MAIN constrainttype = iota
-	C_NONE
+	C_NONE constrainttype = iota
+	C_MAIN
 	C_AND
 	C_OR
 	C_NOT
