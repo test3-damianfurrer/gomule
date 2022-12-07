@@ -88,6 +88,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			switch buf[readb] {
 				case 0x0:
 					main = Constraint{Type: C_AND}
+					fmt.Println("Debug AND identifier")
 				/* 2 bytes, ignore so far [ 0x01 0x00 ] [ 0x02 0x00 ] .. how to differenciate from [1/2] 0 1 [mutiple of 10 byte string]
 				case 0x100:
 [					main = Constraint{Type: C_OR}
@@ -96,6 +97,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 					*/
 				default:
 					fmt.Println("ERROR expected either AND/OR/NOT identifier")
+					return
 			}
 			readb+=1
 			readsub, subret := readConstraints(readb,buf)
