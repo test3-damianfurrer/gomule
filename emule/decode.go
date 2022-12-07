@@ -19,7 +19,8 @@ const (
 	C_AND
 	C_OR
 	C_NOT
-	C_CODECTYPE
+	C_CODEC
+	C_TYPE
 	C_MINSIZE
 	C_MAXSIZE
 	C_FILETYPE
@@ -51,8 +52,9 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 				default:
 					return C_NONE
 			}
+		default:
+			return C_NONE
 	}
-	return
 }
 
 func enumStringConstraint(one byte, two byte, three byte) constrainttype {
@@ -74,6 +76,7 @@ func enumStringConstraint(one byte, two byte, three byte) constrainttype {
 		default:
 			return C_NONE
 	}
+	return C_NONE
 }
 
 func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
