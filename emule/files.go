@@ -7,23 +7,6 @@ import (
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 
-/*
-type constrainttype byte
-const (
-	C_NONE constrainttype = iota
-	C_MAIN
-	C_AND
-	C_OR
-	C_NOT
-	C_CODEC
-	C_TYPE
-	C_MINSIZE
-	C_MAXSIZE
-	C_FILETYPE
-	C_FILEEXT
-)
-*/
-
 func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: user hash:", uhash) 
@@ -432,6 +415,9 @@ if 1==1 {
 	} else {
 		fmt.Println("Type IS NOT C_NONE")
 	}
+	    
+	fmt.Println(stringifyConstraint(constraints))
+	    /*
 	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
 	fmt.Println("sub constraint left type(could be something likeFileext):",constraints.Right.Type)
 	fmt.Println("constraint root value",constraints.Value)
@@ -443,6 +429,7 @@ if 1==1 {
 	    
 	fmt.Println("constraint 2nd AND left type",constraints.Right.Left.Type)
 	fmt.Println("constraint 2nd AND right type",constraints.Right.Right.Type)
+	 */
 	
 	    /*
 	strlen := byteToInt16(buf[4:6])
@@ -485,6 +472,25 @@ if 1==1 {
 	  //[3 0 112 100 102] -> pdf, len 3
 	  //[1 0 4] -> ?
   }
+}
+func stringifyConstraint(in *Constraint)(ret string){
+	switch in.Type {
+		case C_AND:
+			ret = "("+stringifyConstraint(in.Left)+") AND ("+stringifyConstraint(in.Right)+")"
+		case C_OR:
+			ret = "("+stringifyConstraint(in.Left)+") OR ("+stringifyConstraint(in.Right)+")"
+		case C_NOT:
+			ret = "("+stringifyConstraint(in.Left)+") NOT ("+stringifyConstraint(in.Right)+")"
+		case C_CODECTYPE:
+		case C_MINSIZE:
+		case C_MAXSIZE:
+		case C_FILETYPE:
+			ret = fmt.Sprintf("sources.type = %s",in.Value)
+		case C_FILEEXT:
+			ret = fmt.Sprintf("sources.ext = %s",in.Value)
+		default:
+			fmt.Println("ERROR: undefined Constraint Type", in.Type)
+	}
 }
 		
 func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
