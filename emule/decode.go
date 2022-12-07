@@ -108,7 +108,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			readb+=strlen
 			main.Type = enumStringConstraint(buf[readb:readb+3]...)
 			if main.Type == C_NONE {
-				fmt.Println("ERRROR unrecognized string constraint type!",[readb:readb+3])
+				fmt.Println("ERRROR unrecognized string constraint type!",buf[readb:readb+3])
 			}
 			readb+=3
 			
@@ -118,7 +118,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			readb+=4
 			main.Type = enumNumberConstraint(buf[readb:readb+4]...)
 			if main.Type == C_NONE {
-				fmt.Println("ERRROR unrecognized number constraint type!",[readb:readb+4])
+				fmt.Println("ERRROR unrecognized number constraint type!",buf[readb:readb+4])
 			}
 			readb+=4
 		default:
