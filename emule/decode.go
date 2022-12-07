@@ -109,7 +109,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			readb+=1
 			strlen:=int(byteToUint16(buf[readb:readb+2]))
 			readb+=2
-			main = Constraint{Type: C_MAIN, Value: buf[readb:readb+strlen])
+			main = Constraint{Type: C_MAIN, Value: buf[readb:readb+strlen]}
 			readb+=strlen
 			fmt.Println("Debug Main Constraint")
 		case 0x2: //string value
