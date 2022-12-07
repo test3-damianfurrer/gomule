@@ -99,14 +99,13 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 					fmt.Println("ERROR expected either AND/OR/NOT identifier")
 					return
 			}
-			/*readb+=1
+			readb+=1
 			readsub, subret := readConstraints(readb,buf)
 			readb+=readsub
 			main.Left = subret
 			readsub, subret = readConstraints(readb,buf)
 			main.Right = subret
 			readb+=readsub
-			*/
 		case 0x1:
 			readb+=1
 			strlen:=int(byteToUint16(buf[readb:readb+2]))
