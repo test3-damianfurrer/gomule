@@ -81,13 +81,13 @@ func enumStringConstraint(one byte, two byte, three byte) constrainttype {
 
 func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 	readb=pos
-	var main Constraint
+	//var main Constraint
 	switch buf[readb] {
 		case 0x0:
 			readb+=1
 			switch buf[readb] {
 				case 0x0:
-					main = Constraint{Type: C_AND}
+					ret = &Constraint{Type: C_AND}
 					fmt.Println("Debug AND identifier")
 				/* 2 bytes, ignore so far [ 0x01 0x00 ] [ 0x02 0x00 ] .. how to differenciate from [1/2] 0 1 [mutiple of 10 byte string]
 				case 0x100:
@@ -99,11 +99,11 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 					fmt.Println("ERROR expected either AND/OR/NOT identifier")
 					return
 			}
-			readb+=1
+			/*readb+=1
 			readsub, subret := readConstraints(readb,buf)
 			readb+=readsub
 			main.Left = subret
-			/*readsub, subret = readConstraints(readb,buf)
+			readsub, subret = readConstraints(readb,buf)
 			main.Right = subret
 			readb+=readsub
 			*/
@@ -111,27 +111,27 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			readb+=1
 			strlen:=int(byteToUint16(buf[readb:readb+2]))
 			readb+=2
-			main = Constraint{Type: C_MAIN, Value: buf[readb:readb+strlen]}
+			ret = &Constraint{Type: C_MAIN, Value: buf[readb:readb+strlen]}
 			readb+=strlen
 			fmt.Println("Debug Main Constraint")
 		case 0x2: //string value
 			readb+=1
 			strlen:=int(byteToUint16(buf[readb:readb+2]))
 			readb+=2
-			main = Constraint{Value: buf[readb:readb+strlen]}
+			ret = &Constraint{Value: buf[readb:readb+strlen]}
 			readb+=strlen
-			main.Type = enumStringConstraint(buf[readb],buf[readb+1],buf[readb+2])
-			if main.Type == C_NONE {
+			ret.Type = enumStringConstraint(buf[readb],buf[readb+1],buf[readb+2])
+			if ret.Type == C_NONE {
 				fmt.Println("ERRROR unrecognized string constraint type!",buf[readb:readb+3])
 			}
 			readb+=3
 			
 		case 0x3: //int value
 			readb+=1
-			main = Constraint{Value: buf[readb:readb+4]}
+			ret = &Constraint{Value: buf[readb:readb+4]}
 			readb+=4
-			main.Type = enumNumberConstraint(buf[readb],buf[readb+1],buf[readb+2],buf[readb+3])
-			if main.Type == C_NONE {
+			ret.Type = enumNumberConstraint(buf[readb],buf[readb+1],buf[readb+2],buf[readb+3])
+			if ret.Type == C_NONE {
 				fmt.Println("ERRROR unrecognized number constraint type!",buf[readb:readb+4])
 			}
 			readb+=4
