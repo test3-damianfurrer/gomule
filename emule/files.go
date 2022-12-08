@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
+
 func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: user hash:", uhash) 
@@ -287,13 +288,7 @@ func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 }
 
 func dbsearchfiles(query string,strarr []string, db *sql.DB){
-  var sname string
-  var sext string
-  var stype string
-  var srating int
-  var sfilehash []byte
-  var sfilesize uint
-  //params := make([]any,len(strarr)) ///test
+    //params := make([]any,len(strarr)) ///test
   //for i:=0;i < len(strarr);i++ {
 //	  params=append(params,strarr[i])
   //}
@@ -302,7 +297,17 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
   for i:=0;i < len(strarr);i++ {
 	  params=append(params,strarr[i])
   }
-  rows, err := db.Query(query,params...)
+  dbsearchfilesexec(query,&params,db)
+}
+
+func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
+  var sname string
+  var sext string
+  var stype string
+  var srating int
+  var sfilehash []byte
+  var sfilesize uint
+  rows, err := db.Query(query,*params...)
   if err != nil {
     fmt.Println("ERROR: ",err.Error())
     return
@@ -316,13 +321,28 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
 	fmt.Println("Debug: file found: ",sname)
 	fmt.Printf("Debug file hash: %x, size: %d\n",sfilehash,sfilesize)
   }
+  return
 }
 
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//select name, ext, type, rating from sources WHERE name like "%a%" and name like "%three%" and name like "%10%" LIMIT 100
 	/*//type=buf[0]
-	[1 4 0 116 101 115 116] //simple
+	//[1 4 0 116 101 115 116] //simple
+	
+	//starts with and (0x0 0x0) 
+	//0x0 0x0 = AND
+	//0x100 = OR
+	//0x200 = NOT
+	and (1 4 0 116 101 115 116)(2 5 0 73 109 97 103 101)
+	[0 0 1 4 0 116 101 115 116 2 5 0 73 109 97 103 101 1 0 3
+	
+	
 	[0 0 1 4 0 116 101 115 116 2 5 0 73 109 97 103 101 1 0 3] //typ image
+	
+	
+	AND ( 1 4 0 116 101 115 116)( AND (2 5 0 73 109 97 103 101 1 0 3) (2 3 0 106 112 103 1 0 4)) -> 
+	( 1 4 0 116 101 115 116) AND ( (2 5 0 73 109 97 103 101 1 0 3) AND (2 3 0 106 112 103 1 0 4) 7)
+	
 	[0 0 1 4 0 116 101 115 116 0 0 2 5 0 73 109 97 103 101 1 0 3 2 3 0 106 112 103 1 0 4] //image + endung jpg
 	[0 0 1 4 0 116 101 115 116 2 3 0 106 112 103 1 0 4] // endung jpg
   //max search	
@@ -353,7 +373,19 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 	//0 0 3 20 0 0 0 3 1 0 212 0 0 3 1 0 0 0 3 1 0 48 0 0 3 0 0 16 0 3 1 0 2 
 	//0 0 3 0 0 144 0 4 1 0 2 0 0 3 1 0 0 0 3 1 0 21 2 3 0 106 112 103 1 0 4]
 	//("test 2" type: any, min size 1, max size 9, avialbility 1, complete sources 2, ext jpg, codec x265, min bitrate 20, min len 00:01:30)
-  //if debug {
+  /*constraint types
+	1 0 213 = codec
+	3 1 0 211 = max size
+	3 1 0 212 = bitrate?
+	3 1 0 48 = min size? /avail
+	3 1 0 2 = ?
+	4 1 0 2 = duration ?
+	3 1 0 21 = avail ? / min size?
+	1 0 4 = file ending ?
+	string constriant -> 3 byte designator
+	number constriant -> 4 byte desginator
+*/
+	//if debug {
 if 1==1 {
     fmt.Println("DEBUG: Client looks for Files")
     //fmt.Println("DEBUG: searchfiles")
@@ -374,6 +406,42 @@ if 1==1 {
 	dbsearchfiles(querystr,strarr,db)
     } else {
 	fmt.Println("DEBUG: complex search")
+	 //readConstraints(pos int, buf []byte)(readb int,ret *Constraint)
+	readbytes, constraints := readConstraints(1, buf)
+	fmt.Println("read bytes:",readbytes)
+	if constraints == nil {
+		fmt.Println("ERROR: No Contrainsts could be parsed")
+		return
+	}
+	fmt.Println("constrain: ",constraints)
+	fmt.Println("constraint type(should be and):",constraints.Type)
+	if constraints.Type == C_NONE {
+		fmt.Println("Type IS C_NONE")
+	} else {
+		fmt.Println("Type IS NOT C_NONE")
+	}
+	    params := make([]interface{}, 0)
+	//fmt.Println(stringifyConstraint(constraints, &params))
+	sqlquery := constraintsearch2query(constraints, &params)
+	fmt.Println(sqlquery)
+	fmt.Println("params: ",params)
+	dbsearchfilesexec(sqlquery,&params,db)
+	    
+	    /*
+	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
+	fmt.Println("sub constraint left type(could be something likeFileext):",constraints.Right.Type)
+	fmt.Println("constraint root value",constraints.Value)
+	fmt.Println("constraint Main value",constraints.Left.Value)
+	fmt.Println("constraint 2nd AND value",constraints.Right.Value)
+	    
+	fmt.Println("constraint 2nd AND left value",constraints.Right.Left.Value)
+	fmt.Println("constraint 2nd AND right value",constraints.Right.Right.Value)
+	    
+	fmt.Println("constraint 2nd AND left type",constraints.Right.Left.Type)
+	fmt.Println("constraint 2nd AND right type",constraints.Right.Right.Type)
+	 */
+	
+	    /*
 	strlen := byteToInt16(buf[4:6])
     	fmt.Println("DEBUG: strlen:", strlen)
     	fmt.Println("DEBUG: strlen buf:", buf[4:6])
@@ -386,6 +454,7 @@ if 1==1 {
 	fmt.Println("DEBUG: qry:", querystr)
 	fmt.Println("DEBUG: strarr:", strarr)
 	dbsearchfiles(querystr,strarr,db)
+	*/
     }
     
 	
@@ -414,6 +483,44 @@ if 1==1 {
 	  //[1 0 4] -> ?
   }
 }
+/*
+func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
+	switch in.Type {
+		case C_AND:
+			ret = "("+stringifyConstraint(in.Left,params)+") AND ("+stringifyConstraint(in.Right,params)+")"
+		case C_OR:
+			ret = "("+stringifyConstraint(in.Left,params)+") OR ("+stringifyConstraint(in.Right,params)+")"
+		case C_NOT:
+			ret = "("+stringifyConstraint(in.Left,params)+") NOT ("+stringifyConstraint(in.Right,params)+")"
+		case C_MAIN:
+			//ret = fmt.Sprintf("sources.name like '%s'",in.Value)
+			strarr := strings.Split(fmt.Sprintf("%s",in.Value)," ")
+			ret = "("
+  			for i := 0; i < len(strarr); i++ {
+				if i != 0 {
+					ret += " AND "
+				}
+				ret += "sources.name like ? "
+				*params = append(*params,strarr[i])
+			}
+			ret += ")"
+		case C_CODEC:
+		case C_MINSIZE:
+		case C_MAXSIZE:
+		case C_FILETYPE:
+			*params = append(*params,fmt.Sprintf("%s",in.Value))
+			//ret = fmt.Sprintf("sources.type = '%s'",in.Value)
+			ret = "sources.type = ?"
+		case C_FILEEXT:
+			*params = append(*params,fmt.Sprintf("%s",in.Value))
+			//ret = fmt.Sprintf("sources.ext = '%s'",in.Value)
+			ret = "sources.ext like ?"
+		default:
+			fmt.Println("ERROR: undefined Constraint Type", in.Type)
+	}
+	return
+}
+*/
 		
 func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
