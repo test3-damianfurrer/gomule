@@ -33,6 +33,13 @@ var (
 	i2p     bool
 	sam     string
 	samport int
+	usesql  bool
+	sqldriver string
+	sqluser  string
+	sqlpw    string
+	sqladdr	 string
+	sqlport	 int
+	sqldb    string
 )
 
 func init() {
@@ -43,6 +50,15 @@ func init() {
 	flag.StringVar(&sam, "s", "127.0.0.1", "SAM host address")
 	flag.IntVar(&samport, "sp", 7656, "SAM port number")
 	flag.BoolVar(&version, "v", false, "Version")
+	flag.BoolVar(&usesql, "us", false, "Use SQL DB")
+	flag.StringVar(&sqldriver, "sd", "mysql", "SQL driver")
+	flag.StringVar(&sqluser, "su", "user", "SQL user")
+	flag.StringVar(&sqlpw, "pw", "password", "SQL password")
+	flag.StringVar(&sqldb, "db", "gomule", "SQL DB name")
+	flag.StringVar(&sqladdr, "ssi", "127.0.0.1", "SQL Server ip/domain")
+	flag.IntVar(&sqlport, "ssp", 3306, "SQL port number")
+	
+
 }
 
 func main() {
@@ -55,9 +71,19 @@ func main() {
 	}
 
 	sock := emule.NewSockSrv(host, port, debug)
+	sock.Ssname = "Test Server"
+	sock.Ssdesc = "Gomule a Testing Server"
+	sock.Ssmsg = "server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"
 	sock.I2P = i2p
 	sock.SAM = sam
 	sock.SAMPort = samport
+	sock.SQL = usesql
+	sock.SqlDriver = sqldriver
+	sock.SqlUser = sqluser
+	sock.SqlPW = sqlpw
+	sock.SqlAddr = sqladdr
+	sock.SqlPort = sqlport
+	sock.SqlDB = sqldb
 	sock.Start()
 	defer sock.Stop()
 }

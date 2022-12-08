@@ -22,17 +22,31 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"errors"
 
 	sam "github.com/eyedeekay/sam3/helper"
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type SockSrv struct {
 	Host     string
 	Port     int
 	Debug    bool
+	Ssname   string
+	Ssdesc	 string
+	Ssmsg	 string
 	I2P      bool
 	SAM      string
 	SAMPort  int
+	SQL      bool
+	SqlDriver string
+	SqlUser  string
+	SqlPW    string
+	SqlAddr	 string
+	SqlPort	 int
+	SqlDB    string
+	db       *sql.DB
 	listener net.Listener
 }
 
@@ -43,7 +57,11 @@ func NewSockSrv(host string, port int, debug bool) *SockSrv {
 		Debug: debug}
 }
 
-func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error) {
+func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, buflen int) {
+	//possible protocols:
+	//0xe3 - ed2k
+	//0xc5 - emule
+	//0xd4 -zlib compressed
 	protocol = 0xE3
 	buf = make([]byte, 5)
 	err = nil
@@ -58,28 +76,77 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error) 
 	}
 	if buf[0] == 0xE3 {
 		protocol = 0xE3
+	} else if buf[0] == 0xD4 {
+		protocol = 0xD4
+	} else if buf[0] == 0xC5 {
+		protocol = 0xC5
+	} else {
+		fmt.Printf("ERROR: unsuported protocol 0x%02x\n", protocol)
+		err = errors.New("unsuported protocol")
+		return
 	}
 	if this.Debug {
-		fmt.Printf("DEBUG: protocol 0x%02x\n", protocol)
+		fmt.Printf("DEBUG: selected protocol 0x%02x(by byte 0x%02x)\n", protocol, buf[0])
 	}
-	size := byteToInt32(buf[1:n])
+	size := ByteToUint32(buf[1:n])
+	//if this.Debug {
+	//	fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
+	//}
+	buf = make([]byte, 0)
+	toread := size
+	var tmpbuf []byte
+	for{
+		if toread > 1024  {
+			tmpbuf = make([]byte, 1024)
+		} else {
+			tmpbuf = make([]byte, toread)
+		}
+		n, err = conn.Read(tmpbuf)
+		if err != nil {
+			fmt.Println("ERROR: on read to buf", err.Error())
+			//return
+		}
+		buf = append(buf, tmpbuf[0:n]...)
+		if n < 0 {
+			fmt.Println("WARNING: n (conn.Read) < 0, some problem")
+			n = 0
+		}
+		toread -= uint32(n)
+		if toread <= 0 {
+			break;
+		}
+	}
+	//buf = make([]byte, size)
+	//n, err = conn.Read(buf)
+	//if err != nil {
+	//	fmt.Println("ERROR: on read to buf", err.Error())
+	//	//return
+	//}
+	n = int(size-toread)
 	if this.Debug {
-		fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
+		fmt.Printf("DEBUG: size %d, n %d\n", size, n)
 	}
-	buf = make([]byte, size)
-	n, err = conn.Read(buf)
+	buflen = n
 	return
 }
 
 func (this *SockSrv) respConn(conn net.Conn) {
+	//var chigh_id uint32
+	//var cport int16
+	
+	uhash := make([]byte, 16)
+	
 	if this.Debug {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())
 	}
 	for {
-		buf, protocol, err := this.read(conn)
+		buf, protocol, err, buflen := this.read(conn)
 		if err != nil {
 			if err == io.EOF {
-				fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
+				if this.Debug {
+				    fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
+				}
+				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
 			}
 			return
 		}
@@ -87,14 +154,19 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			if this.Debug {
-				fmt.Println("DEBUG: Login")
-			}
-			login(buf, protocol, conn, this.Debug)
+			uhash = login(buf, protocol, conn, false, this.db,HighId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg)//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
 		} else if buf[0] == 0x14 {
-			if this.Debug {
-				fmt.Println("DEBUG: Get list of servers")
-			}
+			listservers(buf, protocol, conn, this.Debug, buflen)
+		} else if buf[0] == 0x15 {
+			offerfiles(buf, protocol, conn, false, buflen, this.db ,uhash)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
+		} else if buf[0] == 0x16 {
+			searchfiles(buf, protocol, conn, this.Debug, buflen, this.db)
+		} else if buf[0] == 0x19 {
+			filesources(buf, uhash, protocol, conn, false, buflen, this.db)
+		} else if buf[0] == 0x1c {
+			requestcallback(buf, protocol, conn, this.Debug, buflen)
+		} else if buf[0] == 0x9a {
+			udpfilesources(buf, protocol, conn, this.Debug, buflen)
 		}
 	}
 }
@@ -104,6 +176,27 @@ func (this *SockSrv) yoursam() string {
 }
 
 func (this *SockSrv) Start() {
+	if this.SQL {
+		if this.Debug {
+		fmt.Println("With SQL")	
+		fmt.Printf("String: %s:%s@tcp(%s:%d)/%s\n", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB)
+		fmt.Println("SQL DRIVER", this.SqlDriver)
+		}
+	
+		
+		db, err := sql.Open(this.SqlDriver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB))
+		if err != nil {
+			fmt.Println("ERROR:", err.Error())
+			return
+		}
+		this.db = db
+		//res, err := db.Query("select * from clients")
+		//if err != nil {
+		//	fmt.Println("ERROR:", err.Error())
+		//	return
+		//}
+	        //defer res.Close()
+	}
 	if this.I2P {
 		ln, err := sam.I2PListener("go-imule-servr", this.yoursam(), "go-imule-server")
 		if err != nil {
@@ -142,6 +235,9 @@ func (this *SockSrv) Start() {
 }
 
 func (this *SockSrv) Stop() {
+	if this.SQL {
+		defer this.db.Close()
+	}
 	defer this.listener.Close()
 	return
 }
