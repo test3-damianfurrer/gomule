@@ -415,8 +415,10 @@ if 1==1 {
 	} else {
 		fmt.Println("Type IS NOT C_NONE")
 	}
+	    params := make([]interface{}, 0)
+	fmt.Println(stringifyConstraint(constraints, &params))
+	fmt.Println("params: ",params)
 	    
-	fmt.Println(stringifyConstraint(constraints))
 	    /*
 	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
 	fmt.Println("sub constraint left type(could be something likeFileext):",constraints.Right.Type)
@@ -473,7 +475,7 @@ if 1==1 {
 	  //[1 0 4] -> ?
   }
 }
-func stringifyConstraint(in *Constraint)(ret string){
+func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 	switch in.Type {
 		case C_AND:
 			ret = "("+stringifyConstraint(in.Left)+") AND ("+stringifyConstraint(in.Right)+")"
@@ -481,13 +483,17 @@ func stringifyConstraint(in *Constraint)(ret string){
 			ret = "("+stringifyConstraint(in.Left)+") OR ("+stringifyConstraint(in.Right)+")"
 		case C_NOT:
 			ret = "("+stringifyConstraint(in.Left)+") NOT ("+stringifyConstraint(in.Right)+")"
+		case C_MAIN:
+			ret = fmt.Sprintf("sources.name like '%s'",in.Value)
 		case C_CODEC:
 		case C_MINSIZE:
 		case C_MAXSIZE:
 		case C_FILETYPE:
-			ret = fmt.Sprintf("sources.type = %s",in.Value)
+			*params = append(*params,fmt.Sprintf("%s",in.Value))
+			ret = fmt.Sprintf("sources.type = '%s'",in.Value)
 		case C_FILEEXT:
-			ret = fmt.Sprintf("sources.ext = %s",in.Value)
+			*params = append(*params,fmt.Sprintf("%s",in.Value))
+			ret = fmt.Sprintf("sources.ext = '%s'",in.Value)
 		default:
 			fmt.Println("ERROR: undefined Constraint Type", in.Type)
 	}
