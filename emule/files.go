@@ -321,6 +321,7 @@ func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
 	fmt.Println("Debug: file found: ",sname)
 	fmt.Printf("Debug file hash: %x, size: %d\n",sfilehash,sfilesize)
   }
+  return
 }
 
 func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
