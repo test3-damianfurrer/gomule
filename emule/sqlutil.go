@@ -41,8 +41,8 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 				if i != 0 {
 					ret += " AND "
 				}
-				ret += "sources.name like ? "
-				*params = append(*params,strarr[i])
+				ret += "sources.name like ?"
+				*params = append(*params,"%"+strarr[i]+"%")
 			}
 			ret += ")"
 		case C_CODEC:
