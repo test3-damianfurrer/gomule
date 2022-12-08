@@ -65,6 +65,7 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 func constraintsearch2query(in *Constraint, params *[]interface{})(sqlquery string){
 	sqlquery = "select sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size from sources left join files on sources.file_hash=files.hash WHERE "
 	sqlquery += stringifyConstraint(in, params)
+	return
 }
 
 func search2query(search string)(sqlquery string, strarr []string){
