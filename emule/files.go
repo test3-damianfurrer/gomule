@@ -59,7 +59,7 @@ func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype stri
 	}
 	//todo figure out ext (file extension e.g. zip)
 	if affectedRows == 0 {
-		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1)",filehashbuf[0:16],uhash,filename,"",filetype)
+		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1)",filehashbuf[0:16],uhash,filename,filename2ext(filename),filetype)
 		if err != nil {
 			fmt.Println("ERROR: ",err.Error())
 			panic("fuck")
