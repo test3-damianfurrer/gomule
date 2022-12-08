@@ -217,7 +217,7 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
     msgsize := uint32(listitems)*uint32(6)
     msgsize += uint32(18) //Type0x42 + file hash + sources count(1byte)
     data = append(data,protocol)
-    data = append(data,Unt32ToByte(msgsize)...)
+    data = append(data,Uint32ToByte(msgsize)...)
     data = append(data,0x42)
     data = append(data,buf[1:17]...) //file hash
     data = append(data,byte(listitems))   // count of sources, just one byte? - limit 255 in sql querry
