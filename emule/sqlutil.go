@@ -30,7 +30,7 @@ func filename2ext(filename string) string {
 	if sindex == 0 {
 		return ""
 	}
-	slen = len(strarr[sindex])
+	slen := len(strarr[sindex])
 	if slen > 8 {
 		return ""
 	}
