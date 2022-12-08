@@ -217,7 +217,7 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
     msgsize := uint32(listitems)*uint32(6)
     msgsize += uint32(18) //Type0x42 + file hash + sources count(1byte)
     data = append(data,protocol)
-    data = append(data,uInt32ToByte(msgsize)...)
+    data = append(data,Unt32ToByte(msgsize)...)
     data = append(data,0x42)
     data = append(data,buf[1:17]...) //file hash
     data = append(data,byte(listitems))   // count of sources, just one byte? - limit 255 in sql querry
@@ -252,7 +252,7 @@ func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (li
 		return
 	}
 	listitems+=1
-	bytes:=uInt32ToByte(ed2kid)
+	bytes:=Uint32ToByte(ed2kid)
 	//srcdata = append(srcdata,byte(192),byte(168),byte(1),byte(249))//
 	srcdata = append(srcdata,bytes[0:4]...)
 	bytes=Int16ToByte(port)
@@ -271,7 +271,7 @@ func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (li
     if debug {
     var fsize uint32
     err = db.QueryRow("select size from files where hash = ?", filehash).Scan(&fsize)
-    fmt.Println("DEBUG: SOURCE: file size: ",uInt32ToByte(fsize))
+    fmt.Println("DEBUG: SOURCE: file size: ",Uint32ToByte(fsize))
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
     }
