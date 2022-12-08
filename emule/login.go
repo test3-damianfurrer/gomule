@@ -161,25 +161,25 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	conn.Write(data)
 
 
-	high_id_b := Uint32ToByte(high_id)
+	high_id_b := UInt32ToByte(high_id)
 	data = EncodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],1, 0, 0, 0})
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 	
-	fcount_b := Uint32ToByte(readRowUint32("select count(*) from files",db))
-	ucount_b := Uint32ToByte(readRowUint32("select count(*) from clients",db))
+	fcount_b := UInt32ToByte(readRowUint32("select count(*) from files",db))
+	ucount_b := UInt32ToByte(readRowUint32("select count(*) from clients",db))
 	data = EncodeByteMsg(protocol,0x34,[]byte{ucount_b[0], ucount_b[1], ucount_b[2], ucount_b[3], fcount_b[0], fcount_b[1], fcount_b[2], fcount_b[3]})
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 	//0x41 server identification missing
-	serverip_b:=Uint32ToByte(shighid)
-	serverport_b:=Uint16ToByte(sport)
+	serverip_b:=UInt32ToByte(shighid)
+	serverport_b:=UInt16ToByte(sport)
 	serverguid_b := make([]byte,16)
-	tagcount_b := Uint32ToByte(uint32(2)) //maybe not acctually honored
+	tagcount_b := UInt32ToByte(uint32(2)) //maybe not acctually honored
 	iddata := make([]byte,0)
 	
 	iddata=append(iddata,serverguid_b...)
