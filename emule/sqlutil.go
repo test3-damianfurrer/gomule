@@ -36,7 +36,8 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 		case C_MAIN:
 			//ret = fmt.Sprintf("sources.name like '%s'",in.Value)
 			strarr := strings.Split(fmt.Sprintf("%s",in.Value)," ")
-			ret = "("
+			//ret = "("
+			ret = ""
   			for i := 0; i < len(strarr); i++ {
 				if i != 0 {
 					ret += " AND "
@@ -44,7 +45,7 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 				ret += "sources.name like ?"
 				*params = append(*params,"%"+strarr[i]+"%")
 			}
-			ret += ")"
+			//ret += ")"
 		case C_CODEC:
 		case C_MINSIZE:
 		case C_MAXSIZE:
@@ -60,6 +61,10 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 			fmt.Println("ERROR: undefined Constraint Type", in.Type)
 	}
 	return
+}
+func constraintsearch2query(in *Constraint, params *[]interface{})(sqlquery string){
+	sqlquery = "select sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size from sources left join files on sources.file_hash=files.hash WHERE "
+	sqlquery += stringifyConstraint(in, params)
 }
 
 func search2query(search string)(sqlquery string, strarr []string){
