@@ -5,7 +5,7 @@ import (
 
 func EncodeByteMsg(protocol byte,msgcode byte,body []byte) []byte {
 	bodysize := len(body)
-	sizebytes := Uint32ToByte(uint32(bodysize+1))
+	sizebytes := UInt32ToByte(uint32(bodysize+1))
 	buf := make([]byte,bodysize+6)
 	buf[0] = protocol
 	buf[1] = sizebytes[0]
@@ -22,7 +22,7 @@ func EncodeByteMsg(protocol byte,msgcode byte,body []byte) []byte {
 func EncodeByteString(str string) []byte {
 	slen:=len(str)
 	buf := make([]byte,slen+2)
-	sizebytes := Uint16ToByte(uint16(slen))
+	sizebytes := UInt16ToByte(uint16(slen))
 	buf[0] = sizebytes[0]
 	buf[1] = sizebytes[1]
 	for i := 0; i < slen; i++ {
@@ -32,7 +32,7 @@ func EncodeByteString(str string) []byte {
 }
 
 
-//func encodeByteTag(ttype byte, tagname []byte, tagvalue []byte, specialdesignator byte){
+//func EncodeByteTag(ttype byte, tagname []byte, tagvalue []byte, specialdesignator byte){
 //	
 //}
 
@@ -41,11 +41,11 @@ func EncodeByteTagString(tagname []byte, tagvalue string) []byte {
 }
 
 func EncodeByteTagInt(tagname []byte, tagvalue uint32) []byte {
-	return EncodeByteTag(3,tagname,Uint32ToByte(tagvalue))
+	return EncodeByteTag(3,tagname,UInt32ToByte(tagvalue))
 }
 
-/*func encodeByteTagInt(tagname []byte, tagvalue float) []byte {
-	return encodeByteTag(4,tagname,uint32ToByte(tagvalue))
+/*func EncodeByteTagInt(tagname []byte, tagvalue float) []byte {
+	return EncodeByteTag(4,tagname,uInt32ToByte(tagvalue))
 }*/
 
 func EncodeByteTag(ttype byte, tagname []byte, tagvalue []byte) []byte {
@@ -91,13 +91,13 @@ func StringToByte(val string) []byte {
 	return buf
 }
 func EncodeByteTagNameStr(val string) []byte {
-	return EncodeByteTagName(stringToByte(val))
+	return EncodeByteTagName(StringToByte(val))
 }
 
 func EncodeByteTagName(nbuf []byte) []byte {
 	blen:=len(nbuf)
 	buf := make([]byte,blen+2)
-	sizebytes := Uint16ToByte(uint16(blen))
+	sizebytes := UInt16ToByte(uint16(blen))
 	buf[0] = sizebytes[0]
 	buf[1] = sizebytes[1]
 	for i := 0; i < blen; i++ {

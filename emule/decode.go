@@ -112,14 +112,14 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			readb+=readsub
 		case 0x1:
 			readb+=1
-			strlen:=int(byteToUint16(buf[readb:readb+2]))
+			strlen:=int(ByteToUint16(buf[readb:readb+2]))
 			readb+=2
 			ret = &Constraint{Type: C_MAIN, Value: buf[readb:readb+strlen]}
 			readb+=strlen
 			fmt.Println("Debug Main Constraint")
 		case 0x2: //string value
 			readb+=1
-			strlen:=int(byteToUint16(buf[readb:readb+2]))
+			strlen:=int(ByteToUint16(buf[readb:readb+2]))
 			readb+=2
 			ret = &Constraint{Value: buf[readb:readb+strlen]}
 			readb+=strlen
@@ -162,7 +162,7 @@ func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
 func readString(pos int, buf []byte)(bread int, ret string) {
   fmt.Println("readstring!",buf[pos-3:len(buf)])
   bread=2
-  bread += int(byteToUint16(buf[pos:pos+2]))
+  bread += int(ByteToUint16(buf[pos:pos+2]))
   ret = fmt.Sprintf("%s",buf[pos+2:bread])
   return
 }
@@ -172,7 +172,7 @@ func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
   ret = &OneTag{Type: buf[pos], NameString: ""}
   bread=3
   readname:=0
-  namelen := byteToUint16(buf[pos+1:pos+bread])
+  namelen := ByteToUint16(buf[pos+1:pos+bread])
   fmt.Println("name tag len",namelen)
   
   if namelen == uint16(1) {
@@ -187,7 +187,7 @@ func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
   
   switch ret.Type {
     case byte(2): //varstring
-      ret.ValueLen = byteToUint16(buf[pos+bread:pos+bread+2])
+      ret.ValueLen = ByteToUint16(buf[pos+bread:pos+bread+2])
       bread += 2
       ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
       bread+=int(ret.ValueLen)

@@ -68,7 +68,7 @@ func Int16ToByte(data int16) (ret []byte) {
 	ret = buf.Bytes()
 	return
 }
-func Uint16ToByte(data uint16) (ret []byte) {
+func UInt16ToByte(data uint16) (ret []byte) {
 	ret = []byte{}
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, data)
@@ -83,7 +83,7 @@ func Int32ToByte(data int32) (ret []byte) {
 	ret = buf.Bytes()
 	return
 }
-func Uint32ToByte(data uint32) (ret []byte) {
+func UInt32ToByte(data uint32) (ret []byte) {
 	ret = []byte{}
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, data)
