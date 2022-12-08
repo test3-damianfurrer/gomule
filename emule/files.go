@@ -288,13 +288,7 @@ func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 }
 
 func dbsearchfiles(query string,strarr []string, db *sql.DB){
-  var sname string
-  var sext string
-  var stype string
-  var srating int
-  var sfilehash []byte
-  var sfilesize uint
-  //params := make([]any,len(strarr)) ///test
+    //params := make([]any,len(strarr)) ///test
   //for i:=0;i < len(strarr);i++ {
 //	  params=append(params,strarr[i])
   //}
@@ -307,7 +301,12 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
 }
 
 func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
-	
+  var sname string
+  var sext string
+  var stype string
+  var srating int
+  var sfilehash []byte
+  var sfilesize uint
   rows, err := db.Query(query,*params...)
   if err != nil {
     fmt.Println("ERROR: ",err.Error())
