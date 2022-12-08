@@ -24,6 +24,18 @@ import (
 //codec   varchar(32)     NO
 //online  tinyint(1)      NO              0
 //complete        tinyint(1)      NO              0
+func filename2ext(filename string) string {
+	strarr := strings.Split(filename,".")
+	sindex := len(strarr)-1
+	if sindex == 0 {
+		return ""
+	}
+	slen = len(strarr[sindex])
+	if slen > 8 {
+		return ""
+	}
+	return strarr[sindex]
+}
 
 func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 	switch in.Type {
