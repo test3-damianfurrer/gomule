@@ -475,6 +475,7 @@ if 1==1 {
 	  //[1 0 4] -> ?
   }
 }
+/*
 func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 	switch in.Type {
 		case C_AND:
@@ -485,7 +486,7 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 			ret = "("+stringifyConstraint(in.Left,params)+") NOT ("+stringifyConstraint(in.Right,params)+")"
 		case C_MAIN:
 			//ret = fmt.Sprintf("sources.name like '%s'",in.Value)
-			strarr = strings.Split(fmt.Sprintf("%s",in.Value)," ")
+			strarr := strings.Split(fmt.Sprintf("%s",in.Value)," ")
 			ret = "("
   			for i := 0; i < len(strarr); i++ {
 				if i != 0 {
@@ -511,6 +512,7 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 	}
 	return
 }
+*/
 		
 func requestcallback(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
 	//type=buf[0]
