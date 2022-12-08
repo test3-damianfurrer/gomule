@@ -25,6 +25,42 @@ import (
 //online  tinyint(1)      NO              0
 //complete        tinyint(1)      NO              0
 
+func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
+	switch in.Type {
+		case C_AND:
+			ret = "("+stringifyConstraint(in.Left,params)+") AND ("+stringifyConstraint(in.Right,params)+")"
+		case C_OR:
+			ret = "("+stringifyConstraint(in.Left,params)+") OR ("+stringifyConstraint(in.Right,params)+")"
+		case C_NOT:
+			ret = "("+stringifyConstraint(in.Left,params)+") NOT ("+stringifyConstraint(in.Right,params)+")"
+		case C_MAIN:
+			//ret = fmt.Sprintf("sources.name like '%s'",in.Value)
+			strarr := strings.Split(fmt.Sprintf("%s",in.Value)," ")
+			ret = "("
+  			for i := 0; i < len(strarr); i++ {
+				if i != 0 {
+					ret += " AND "
+				}
+				ret += "sources.name like ? "
+				*params = append(*params,strarr[i])
+			}
+			ret += ")"
+		case C_CODEC:
+		case C_MINSIZE:
+		case C_MAXSIZE:
+		case C_FILETYPE:
+			*params = append(*params,fmt.Sprintf("%s",in.Value))
+			//ret = fmt.Sprintf("sources.type = '%s'",in.Value)
+			ret = "sources.type = ?"
+		case C_FILEEXT:
+			*params = append(*params,fmt.Sprintf("%s",in.Value))
+			//ret = fmt.Sprintf("sources.ext = '%s'",in.Value)
+			ret = "sources.ext like ?"
+		default:
+			fmt.Println("ERROR: undefined Constraint Type", in.Type)
+	}
+	return
+}
 
 func search2query(search string)(sqlquery string, strarr []string){
   sqlquery = "select sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size from sources left join files on sources.file_hash=files.hash WHERE "
