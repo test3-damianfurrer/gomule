@@ -478,11 +478,11 @@ if 1==1 {
 func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 	switch in.Type {
 		case C_AND:
-			ret = "("+stringifyConstraint(in.Left)+") AND ("+stringifyConstraint(in.Right)+")"
+			ret = "("+stringifyConstraint(in.Left,params)+") AND ("+stringifyConstraint(in.Right,params)+")"
 		case C_OR:
-			ret = "("+stringifyConstraint(in.Left)+") OR ("+stringifyConstraint(in.Right)+")"
+			ret = "("+stringifyConstraint(in.Left,params)+") OR ("+stringifyConstraint(in.Right,params)+")"
 		case C_NOT:
-			ret = "("+stringifyConstraint(in.Left)+") NOT ("+stringifyConstraint(in.Right)+")"
+			ret = "("+stringifyConstraint(in.Left,params)+") NOT ("+stringifyConstraint(in.Right,params)+")"
 		case C_MAIN:
 			ret = fmt.Sprintf("sources.name like '%s'",in.Value)
 		case C_CODEC:
