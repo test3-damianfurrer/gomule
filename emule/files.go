@@ -303,7 +303,12 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
   for i:=0;i < len(strarr);i++ {
 	  params=append(params,strarr[i])
   }
-  rows, err := db.Query(query,params...)
+  dbsearchfilesexec(query,&params,db)
+}
+
+func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
+	
+  rows, err := db.Query(query,*params...)
   if err != nil {
     fmt.Println("ERROR: ",err.Error())
     return
@@ -416,8 +421,11 @@ if 1==1 {
 		fmt.Println("Type IS NOT C_NONE")
 	}
 	    params := make([]interface{}, 0)
-	fmt.Println(stringifyConstraint(constraints, &params))
+	//fmt.Println(stringifyConstraint(constraints, &params))
+	sqlquery := constraintsearch2query(constraints, &params)
+	fmt.Println(sqlquery)
 	fmt.Println("params: ",params)
+	dbsearchfilesexec(sqlquery,&params,db)
 	    
 	    /*
 	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
