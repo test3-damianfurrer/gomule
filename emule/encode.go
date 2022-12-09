@@ -3,9 +3,9 @@ package emule
 import (
 )
 
-func encodeByteMsg(protocol byte,msgcode byte,body []byte) []byte {
+func EncodeByteMsg(protocol byte,msgcode byte,body []byte) []byte {
 	bodysize := len(body)
-	sizebytes := uint32ToByte(uint32(bodysize+1))
+	sizebytes := UInt32ToByte(uint32(bodysize+1))
 	buf := make([]byte,bodysize+6)
 	buf[0] = protocol
 	buf[1] = sizebytes[0]
@@ -19,10 +19,10 @@ func encodeByteMsg(protocol byte,msgcode byte,body []byte) []byte {
 	return buf
 }
 
-func encodeByteString(str string) []byte {
+func EncodeByteString(str string) []byte {
 	slen:=len(str)
 	buf := make([]byte,slen+2)
-	sizebytes := uint16ToByte(uint16(slen))
+	sizebytes := UInt16ToByte(uint16(slen))
 	buf[0] = sizebytes[0]
 	buf[1] = sizebytes[1]
 	for i := 0; i < slen; i++ {
@@ -32,23 +32,23 @@ func encodeByteString(str string) []byte {
 }
 
 
-//func encodeByteTag(ttype byte, tagname []byte, tagvalue []byte, specialdesignator byte){
+//func EncodeByteTag(ttype byte, tagname []byte, tagvalue []byte, specialdesignator byte){
 //	
 //}
 
-func encodeByteTagString(tagname []byte, tagvalue string) []byte {
-	return encodeByteTag(2,tagname,encodeByteString(tagvalue))
+func EncodeByteTagString(tagname []byte, tagvalue string) []byte {
+	return EncodeByteTag(2,tagname,EncodeByteString(tagvalue))
 }
 
-func encodeByteTagInt(tagname []byte, tagvalue uint32) []byte {
-	return encodeByteTag(3,tagname,uint32ToByte(tagvalue))
+func EncodeByteTagInt(tagname []byte, tagvalue uint32) []byte {
+	return EncodeByteTag(3,tagname,UInt32ToByte(tagvalue))
 }
 
-/*func encodeByteTagInt(tagname []byte, tagvalue float) []byte {
-	return encodeByteTag(4,tagname,uint32ToByte(tagvalue))
+/*func EncodeByteTagInt(tagname []byte, tagvalue float) []byte {
+	return EncodeByteTag(4,tagname,uInt32ToByte(tagvalue))
 }*/
 
-func encodeByteTag(ttype byte, tagname []byte, tagvalue []byte) []byte {
+func EncodeByteTag(ttype byte, tagname []byte, tagvalue []byte) []byte {
 	//buflen=len(tagname)+len(tagvalue)+1
 	buf := make([]byte,0)
 	buf = append(buf, ttype)
@@ -77,12 +77,12 @@ func encodeByteTag(ttype byte, tagname []byte, tagvalue []byte) []byte {
 	*/
 }
 
-func encodeByteTagNameInt(val byte) []byte {
+func EncodeByteTagNameInt(val byte) []byte {
 	buf := make([]byte,1)
 	buf[0]=val
-	return encodeByteTagName(buf)
+	return EncodeByteTagName(buf)
 }
-func stringToByte(val string) []byte {
+func StringToByte(val string) []byte {
 	strlen:=len(val)
 	buf := make([]byte,strlen)
 	for i := 0; i < strlen; i++ {
@@ -90,14 +90,14 @@ func stringToByte(val string) []byte {
 	}
 	return buf
 }
-func encodeByteTagNameStr(val string) []byte {
-	return encodeByteTagName(stringToByte(val))
+func EncodeByteTagNameStr(val string) []byte {
+	return EncodeByteTagName(StringToByte(val))
 }
 
-func encodeByteTagName(nbuf []byte) []byte {
+func EncodeByteTagName(nbuf []byte) []byte {
 	blen:=len(nbuf)
 	buf := make([]byte,blen+2)
-	sizebytes := uint16ToByte(uint16(blen))
+	sizebytes := UInt16ToByte(uint16(blen))
 	buf[0] = sizebytes[0]
 	buf[1] = sizebytes[1]
 	for i := 0; i < blen; i++ {

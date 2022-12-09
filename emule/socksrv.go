@@ -88,7 +88,7 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 	if this.Debug {
 		fmt.Printf("DEBUG: selected protocol 0x%02x(by byte 0x%02x)\n", protocol, buf[0])
 	}
-	size := byteToUint32(buf[1:n])
+	size := ByteToUint32(buf[1:n])
 	//if this.Debug {
 	//	fmt.Printf("DEBUG: size %v -> %d\n", buf[1:n], size)
 	//}
@@ -154,7 +154,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			uhash = login(buf, protocol, conn, false, this.db,highId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg)//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
+			uhash = login(buf, protocol, conn, false, this.db,HighId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg)//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
