@@ -154,15 +154,15 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			uhash = login(buf, protocol, conn, false, this.db,HighId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg)//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
+			uhash = login(buf, protocol, conn, this.Debug, this.db,HighId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg)//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
-			offerfiles(buf, protocol, conn, false, buflen, this.db ,uhash)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
+			offerfiles(buf, protocol, conn, this.Debug, buflen, this.db ,uhash)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
 			searchfiles(buf, protocol, conn, this.Debug, buflen, this.db)
 		} else if buf[0] == 0x19 {
-			filesources(buf, uhash, protocol, conn, false, buflen, this.db)
+			filesources(buf, uhash, protocol, conn, this.Debug, buflen, this.db)
 		} else if buf[0] == 0x1c {
 			requestcallback(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x9a {
