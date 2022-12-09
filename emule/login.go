@@ -101,6 +101,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 				fmt.Printf("Debug Port Tag: %d\n",ByteToUint32(tagarr[i].Value))
 			default:
 				fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+				fmt.Println(" ->Value: ",tagarr[i].Value)
 		}
 		/*fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
 		if tagarr[i].Type == byte(2) {
