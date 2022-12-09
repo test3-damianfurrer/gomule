@@ -147,11 +147,11 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 
 }
 
-func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
+func ReadTags(pos int, buf []byte, tags int,debug bool)(totalread int, ret []*OneTag){
 	index := pos
 	totalread = 0
 	for i := 0; i < tags; i++ {
-		bread, tag := readTag(index,buf)
+		bread, tag := readTag(index,buf,debug)
 		totalread += bread
 		index += bread
 		ret = append(ret,tag)
@@ -167,13 +167,17 @@ func readString(pos int, buf []byte)(bread int, ret string) {
   return
 }
 
-func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
-  fmt.Println("readtag! at ",pos)
+func ReadTag(pos int, buf []byte, debug bool)(bread int, ret *OneTag) {
+  if debug {
+    fmt.Println("readtag! at ",pos)
+  }
   ret = &OneTag{Type: buf[pos], NameString: ""}
   bread=3
   readname:=0
   namelen := ByteToUint16(buf[pos+1:pos+bread])
-  fmt.Println("name tag len",namelen)
+  if debug {
+    fmt.Println("name tag len",namelen)
+  }
   
   if namelen == uint16(1) {
     ret.NameByte = buf[pos+3]
