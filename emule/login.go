@@ -85,7 +85,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	
 	//(pos int, buf []byte, tags int)(totalread int, ret []*OneTag)
 	
-	totalread, tagarr := readTags(27,buf,4)
+	totalread, tagarr := readTags(27,buf,tags)
 	fmt.Println("DEBUG: len(tagarr)",len(tagarr))
 	for i := 0; i < len(tagarr); i++ {
 		switch tagarr[i].NameByte {
