@@ -86,22 +86,34 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	//(pos int, buf []byte, tags int)(totalread int, ret []*OneTag)
 	
 	totalread, tagarr := ReadTags(27,buf,int(tags),debug)
-	fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+	if debug {
+		fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+	}
 	for i := 0; i < len(tagarr); i++ {
 		switch tagarr[i].NameByte {
 			case 0x1:
 				if tagarr[i].Type == byte(2) {
-					fmt.Printf("Debug Name Tag: %s\n",tagarr[i].Value)
+					if debug {
+						fmt.Printf("Debug Name Tag: %s\n",tagarr[i].Value)
+					}
 				}
 			case 0x11:
-				fmt.Printf("Debug Version Tag: %d\n",ByteToUint32(tagarr[i].Value))
+				if debug {
+					fmt.Printf("Debug Version Tag: %d\n",ByteToUint32(tagarr[i].Value))
+				}
 			case 0x20:
-				fmt.Printf("Debug Flags Tag: %b\n",ByteToUint32(tagarr[i].Value))
+				if debug {
+					fmt.Printf("Debug Flags Tag: %b\n",ByteToUint32(tagarr[i].Value))
+				}
 			case 0x0f:
-				fmt.Printf("Debug Port Tag: %d\n",ByteToUint32(tagarr[i].Value))
+				if debug {
+					fmt.Printf("Debug Port Tag: %d\n",ByteToUint32(tagarr[i].Value))
+				}
 			default:
-				fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
-				fmt.Println(" ->Value: ",tagarr[i].Value)
+				if debug {
+					fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+					fmt.Println(" ->Value: ",tagarr[i].Value)
+				}
 		}
 		/*fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
 		if tagarr[i].Type == byte(2) {
@@ -109,10 +121,10 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 		}
 		*/
 	}
-	fmt.Println("DEBUG: totalread:  ",totalread)
-	
-	fmt.Println("DEBUG: after loop")
-	
+	if debug {
+		fmt.Println("DEBUG: totalread:  ",totalread)
+		fmt.Println("DEBUG: after loop")
+	}
 	/*index:=27
 	tstbread, tstres := readTag(index,buf)
 	index+=tstbread
