@@ -151,7 +151,7 @@ func ReadTags(pos int, buf []byte, tags int,debug bool)(totalread int, ret []*On
 	index := pos
 	totalread = 0
 	for i := 0; i < tags; i++ {
-		bread, tag := readTag(index,buf,debug)
+		bread, tag := ReadTag(index,buf,debug)
 		totalread += bread
 		index += bread
 		ret = append(ret,tag)
