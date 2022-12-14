@@ -150,7 +150,7 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 func ReadTags(pos int, buf []byte, tags int,debug bool)(totalread int, ret []*OneTag){
 	index := pos
 	totalread = 0
-	fmt.Println("TAGS BUF:",buf[pos:pos+50])
+	//fmt.Println("TAGS BUF:",buf[pos:pos+50])
 	for i := 0; i < tags; i++ {
 		bread, tag := ReadTag(index,buf,debug)
 		totalread += bread
@@ -174,7 +174,7 @@ func ReadTag(pos int, buf []byte, debug bool)(bread int, ret *OneTag) {
 	  dpos = len(buf)
   }
 	
-  fmt.Println("TAG BUF:",buf[pos:dpos])
+  //fmt.Println("TAG BUF:",buf[pos:dpos])
   if debug {
     fmt.Println("readtag! at ",pos)
   }
