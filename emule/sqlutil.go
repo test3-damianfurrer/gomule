@@ -88,7 +88,7 @@ func constraintsearch2query(in *Constraint, params *[]interface{})(sqlquery stri
 	constraints := stringifyConstraint(in, params)
 	sqlquery = "select " + fields + " from sources left join files on sources.file_hash=files.hash WHERE "
 	sqlquery += constraints
-	sqlquery2 = "select count(sources.id)" + fields + " from sources left join files on sources.file_hash=files.hash WHERE "
+	sqlquery2 := "select count(sources.id)" + fields + " from sources left join files on sources.file_hash=files.hash WHERE "
 	sqlquery2 += constraints
 	sqlquery2 = sqlquery + "group by " + fields + " "
 	fmt.Println("DEBUG: QUERY2: ",sqlquery2) //availability would have to be having after where
