@@ -71,6 +71,19 @@ func main() {
 	}
 
 	sock := emule.NewSockSrv(host, port, debug)
+	
+	/*
+	SupportGzip
+	SupportNewTags
+	SupportUnicode
+	SupportRelSearch
+	SupportTTagInteger
+	SupportLargeFiles
+	SupportObfuscation
+	*/
+	sock.SupportGzip=true
+	//sock.SupportLargeFiles=true
+	
 	sock.Ssname = "Test Server"
 	sock.Ssdesc = "Gomule a Testing Server"
 	sock.Ssmsg = "server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"

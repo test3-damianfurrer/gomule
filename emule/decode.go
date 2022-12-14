@@ -3,7 +3,7 @@ package emule
 import (
 	"fmt"
 )
-
+//TODO: check buf len on all and prevent read > len(buf)
 type OneTag struct {
   Type byte
   NameByte byte
@@ -112,14 +112,14 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 			readb+=readsub
 		case 0x1:
 			readb+=1
-			strlen:=int(byteToUint16(buf[readb:readb+2]))
+			strlen:=int(ByteToUint16(buf[readb:readb+2]))
 			readb+=2
 			ret = &Constraint{Type: C_MAIN, Value: buf[readb:readb+strlen]}
 			readb+=strlen
 			fmt.Println("Debug Main Constraint")
 		case 0x2: //string value
 			readb+=1
-			strlen:=int(byteToUint16(buf[readb:readb+2]))
+			strlen:=int(ByteToUint16(buf[readb:readb+2]))
 			readb+=2
 			ret = &Constraint{Value: buf[readb:readb+strlen]}
 			readb+=strlen
@@ -147,11 +147,12 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 
 }
 
-func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
+func ReadTags(pos int, buf []byte, tags int,debug bool)(totalread int, ret []*OneTag){
 	index := pos
 	totalread = 0
+	//fmt.Println("TAGS BUF:",buf[pos:pos+50])
 	for i := 0; i < tags; i++ {
-		bread, tag := readTag(index,buf)
+		bread, tag := ReadTag(index,buf,debug)
 		totalread += bread
 		index += bread
 		ret = append(ret,tag)
@@ -162,18 +163,28 @@ func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
 func readString(pos int, buf []byte)(bread int, ret string) {
   fmt.Println("readstring!",buf[pos-3:len(buf)])
   bread=2
-  bread += int(byteToUint16(buf[pos:pos+2]))
+  bread += int(ByteToUint16(buf[pos:pos+2]))
   ret = fmt.Sprintf("%s",buf[pos+2:bread])
   return
 }
 
-func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
-  fmt.Println("readtag! at ",pos)
+func ReadTag(pos int, buf []byte, debug bool)(bread int, ret *OneTag) {
+  dpos := pos + 50
+  if dpos > len(buf){
+	  dpos = len(buf)
+  }
+	
+  //fmt.Println("TAG BUF:",buf[pos:dpos])
+  if debug {
+    fmt.Println("readtag! at ",pos)
+  }
   ret = &OneTag{Type: buf[pos], NameString: ""}
   bread=3
   readname:=0
-  namelen := byteToUint16(buf[pos+1:pos+bread])
-  fmt.Println("name tag len",namelen)
+  namelen := ByteToUint16(buf[pos+1:pos+bread])
+  if debug {
+    fmt.Println("name tag len",namelen)
+  }
   
   if namelen == uint16(1) {
     ret.NameByte = buf[pos+3]
@@ -187,7 +198,7 @@ func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
   
   switch ret.Type {
     case byte(2): //varstring
-      ret.ValueLen = byteToUint16(buf[pos+bread:pos+bread+2])
+      ret.ValueLen = ByteToUint16(buf[pos+bread:pos+bread+2])
       bread += 2
       ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
       bread+=int(ret.ValueLen)

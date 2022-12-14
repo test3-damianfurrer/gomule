@@ -24,6 +24,18 @@ import (
 //codec   varchar(32)     NO
 //online  tinyint(1)      NO              0
 //complete        tinyint(1)      NO              0
+func filename2ext(filename string) string {
+	strarr := strings.Split(filename,".")
+	sindex := len(strarr)-1
+	if sindex == 0 {
+		return ""
+	}
+	slen := len(strarr[sindex])
+	if slen > 8 {
+		return ""
+	}
+	return strings.ToUpper(strarr[sindex])
+}
 
 func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 	switch in.Type {
@@ -34,9 +46,7 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 		case C_NOT:
 			ret = "("+stringifyConstraint(in.Left,params)+") NOT ("+stringifyConstraint(in.Right,params)+")"
 		case C_MAIN:
-			//ret = fmt.Sprintf("sources.name like '%s'",in.Value)
 			strarr := strings.Split(fmt.Sprintf("%s",in.Value)," ")
-			//ret = "("
 			ret = ""
   			for i := 0; i < len(strarr); i++ {
 				if i != 0 {
@@ -45,17 +55,14 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 				ret += "sources.name like ?"
 				*params = append(*params,"%"+strarr[i]+"%")
 			}
-			//ret += ")"
 		case C_CODEC:
 		case C_MINSIZE:
 		case C_MAXSIZE:
 		case C_FILETYPE:
 			*params = append(*params,fmt.Sprintf("%s",in.Value))
-			//ret = fmt.Sprintf("sources.type = '%s'",in.Value)
 			ret = "sources.type = ?"
 		case C_FILEEXT:
 			*params = append(*params,fmt.Sprintf("%s",in.Value))
-			//ret = fmt.Sprintf("sources.ext = '%s'",in.Value)
 			ret = "sources.ext like ?"
 		default:
 			fmt.Println("ERROR: undefined Constraint Type", in.Type)
