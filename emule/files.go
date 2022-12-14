@@ -137,7 +137,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 					}
 				case 0x3a:
 					if tagarr[i].Type == byte(3) {
-						fsize += uint64(ByteToUint32(tagarr[i].Value) * uint64(0x100000000))
+						fsize += uint64(ByteToUint32(tagarr[i].Value)) * uint64(0x100000000)
 						if debugloop {
 							fmt.Printf("Debug >32bit File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
 							fmt.Printf("Debug Total File Size Tag: %d\n",fsize)							
