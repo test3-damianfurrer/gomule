@@ -96,12 +96,6 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 	    }
 	    break;
     }
-    //if debugloop {
-      //fmt.Println("DEBUG: byteoffset", byteoffset)
-      //fmt.Println("DEBUG: iteration", iteration)
-    //}
-//fmt.Println("DEBUG: iteration", iteration)
-//fmt.Println("DEBUG: byte on offset", buf[byteoffset])
     filehashbuf := buf[byteoffset+0:byteoffset+16]
     
 	 //obfuscated
@@ -111,34 +105,13 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     if debugloop {
     	fmt.Println("DEBUG: 1. tag count:", itag)
     }
-	  //skip 4 [2 1 0 1] 
-    strlen := uint32(ByteToInt16(buf[byteoffset+30:byteoffset+32]))
-    strbuf := buf[byteoffset+32:byteoffset+32+strlen]
-    fname := fmt.Sprintf("%s",strbuf)
-    //[3 1 0 2]
-    fsize := ByteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
+    fname := ""
+	ftype := ""
+	fsize := uint32(0)
    
-    //tagsoffset := byteoffset+32+strlen+8
+    
     nubyteoffset := byteoffset+26 //after tag count
     
-	
-/*	old  */
-    if itag > 2 {
-    	//[2 1 0 3]
-	strlentype := uint32(ByteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
-    	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
-    	//str = fmt.Sprintf("%s",strbuf)
-    	
-    //	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop, db, uhash)
-    	byteoffset = byteoffset+32+strlen+14+strlentype
-	    //in theory needs to be able to handle more tags
-    } else {
-    //	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
-	fmt.Println("disc",filehashbuf, fname, fsize)
-	byteoffset = byteoffset+32+strlen+8
-    }
-	  
-	  
     totalreadtags, tagarr := ReadTags(int(nubyteoffset),buf,int(itag),debug)
     if debug {
 		fmt.Println("DEBUG: len(tagarr)",len(tagarr))
@@ -147,18 +120,21 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 		switch tagarr[i].NameByte {
 			case 0x1:
 				if tagarr[i].Type == byte(2) {
+					fname = fmt.Sprintf("%s",tagarr[i].Value)
 					if debug {
 						fmt.Printf("Debug Filename Tag: %s\n",tagarr[i].Value)
 					}
 				}
 			case 0x2:
 				if tagarr[i].Type == byte(3) {
+					fsize = ByteToUint32(tagarr[i].Value)
 					if debug {
-						fmt.Printf("Debug File Size Tag: %d\n",tagarr[i].Value)
+						fmt.Printf("Debug File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
 					}
 				}
 			case 0x3:
 				if tagarr[i].Type == byte(2) {
+					ftype = fmt.Sprintf("%s",tagarr[i].Value)
 					if debug {
 						fmt.Printf("Debug File Type Tag: %s\n",tagarr[i].Value)
 					}
@@ -169,12 +145,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 					fmt.Println(" ->Value: ",tagarr[i].Value)
 				}
 		}
-		/*fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
-		if tagarr[i].Type == byte(2) {
-			fmt.Printf("Debug %s",tagarr[i].Value)
-		}
-		*/
 	}
+	  prconefile(filehashbuf, fname, fsize, ftype, debugloop, db, uhash)
 	  nubyteoffset+=uint32(totalreadtags)
 	  	  
 	  if byteoffset != nubyteoffset {
