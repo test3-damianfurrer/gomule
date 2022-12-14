@@ -83,6 +83,7 @@ func (this *SockSrv) getTCPFlags() (ret uint32) {
 	if this.Debug {
 		fmt.Printf("DEBUG: used Serverflags: %b\n",ret)
 	}
+	return
 }
 
 func NewSockSrv(host string, port int, debug bool) *SockSrv {
@@ -189,7 +190,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			uhash = login(buf, protocol, conn, this.Debug, this.db,HighId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg, getTCPFlags())//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
+			uhash = login(buf, protocol, conn, this.Debug, this.db,HighId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg, this.getTCPFlags())//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
