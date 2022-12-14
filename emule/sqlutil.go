@@ -57,7 +57,13 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 			}
 		case C_CODEC:
 		case C_MINSIZE:
+			*params = append(*params,ByteToUint32(in.Value))
+			fmt.Println("DEBUG(sqlutil.go): minsize ",ByteToUint32(in.Value),in.Value)
+			ret = "files.size >= ?"
 		case C_MAXSIZE:
+			*params = append(*params,ByteToUint32(in.Value))
+			fmt.Println("DEBUG(sqlutil.go): minsize ",ByteToUint32(in.Value),in.Value)
+			ret = "files.size <= ?"
 		case C_FILETYPE:
 			*params = append(*params,fmt.Sprintf("%s",in.Value))
 			ret = "sources.type = ?"
