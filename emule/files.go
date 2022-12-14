@@ -108,7 +108,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 		fsize := uint64(0)
 
 		byteoffset += 26 //after tag count
-		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),true)//debug)
+		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),debug)
 		if debugloop {
 			fmt.Println("DEBUG: len(tagarr)",len(tagarr))
 		}
