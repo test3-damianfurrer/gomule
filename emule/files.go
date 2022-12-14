@@ -119,8 +119,26 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     fsize := ByteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
    
     //tagsoffset := byteoffset+32+strlen+8
-    nubyteoffset := int(byteoffset+32+strlen+8)
-    totalreadtags, tagarr := ReadTags(nubyteoffset,buf,int(itag),debug)
+    nubyteoffset := int(byteoffset+32+strlen)
+    
+	
+/*	old  */
+    if itag > 2 {
+    	//[2 1 0 3]
+	strlentype := uint32(ByteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
+    	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
+    	//str = fmt.Sprintf("%s",strbuf)
+    	
+    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop, db, uhash)
+    	byteoffset = byteoffset+32+strlen+14+strlentype
+	    //in theory needs to be able to handle more tags
+    } else {
+    	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
+	byteoffset = byteoffset+32+strlen+8
+    }
+	  
+	  
+	  totalreadtags, tagarr := ReadTags(nubyteoffset,buf,int(itag),debug)
     if debug {
 	fmt.Println("DEBUG: len(tagarr)",len(tagarr))
     }
@@ -145,21 +163,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 		*/
 	}
 	nubyteoffset+=totalreadtags
-	
-/*	old  */
-    if itag > 2 {
-    	//[2 1 0 3]
-	strlentype := uint32(ByteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
-    	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
-    	//str = fmt.Sprintf("%s",strbuf)
-    	
-    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop, db, uhash)
-    	byteoffset = byteoffset+32+strlen+14+strlentype
-	    //in theory needs to be able to handle more tags
-    } else {
-    	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
-	byteoffset = byteoffset+32+strlen+8
-    }
+	  
+	  
 	  fmt.Println("byteoffset(old)",byteoffset)
 	  fmt.Println("nubyteoffset",nubyteoffset)
 	  //test
