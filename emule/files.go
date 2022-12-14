@@ -76,100 +76,88 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 	
 	//30 bytes more: [2 1 0 1 50 0 116 104 101 46 115 105 109 112 115 111 110 115 46 115 48 50 101 49 48 46 105 110 116 101]
 	// [2 1 0 1] len 50 
-  count := ByteToInt32(buf[0:4]) //cant be more than 200 by spec
-  if debug {
-    fmt.Println("DEBUG: prcofferfiles")
-    fmt.Println("DEBUG: files:", count)
-  }
-  iteration := 0
-  byteoffset := uint32(4)
-  debugloop:=debug
-  
-  for{
-    if byteoffset >= uint32(blen) {
-    //if iteration > 202{
-	    if byteoffset != uint32(blen){
-		    fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
-	    }
-	    if int32(iteration) != count{
-		    fmt.Println("WARNING: offerfiles: last iteration doesn't match filecount", iteration, count)
-	    }
-	    break;
-    }
-    filehashbuf := buf[byteoffset+0:byteoffset+16]
-    
-	 //obfuscated
-    //fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
-    //fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
-    itag := ByteToInt32(buf[byteoffset+22:byteoffset+26])
-    if debugloop {
-    	fmt.Println("DEBUG: 1. tag count:", itag)
-    }
-    fname := ""
-	ftype := ""
-	fsize := uint32(0)
-   
-    
-    nubyteoffset := byteoffset+26 //after tag count
-    
-    totalreadtags, tagarr := ReadTags(int(nubyteoffset),buf,int(itag),debug)
-    if debug {
-		fmt.Println("DEBUG: len(tagarr)",len(tagarr))
-    }
-	for i := 0; i < len(tagarr); i++ {
-		switch tagarr[i].NameByte {
-			case 0x1:
-				if tagarr[i].Type == byte(2) {
-					fname = fmt.Sprintf("%s",tagarr[i].Value)
-					if debug {
-						fmt.Printf("Debug Filename Tag: %s\n",tagarr[i].Value)
-					}
-				}
-			case 0x2:
-				if tagarr[i].Type == byte(3) {
-					fsize = ByteToUint32(tagarr[i].Value)
-					if debug {
-						fmt.Printf("Debug File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
-					}
-				}
-			case 0x3:
-				if tagarr[i].Type == byte(2) {
-					ftype = fmt.Sprintf("%s",tagarr[i].Value)
-					if debug {
-						fmt.Printf("Debug File Type Tag: %s\n",tagarr[i].Value)
-					}
-				}
-			default:
-				if debug {
-					fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
-					fmt.Println(" ->Value: ",tagarr[i].Value)
-				}
-		}
+	count := ByteToInt32(buf[0:4]) //cant be more than 200 by spec
+	if debug {
+		fmt.Println("DEBUG: prcofferfiles")
+		fmt.Println("DEBUG: files:", count)
 	}
-	  prconefile(filehashbuf, fname, fsize, ftype, debugloop, db, uhash)
-	  nubyteoffset+=uint32(totalreadtags)
-	  	  
-	  if byteoffset != nubyteoffset {
-		  fmt.Println("WARNING: byteoffset != nubyteoffset")
-	  fmt.Println("byteoffset(old)",byteoffset)
-	  fmt.Println("nubyteoffset",nubyteoffset)
-	  }
-	  byteoffset = nubyteoffset
-	  //test
-	  //return
-/**/
-    //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
-    iteration+=1
-	  
-    if debugloop {
-      fmt.Println("DEBUG: new byteoffset", byteoffset)
-      fmt.Println("DEBUG: next iteration", iteration)
-    }
-  }
-  if debug {
-    fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
-  }
+	iteration := 0
+	byteoffset := uint32(4)
+	debugloop:=debug
+	for{
+		if byteoffset >= uint32(blen) {
+			//if iteration > 202{
+			if byteoffset != uint32(blen){
+				fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
+			}
+			if int32(iteration) != count{
+				fmt.Println("WARNING: offerfiles: last iteration doesn't match filecount", iteration, count)
+			}
+			break;
+		}
+		filehashbuf := buf[byteoffset+0:byteoffset+16]
+		//obfuscated
+		//fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
+		//fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
+		itag := ByteToInt32(buf[byteoffset+22:byteoffset+26])
+		if debugloop {
+			fmt.Println("DEBUG: 1. tag count:", itag)
+		}
+		fname := ""
+		ftype := ""
+		fsize := uint32(0)
+
+		byteoffset += 26 //after tag count
+		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),debug)
+		if debug {
+			fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+		}
+		for i := 0; i < len(tagarr); i++ {
+			switch tagarr[i].NameByte {
+				case 0x1:
+					if tagarr[i].Type == byte(2) {
+						fname = fmt.Sprintf("%s",tagarr[i].Value)
+						if debug {
+							fmt.Printf("Debug Filename Tag: %s\n",tagarr[i].Value)
+						}
+					}
+				case 0x2:
+					if tagarr[i].Type == byte(3) {
+						fsize = ByteToUint32(tagarr[i].Value)
+						if debug {
+							fmt.Printf("Debug File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
+						}
+					}
+				case 0x3:
+					if tagarr[i].Type == byte(2) {
+						ftype = fmt.Sprintf("%s",tagarr[i].Value)
+						if debug {
+							fmt.Printf("Debug File Type Tag: %s\n",tagarr[i].Value)
+						}
+					}
+				default:
+					if debug {
+						fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+						fmt.Println(" ->Value: ",tagarr[i].Value)
+						return //test
+					}
+			}
+		}
+		prconefile(filehashbuf, fname, fsize, ftype, debugloop, db, uhash)
+		byteoffset+=uint32(totalreadtags)
+
+	    iteration+=1
+
+	    if debugloop {
+	      fmt.Println("DEBUG: new byteoffset", byteoffset)
+	      fmt.Println("DEBUG: next iteration", iteration)
+	    }
+	}
+	if debug {
+		fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
+	}
 }
+
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB, uhash []byte) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
