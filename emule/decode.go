@@ -169,7 +169,7 @@ func readString(pos int, buf []byte)(bread int, ret string) {
 }
 
 func ReadTag(pos int, buf []byte, debug bool)(bread int, ret *OneTag) {
-  dpos = pos + 50
+  dpos := pos + 50
   if dpos > len(buf){
 	  dpos = len(buf)
   }
