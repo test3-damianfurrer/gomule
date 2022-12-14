@@ -129,18 +129,18 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
     	//str = fmt.Sprintf("%s",strbuf)
     	
-    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop, db, uhash)
+    //	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop, db, uhash)
     	byteoffset = byteoffset+32+strlen+14+strlentype
 	    //in theory needs to be able to handle more tags
     } else {
-    	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
+    //	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
 	byteoffset = byteoffset+32+strlen+8
     }
 	  
 	  
-	  totalreadtags, tagarr := ReadTags(nubyteoffset,buf,int(itag),debug)
+    totalreadtags, tagarr := ReadTags(nubyteoffset,buf,int(itag),debug)
     if debug {
-	fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+		fmt.Println("DEBUG: len(tagarr)",len(tagarr))
     }
 	for i := 0; i < len(tagarr); i++ {
 		switch tagarr[i].NameByte {
@@ -153,7 +153,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 			case 0x2:
 				if tagarr[i].Type == byte(3) {
 					if debug {
-						fmt.Printf("Debug File Size Tag: %s\n",tagarr[i].Value)
+						fmt.Printf("Debug File Size Tag: %d\n",tagarr[i].Value)
 					}
 				}
 			case 0x3:
@@ -174,13 +174,17 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 		}
 		*/
 	}
-	nubyteoffset+=totalreadtags
+	  //nubyteoffset+=totalreadtags
 	  
 	  
+	  if byteoffset != nubyteoffset {
+		  fmt.Println("WARNING: byteoffset != nubyteoffset")
 	  fmt.Println("byteoffset(old)",byteoffset)
 	  fmt.Println("nubyteoffset",nubyteoffset)
+	  }
+	  byteoffset = nubyteoffset
 	  //test
-	  return
+	  //return
 /**/
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
     iteration+=1
