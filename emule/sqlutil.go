@@ -30,11 +30,11 @@ func filename2ext(filename string) string {
 	if sindex == 0 {
 		return ""
 	}
-	slen = len(strarr[sindex])
+	slen := len(strarr[sindex])
 	if slen > 8 {
 		return ""
 	}
-	return strarr[sindex]
+	return strings.ToUpper(strarr[sindex])
 }
 
 func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
@@ -46,9 +46,7 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 		case C_NOT:
 			ret = "("+stringifyConstraint(in.Left,params)+") NOT ("+stringifyConstraint(in.Right,params)+")"
 		case C_MAIN:
-			//ret = fmt.Sprintf("sources.name like '%s'",in.Value)
 			strarr := strings.Split(fmt.Sprintf("%s",in.Value)," ")
-			//ret = "("
 			ret = ""
   			for i := 0; i < len(strarr); i++ {
 				if i != 0 {
@@ -57,17 +55,14 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 				ret += "sources.name like ?"
 				*params = append(*params,"%"+strarr[i]+"%")
 			}
-			//ret += ")"
 		case C_CODEC:
 		case C_MINSIZE:
 		case C_MAXSIZE:
 		case C_FILETYPE:
 			*params = append(*params,fmt.Sprintf("%s",in.Value))
-			//ret = fmt.Sprintf("sources.type = '%s'",in.Value)
 			ret = "sources.type = ?"
 		case C_FILEEXT:
 			*params = append(*params,fmt.Sprintf("%s",in.Value))
-			//ret = fmt.Sprintf("sources.ext = '%s'",in.Value)
 			ret = "sources.ext like ?"
 		default:
 			fmt.Println("ERROR: undefined Constraint Type", in.Type)

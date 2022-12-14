@@ -76,73 +76,88 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 	
 	//30 bytes more: [2 1 0 1 50 0 116 104 101 46 115 105 109 112 115 111 110 115 46 115 48 50 101 49 48 46 105 110 116 101]
 	// [2 1 0 1] len 50 
-  count := byteToInt32(buf[0:4]) //cant be more than 200 by spec
-  if debug {
-    fmt.Println("DEBUG: prcofferfiles")
-    fmt.Println("DEBUG: files:", count)
-  }
-  iteration := 0
-  byteoffset := uint32(4)
-  debugloop:=debug
-  
-  for{
-    if byteoffset >= uint32(blen) {
-    //if iteration > 202{
-	    if byteoffset != uint32(blen){
-		    fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
+	count := ByteToInt32(buf[0:4]) //cant be more than 200 by spec
+	if debug {
+		fmt.Println("DEBUG: prcofferfiles")
+		fmt.Println("DEBUG: files:", count)
+	}
+	iteration := 0
+	byteoffset := uint32(4)
+	debugloop:=debug
+	for{
+		if byteoffset >= uint32(blen) {
+			//if iteration > 202{
+			if byteoffset != uint32(blen){
+				fmt.Println("WARNING: byteoffset doesn't match buffer length", byteoffset, blen)
+			}
+			if int32(iteration) != count{
+				fmt.Println("WARNING: offerfiles: last iteration doesn't match filecount", iteration, count)
+			}
+			break;
+		}
+		filehashbuf := buf[byteoffset+0:byteoffset+16]
+		//obfuscated
+		//fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
+		//fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
+		itag := ByteToInt32(buf[byteoffset+22:byteoffset+26])
+		if debugloop {
+			fmt.Println("DEBUG: 1. tag count:", itag)
+		}
+		fname := ""
+		ftype := ""
+		fsize := uint32(0)
+
+		byteoffset += 26 //after tag count
+		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),debug)
+		if debug {
+			fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+		}
+		for i := 0; i < len(tagarr); i++ {
+			switch tagarr[i].NameByte {
+				case 0x1:
+					if tagarr[i].Type == byte(2) {
+						fname = fmt.Sprintf("%s",tagarr[i].Value)
+						if debug {
+							fmt.Printf("Debug Filename Tag: %s\n",tagarr[i].Value)
+						}
+					}
+				case 0x2:
+					if tagarr[i].Type == byte(3) {
+						fsize = ByteToUint32(tagarr[i].Value)
+						if debug {
+							fmt.Printf("Debug File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
+						}
+					}
+				case 0x3:
+					if tagarr[i].Type == byte(2) {
+						ftype = fmt.Sprintf("%s",tagarr[i].Value)
+						if debug {
+							fmt.Printf("Debug File Type Tag: %s\n",tagarr[i].Value)
+						}
+					}
+				default:
+					if debug {
+						fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+						fmt.Println(" ->Value: ",tagarr[i].Value)
+						return //test
+					}
+			}
+		}
+		prconefile(filehashbuf, fname, fsize, ftype, debugloop, db, uhash)
+		byteoffset+=uint32(totalreadtags)
+
+	    iteration+=1
+
+	    if debugloop {
+	      fmt.Println("DEBUG: new byteoffset", byteoffset)
+	      fmt.Println("DEBUG: next iteration", iteration)
 	    }
-	    if int32(iteration) != count{
-		    fmt.Println("WARNING: offerfiles: last iteration doesn't match filecount", iteration, count)
-	    }
-	    break;
-    }
-    //if debugloop {
-      //fmt.Println("DEBUG: byteoffset", byteoffset)
-      //fmt.Println("DEBUG: iteration", iteration)
-    //}
-//fmt.Println("DEBUG: iteration", iteration)
-//fmt.Println("DEBUG: byte on offset", buf[byteoffset])
-    filehashbuf := buf[byteoffset+0:byteoffset+16]
-    
-	 //obfuscated
-    //fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
-    //fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
-    itag := byteToInt32(buf[byteoffset+22:byteoffset+26])
-    if debugloop {
-    	fmt.Println("DEBUG: 1. tag count:", itag)
-    }
-	  //skip 4 [2 1 0 1] 
-    strlen := uint32(byteToInt16(buf[byteoffset+30:byteoffset+32]))
-    strbuf := buf[byteoffset+32:byteoffset+32+strlen]
-    fname := fmt.Sprintf("%s",strbuf)
-    //[3 1 0 2]
-    fsize := byteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
-   
-    if itag > 2 {
-    	//[2 1 0 3]
-	strlentype := uint32(byteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
-    	strbuf = buf[byteoffset+32+strlen+14:byteoffset+32+strlen+14+strlentype]
-    	//str = fmt.Sprintf("%s",strbuf)
-    	
-    	prconefile(filehashbuf, fname, fsize, fmt.Sprintf("%s",strbuf), debugloop, db, uhash)
-    	byteoffset = byteoffset+32+strlen+14+strlentype
-	    //in theory needs to be able to handle more tags
-    } else {
-    	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
-	byteoffset = byteoffset+32+strlen+8
-    }
-    //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
-    iteration+=1
-	  
-    if debugloop {
-      fmt.Println("DEBUG: new byteoffset", byteoffset)
-      fmt.Println("DEBUG: next iteration", iteration)
-    }
-  }
-  if debug {
-    fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
-  }
+	}
+	if debug {
+		fmt.Printf("DEBUG: processed %d files and %d bytes\n",iteration,byteoffset)
+	}
 }
+
 func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB, uhash []byte) {
   if debug {
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
@@ -195,7 +210,7 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
     fmt.Println("DEBUG: Client looks for File Sources")
     fmt.Println("DEBUG: 16lehash:", buf[1:17])
     fmt.Printf("DEBUG: file hash: %x\n",buf[1:17])
-    fmt.Println("DEBUG: size bytes after hash:", buf[17:n],byteToUint32(buf[17:n])) 
+    fmt.Println("DEBUG: size bytes after hash:", buf[17:n],ByteToUint32(buf[17:n])) 
 	  //current db layout doesn't allow for the same hash with differing sizes (unique key)
 	  //thus I ignore it until I decide on a new db layout.
     
@@ -217,7 +232,7 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
     msgsize := uint32(listitems)*uint32(6)
     msgsize += uint32(18) //Type0x42 + file hash + sources count(1byte)
     data = append(data,protocol)
-    data = append(data,uint32ToByte(msgsize)...)
+    data = append(data,UInt32ToByte(msgsize)...)
     data = append(data,0x42)
     data = append(data,buf[1:17]...) //file hash
     data = append(data,byte(listitems))   // count of sources, just one byte? - limit 255 in sql querry
@@ -252,10 +267,10 @@ func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (li
 		return
 	}
 	listitems+=1
-	bytes:=uint32ToByte(ed2kid)
+	bytes:=UInt32ToByte(ed2kid)
 	//srcdata = append(srcdata,byte(192),byte(168),byte(1),byte(249))//
 	srcdata = append(srcdata,bytes[0:4]...)
-	bytes=int16ToByte(port)
+	bytes=Int16ToByte(port)
 	srcdata = append(srcdata,bytes[0:2]...)
 	    if debug {
 		    fmt.Println("DEBUG: SOURCE: HASH: ",srcuhash)
@@ -271,7 +286,7 @@ func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (li
     if debug {
     var fsize uint32
     err = db.QueryRow("select size from files where hash = ?", filehash).Scan(&fsize)
-    fmt.Println("DEBUG: SOURCE: file size: ",uint32ToByte(fsize))
+    fmt.Println("DEBUG: SOURCE: file size: ",UInt32ToByte(fsize))
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
     }
@@ -392,7 +407,7 @@ if 1==1 {
     fmt.Println("DEBUG: buf full query:", buf[1:n])
     if(buf[1] == 0x01) {
 	fmt.Println("DEBUG: simple search")
-    	strlen := byteToInt16(buf[2:4])
+    	strlen := ByteToInt16(buf[2:4])
     	fmt.Println("DEBUG: strlen:", strlen)
     	fmt.Println("DEBUG: strlen buf:", buf[2:4])
     	fmt.Println("DEBUG: buf string:", buf[4:4+strlen])
@@ -442,7 +457,7 @@ if 1==1 {
 	 */
 	
 	    /*
-	strlen := byteToInt16(buf[4:6])
+	strlen := ByteToInt16(buf[4:6])
     	fmt.Println("DEBUG: strlen:", strlen)
     	fmt.Println("DEBUG: strlen buf:", buf[4:6])
 	fmt.Println("DEBUG: buf string:", buf[6:6+strlen])
