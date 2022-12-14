@@ -33,6 +33,7 @@ type Constraint struct {
 	Right *Constraint
 }
 func enumNumberConstraint(one byte, two byte, three byte, four byte) constrainttype {
+	// [1 1 0 2]
 	switch one {
 		case 3:
 			switch two {
@@ -41,7 +42,7 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 						case 0:
 							switch four {
 								case 211:
-									return C_MAXSIZE
+									return C_NONE //C_MAXSIZE
 								default:
 									return C_NONE
 							}
@@ -50,6 +51,12 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 					}
 				default:
 					return C_NONE
+			}
+		case 1:
+			if two == 1 && three == 0 && four == 2{
+				return C_MINSIZE
+			} else {
+				return C_NONE
 			}
 		default:
 			return C_NONE
