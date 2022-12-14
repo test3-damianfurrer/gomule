@@ -118,6 +118,35 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     //[3 1 0 2]
     fsize := ByteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
    
+    //tagsoffset := byteoffset+32+strlen+8
+	nubyteoffset = byteoffset+32+strlen+8
+    totalreadtags, tagarr := ReadTags(nubyteoffset,buf,int(itag),debug)
+    if debug {
+	fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+    }
+	for i := 0; i < len(tagarr); i++ {
+		switch tagarr[i].NameByte {
+			case 0x3:
+				if tagarr[i].Type == byte(2) {
+					if debug {
+						fmt.Printf("Debug Filename Tag: %s\n",tagarr[i].Value)
+					}
+				}
+			default:
+				if debug {
+					fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+					fmt.Println(" ->Value: ",tagarr[i].Value)
+				}
+		}
+		/*fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
+		if tagarr[i].Type == byte(2) {
+			fmt.Printf("Debug %s",tagarr[i].Value)
+		}
+		*/
+	}
+	nubyteoffset+=totalreadtags
+	
+/*	old  */
     if itag > 2 {
     	//[2 1 0 3]
 	strlentype := uint32(ByteToInt16(buf[byteoffset+32+strlen+12:byteoffset+32+strlen+14]))
@@ -131,6 +160,11 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
 	byteoffset = byteoffset+32+strlen+8
     }
+	  fmt.Println("byteoffset(old)",byteoffset)
+	  fmt.Println("nubyteoffset",nubyteoffset)
+	  //test
+	  return
+/**/
     //fmt.Println("DEBUG: 30 bytes more:", buf[byteoffset+36+strlen+14+strlentype:byteoffset+36+strlen+14+strlentype+30])
     iteration+=1
 	  
