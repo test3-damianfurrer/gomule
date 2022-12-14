@@ -143,6 +143,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 							fmt.Printf("Debug Total File Size Tag: %d\n",fsize)							
 						}
 					}
+					return //test
 				default:
 					if debugloop {
 						fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
