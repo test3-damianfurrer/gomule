@@ -39,6 +39,11 @@ func filename2ext(filename string) string {
 
 func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 	switch in.Type {
+		/*
+		C_FILETYPE
+		C_FILEEXT
+		C_AVAIL
+		*/
 		case C_AND:
 			ret = "("+stringifyConstraint(in.Left,params)+") AND ("+stringifyConstraint(in.Right,params)+")"
 		case C_OR:
@@ -55,7 +60,10 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 				ret += "sources.name like ?"
 				*params = append(*params,"%"+strarr[i]+"%")
 			}
+		case C_AVAIL:
 		case C_CODEC:
+			*params = append(*params,fmt.Sprintf("%s",in.Value))
+			ret = "sources.codec like ?"
 		case C_MINSIZE:
 			*params = append(*params,ByteToUint32(in.Value))
 			fmt.Println("DEBUG(sqlutil.go): minsize ",ByteToUint32(in.Value),in.Value)
@@ -76,8 +84,14 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 	return
 }
 func constraintsearch2query(in *Constraint, params *[]interface{})(sqlquery string){
-	sqlquery = "select sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size from sources left join files on sources.file_hash=files.hash WHERE "
-	sqlquery += stringifyConstraint(in, params)
+	fields := "sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size"
+	constraints := stringifyConstraint(in, params)
+	sqlquery = "select " + fields + " from sources left join files on sources.file_hash=files.hash WHERE "
+	sqlquery += constraints
+	sqlquery2 = "select count(sources.id)" + fields + " from sources left join files on sources.file_hash=files.hash WHERE "
+	sqlquery2 += constraints
+	sqlquery2 = sqlquery + "group by " + fields + " "
+	fmt.Println("DEBUG: QUERY2: ",sqlquery2) //availability would have to be having after where
 	return
 }
 
