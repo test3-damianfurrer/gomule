@@ -119,7 +119,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     fsize := ByteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
    
     //tagsoffset := byteoffset+32+strlen+8
-    nubyteoffset := int(byteoffset+26) //after tag count
+    nubyteoffset := byteoffset+26 //after tag count
     
 	
 /*	old  */
@@ -134,11 +134,12 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 	    //in theory needs to be able to handle more tags
     } else {
     //	prconefile(filehashbuf, fname, fsize, "", debugloop, db, uhash)
+	fmt.Println("disc",filehashbuf, fname, fsize)
 	byteoffset = byteoffset+32+strlen+8
     }
 	  
 	  
-    totalreadtags, tagarr := ReadTags(nubyteoffset,buf,int(itag),debug)
+    totalreadtags, tagarr := ReadTags(int(nubyteoffset),buf,int(itag),debug)
     if debug {
 		fmt.Println("DEBUG: len(tagarr)",len(tagarr))
     }
@@ -174,9 +175,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 		}
 		*/
 	}
-	  //nubyteoffset+=totalreadtags
-	  
-	  
+	  nubyteoffset+=uint32(totalreadtags)
+	  	  
 	  if byteoffset != nubyteoffset {
 		  fmt.Println("WARNING: byteoffset != nubyteoffset")
 	  fmt.Println("byteoffset(old)",byteoffset)
