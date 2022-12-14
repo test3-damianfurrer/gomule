@@ -144,10 +144,22 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     }
 	for i := 0; i < len(tagarr); i++ {
 		switch tagarr[i].NameByte {
-			case 0x3:
+			case 0x1:
 				if tagarr[i].Type == byte(2) {
 					if debug {
 						fmt.Printf("Debug Filename Tag: %s\n",tagarr[i].Value)
+					}
+				}
+			case 0x2:
+				if tagarr[i].Type == byte(3) {
+					if debug {
+						fmt.Printf("Debug File Size Tag: %s\n",tagarr[i].Value)
+					}
+				}
+			case 0x3:
+				if tagarr[i].Type == byte(2) {
+					if debug {
+						fmt.Printf("Debug File Type Tag: %s\n",tagarr[i].Value)
 					}
 				}
 			default:
