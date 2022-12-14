@@ -39,6 +39,13 @@ type SockSrv struct {
 	I2P      bool
 	SAM      string
 	SAMPort  int
+	SupportGzip		bool
+	SupportNewTags		bool
+	SupportUnicode		bool
+	SupportRelSearch	bool
+	SupportTTagInteger	bool
+	SupportLargeFiles	bool
+	SupportObfuscation	bool
 	SQL      bool
 	SqlDriver string
 	SqlUser  string
@@ -48,6 +55,34 @@ type SockSrv struct {
 	SqlDB    string
 	db       *sql.DB
 	listener net.Listener
+}
+
+func (this *SockSrv) getTCPFlags() (ret uint32) {
+	ret = uint32(0)
+	if this.SupportGzip{
+		ret +=  uint32(0x00000001)
+	}
+	if this.SupportNewTags{
+		ret += uint32(0x00000008)
+	}
+	if this.SupportUnicode{
+		ret += uint32(0x00000010)
+	}
+	if this.SupportRelSearch{
+		ret += uint32(0x00000040)
+	}
+	if this.SupportTTagInteger{
+		ret += uint32(0x00000080)
+	}
+	if this.SupportLargeFiles{
+		ret += uint32(0x00000100)
+	}
+	if this.SupportObfuscation{
+		ret += uint32(0x00000400)
+	}
+	if this.Debug {
+		fmt.Printf("DEBUG: used Serverflags: %b\n",ret)
+	}
 }
 
 func NewSockSrv(host string, port int, debug bool) *SockSrv {
@@ -154,7 +189,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			fmt.Printf("DEBUG: type 0x%02x\n", buf[0])
 		}
 		if buf[0] == 0x01 {
-			uhash = login(buf, protocol, conn, this.Debug, this.db,HighId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg)//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
+			uhash = login(buf, protocol, conn, this.Debug, this.db,HighId(this.Host),uint16(this.Port), this.Ssname, this.Ssdesc, this.Ssmsg, getTCPFlags())//chigh_id, cport, uhash = login(buf, protocol, conn, this.Debug, this.db)
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
