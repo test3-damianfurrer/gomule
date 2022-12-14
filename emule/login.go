@@ -41,7 +41,7 @@ func logout(uhash []byte, debug bool, db *sql.DB){
 	
 }
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16, ssname string, ssdesc string, ssmsg string) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16, ssname string, ssdesc string, ssmsg string, sflags uint32) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
@@ -173,7 +173,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	}
 	conn.Write(data)
 
-
+//tcp tags uin32 here
 	high_id_b := UInt32ToByte(high_id)
 	data = EncodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],1, 0, 0, 0})
 	if debug {
