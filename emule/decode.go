@@ -24,6 +24,7 @@ const (
 	C_MAXSIZE
 	C_FILETYPE
 	C_FILEEXT
+	C_AVAIL
 )
 
 type Constraint struct {
@@ -33,9 +34,19 @@ type Constraint struct {
 	Right *Constraint
 }
 func enumNumberConstraint(one byte, two byte, three byte, four byte) constrainttype {
-	// [1 1 0 2] - min size
+	// [1 1 0 2] - min size amule
 	// [2 1 0 2] - max size
+	// [1 1 0 21] - verfügbarkeit (min amount of available sources?)
+	// 3 1 0 2 - min size emule
+	// 4 1 0 2 - max size emule
+	//[3 1 0 21] - availabillity emule
 	switch one {
+		case 4:
+			if two == 1 && three == 0 && four == 2 {
+				return C_MAXSIZE
+			} else {
+				return C_NONE
+			}
 		case 3:
 			switch two {
 				case 1:
@@ -44,6 +55,10 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 							switch four {
 								case 211:
 									return C_NONE //C_MAXSIZE
+								case 21:
+									return C_AVAIL
+								case 2:
+									return C_MINSIZE
 								default:
 									return C_NONE
 							}
@@ -54,8 +69,15 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 					return C_NONE
 			}
 		case 1:
-			if two == 1 && three == 0 && four == 2{
-				return C_MINSIZE
+			if two == 1 && three == 0 {
+				switch four {
+					case 2:
+						return C_MINSIZE
+					case 21:
+						return C_AVAIL
+					default:
+						return C_NONE
+				}
 			} else {
 				return C_NONE
 			}
