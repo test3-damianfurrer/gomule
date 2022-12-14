@@ -108,8 +108,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 		fsize := uint32(0)
 
 		byteoffset += 26 //after tag count
-		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),debug)
-		if debug {
+		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),false)//debug)
+		if debugloop {
 			fmt.Println("DEBUG: len(tagarr)",len(tagarr))
 		}
 		for i := 0; i < len(tagarr); i++ {
@@ -117,33 +117,34 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 				case 0x1:
 					if tagarr[i].Type == byte(2) {
 						fname = fmt.Sprintf("%s",tagarr[i].Value)
-						if debug {
+						if debugloop {
 							fmt.Printf("Debug Filename Tag: %s\n",tagarr[i].Value)
 						}
 					}
 				case 0x2:
 					if tagarr[i].Type == byte(3) {
 						fsize = ByteToUint32(tagarr[i].Value)
-						if debug {
+						if debugloop {
 							fmt.Printf("Debug File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
 						}
 					}
 				case 0x3:
 					if tagarr[i].Type == byte(2) {
 						ftype = fmt.Sprintf("%s",tagarr[i].Value)
-						if debug {
+						if debugloop {
 							fmt.Printf("Debug File Type Tag: %s\n",tagarr[i].Value)
 						}
 					}
 				default:
-					if debug {
+					if debugloop {
 						fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
 						fmt.Println(" ->Value: ",tagarr[i].Value)
 						return //test
 					}
 			}
 		}
-		prconefile(filehashbuf, fname, fsize, ftype, debugloop, db, uhash)
+		//prconefile(filehashbuf, fname, fsize, ftype, debugloop, db, uhash)
+		prconefile(filehashbuf, fname, fsize, ftype, false, db, uhash)
 		byteoffset+=uint32(totalreadtags)
 
 	    iteration+=1
