@@ -82,7 +82,7 @@ func main() {
 	SupportObfuscation
 	*/
 	sock.SupportGzip=true
-	//sock.SupportLargeFiles=true
+	sock.SupportLargeFiles=true
 	
 	sock.Ssname = "Test Server"
 	sock.Ssdesc = "Gomule a Testing Server"

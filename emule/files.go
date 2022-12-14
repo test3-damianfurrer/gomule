@@ -7,7 +7,7 @@ import (
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 
-func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash []byte){
+func prconefile(filehashbuf []byte, filename string, fsize uint64, filetype string, debug bool, db *sql.DB, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: user hash:", uhash) 
 		fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
@@ -105,11 +105,11 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 		}
 		fname := ""
 		ftype := ""
-		fsize := uint32(0)
+		fsize := uint64(0)
 
 		byteoffset += 26 //after tag count
-		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),debug)
-		if debug {
+		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),true)//debug)
+		if debugloop {
 			fmt.Println("DEBUG: len(tagarr)",len(tagarr))
 		}
 		for i := 0; i < len(tagarr); i++ {
@@ -117,33 +117,42 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 				case 0x1:
 					if tagarr[i].Type == byte(2) {
 						fname = fmt.Sprintf("%s",tagarr[i].Value)
-						if debug {
+						if debugloop {
 							fmt.Printf("Debug Filename Tag: %s\n",tagarr[i].Value)
 						}
 					}
 				case 0x2:
 					if tagarr[i].Type == byte(3) {
-						fsize = ByteToUint32(tagarr[i].Value)
-						if debug {
+						fsize = uint64(ByteToUint32(tagarr[i].Value))
+						if debugloop {
 							fmt.Printf("Debug File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
 						}
 					}
 				case 0x3:
 					if tagarr[i].Type == byte(2) {
 						ftype = fmt.Sprintf("%s",tagarr[i].Value)
-						if debug {
+						if debugloop {
 							fmt.Printf("Debug File Type Tag: %s\n",tagarr[i].Value)
 						}
 					}
+				case 0x3a:
+					if tagarr[i].Type == byte(3) {
+						fsize += uint64(ByteToUint32(tagarr[i].Value)) * uint64(0x100000000)
+						if debugloop {
+							fmt.Printf("Debug >32bit File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
+							fmt.Printf("Debug Total File Size Tag: %d\n",fsize)							
+						}
+					}
 				default:
-					if debug {
+					if debugloop {
 						fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
 						fmt.Println(" ->Value: ",tagarr[i].Value)
 						return //test
 					}
 			}
 		}
-		prconefile(filehashbuf, fname, fsize, ftype, debugloop, db, uhash)
+		//prconefile(filehashbuf, fname, fsize, ftype, debugloop, db, uhash)
+		prconefile(filehashbuf, fname, fsize, ftype, false, db, uhash)
 		byteoffset+=uint32(totalreadtags)
 
 	    iteration+=1
@@ -284,12 +293,14 @@ func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (li
     }
     rows.Close()
     if debug {
-    var fsize uint32
+    var fsize uint64 //info only
     err = db.QueryRow("select size from files where hash = ?", filehash).Scan(&fsize)
-    fmt.Println("DEBUG: SOURCE: file size: ",UInt32ToByte(fsize))
     if err != nil {
 	fmt.Println("ERROR: ",err.Error())
     }
+    fmt.Println("DEBUG: SOURCE: file size: ",fsize)
+    //fmt.Println("DEBUG: SOURCE: file size: ",UInt32ToByte(fsize))
+    
     }
     return
 }
