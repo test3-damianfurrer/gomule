@@ -7,7 +7,7 @@ import (
 	libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 
-func prconefile(filehashbuf []byte, filename string, fsize uint32, filetype string, debug bool, db *sql.DB, uhash []byte){
+func prconefile(filehashbuf []byte, filename string, fsize uint64, filetype string, debug bool, db *sql.DB, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: user hash:", uhash) 
 		fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
@@ -105,10 +105,10 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 		}
 		fname := ""
 		ftype := ""
-		fsize := uint32(0)
+		fsize := uint64(0)
 
 		byteoffset += 26 //after tag count
-		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),false)//debug)
+		totalreadtags, tagarr := ReadTags(int(byteoffset),buf,int(itag),true)//debug)
 		if debugloop {
 			fmt.Println("DEBUG: len(tagarr)",len(tagarr))
 		}
@@ -123,7 +123,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 					}
 				case 0x2:
 					if tagarr[i].Type == byte(3) {
-						fsize = ByteToUint32(tagarr[i].Value)
+						fsize = uint64(ByteToUint32(tagarr[i].Value))
 						if debugloop {
 							fmt.Printf("Debug File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
 						}
@@ -133,6 +133,14 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 						ftype = fmt.Sprintf("%s",tagarr[i].Value)
 						if debugloop {
 							fmt.Printf("Debug File Type Tag: %s\n",tagarr[i].Value)
+						}
+					}
+				case 0x3a:
+					if tagarr[i].Type == byte(3) {
+						fsize += uint64(ByteToUint32(tagarr[i].Value) * uint64(0x100000000))
+						if debugloop {
+							fmt.Printf("Debug >32bit File Size Tag: %d\n",ByteToUint32(tagarr[i].Value))
+							fmt.Printf("Debug Total File Size Tag: %d\n",fsize)							
 						}
 					}
 				default:
