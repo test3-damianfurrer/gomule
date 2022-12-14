@@ -92,6 +92,7 @@ func constraintsearch2query(in *Constraint, params *[]interface{})(sqlquery stri
 	sqlquery2 += constraints
 	sqlquery2 = sqlquery2 + " group by " + fields + " "
 	fmt.Println("DEBUG: QUERY2: ",sqlquery2) //availability would have to be having after where
+	sqlquery = sqlquery2
 	return
 }
 
