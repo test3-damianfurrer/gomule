@@ -119,7 +119,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
     fsize := ByteToUint32(buf[byteoffset+32+strlen+4:byteoffset+32+strlen+8])
    
     //tagsoffset := byteoffset+32+strlen+8
-    nubyteoffset := int(byteoffset+32+strlen)
+    nubyteoffset := int(byteoffset+26) //after tag count
     
 	
 /*	old  */
