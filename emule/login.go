@@ -175,7 +175,8 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 
 //tcp tags uin32 here
 	high_id_b := UInt32ToByte(high_id)
-	data = EncodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],1, 0, 0, 0})
+	tcpflags_b:= UInt32ToByte(sflags)
+	data = EncodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],tcpflags_b[0], tcpflags_b[1], tcpflags_b[2], tcpflags_b[3]})
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
