@@ -183,8 +183,10 @@ func (this *SockSrv) respConn(conn net.Conn) {
 				    fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
 				}
 				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
-			} else {
-				fmt.Println("ERROR: from read:", err, err.Error())
+			} else if err == net.ErrClosed {
+				fmt.Println("DEBUG: conn closed due to invalid client data:", err.Error())
+			}else {
+				fmt.Println("ERROR: from read:", err.Error())
 			}
 			return
 		}
