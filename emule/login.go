@@ -63,6 +63,13 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	
 	var tmpbuf []byte
 	
+	
+	if !SliceBuf(buf,700,750,&tmpbuf) {
+		conn.Close()
+		return
+	}
+	fmt.Println("DEBUG: fake:", tmpbuf)
+	
 	high_id := HighId(conn.RemoteAddr().String())
 	if !SliceBuf(buf,21,23,&tmpbuf) {
 		conn.Close()
