@@ -183,6 +183,8 @@ func (this *SockSrv) respConn(conn net.Conn) {
 				    fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
 				}
 				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
+			} else {
+				fmt.Println("ERROR: from read:", err.Error())
 			}
 			return
 		}
