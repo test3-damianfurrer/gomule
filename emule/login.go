@@ -45,7 +45,10 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
-	SliceBuf(buf,1,17,&uhash)
+	if !SliceBuf(buf,1,17,&uhash) {
+		conn.Close()
+		return
+	}
 	//uhash=buf[1:17]
 	//uhash = make([]byte, 16)
 	//i := 0
@@ -58,9 +61,19 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	//}
 	//buf[1:17]
 	
+	var tmpbuf []byte
+	
 	high_id := HighId(conn.RemoteAddr().String())
-	port := ByteToInt16(buf[21:23])
-	tags := ByteToInt32(buf[23:27])
+	if !SliceBuf(buf,21,23,&tmpbuf) {
+		conn.Close()
+		return
+	}
+	port := ByteToInt16(tmpbuf)
+	if !SliceBuf(buf,23,27,&tmpbuf) {
+		conn.Close()
+		return
+	}
+	tags := ByteToInt32(tmpbuf)
 	if debug {
 		uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
