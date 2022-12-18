@@ -103,14 +103,14 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 			}
 			break;
 		}
-		if !SliceBuf(buf,byteoffset,byteoffset+16,&tmpbuf) {
+		if !SliceBuf(buf,int(byteoffset),int(byteoffset)+16,&tmpbuf) {
 			return
 		}
 		filehashbuf := tmpbuf//buf[byteoffset+0:byteoffset+16]
 		//obfuscated
 		//fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
 		//fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
-		if !SliceBuf(buf,byteoffset+22,byteoffset+26,&tmpbuf) {
+		if !SliceBuf(buf,int(byteoffset)+22,int(byteoffset)+26,&tmpbuf) {
 			return
 		}
 		itag := ByteToInt32(tmpbuf)
@@ -456,14 +456,14 @@ if 1==1 {
     	strlen := ByteToInt16(tmpbuf[2:4])
     	fmt.Println("DEBUG: strlen:", strlen)
     	fmt.Println("DEBUG: strlen buf:", tmpbuf[2:4])
-	if !SliceBuf(buf,4,4+strlen,&tmpbuf) {
+	    if !SliceBuf(buf,4,4+int(strlen),&tmpbuf) {
 		return
 	}
     	fmt.Println("DEBUG: buf string:", tmpbuf)
     	strbuf := tmpbuf
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
-	if !SliceBuf(buf,4+strlen,n,&tmpbuf) {
+	    if !SliceBuf(buf,4+int(strlen),n,&tmpbuf) {
 		return
 	}
         fmt.Println("DEBUG: buf other:", tmpbuf)
