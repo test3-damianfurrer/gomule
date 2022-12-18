@@ -8,20 +8,24 @@ import (
 )
 
 func prconefile(filehashbuf []byte, filename string, fsize uint64, filetype string, debug bool, db *sql.DB, uhash []byte){
+	var tmpbuf []byte
+	if !SliceBuf(filehashbuf,0,16,&tmpbuf) {
+		return
+	}
 	if debug {
 		fmt.Println("DEBUG: user hash:", uhash) 
 		fuuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
-		filehashbuf[0:2], filehashbuf[2:4], 
-		filehashbuf[4:6], filehashbuf[6:8],
-		filehashbuf[8:10], filehashbuf[10:12], 
-		filehashbuf[12:14], filehashbuf[14:16])
+		tmpbuf[0:2], tmpbuf[2:4], 
+		tmpbuf[4:6], tmpbuf[6:8],
+		tmpbuf[8:10], tmpbuf[10:12], 
+		tmpbuf[12:14], tmpbuf[14:16])
     		fmt.Println("DEBUG: File hash:", fuuid)  
     		fmt.Println("DEBUG: File name:", filename)
     		fmt.Println("DEBUG: File type:", filetype)
 		fmt.Println("DEBUG: File size:", fsize)
 	}
 	//files
-	res, err := db.Exec("UPDATE files SET time_offer = CURRENT_TIMESTAMP WHERE hash = ?",filehashbuf[0:16])
+	res, err := db.Exec("UPDATE files SET time_offer = CURRENT_TIMESTAMP WHERE hash = ?",tmpbuf)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
@@ -36,7 +40,7 @@ func prconefile(filehashbuf []byte, filename string, fsize uint64, filetype stri
 	}
 	
 	if affectedRows == 0 {
-		res, err = db.Exec("INSERT INTO files(hash, size, time_creation, time_offer) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",filehashbuf[0:16],fsize)
+		res, err = db.Exec("INSERT INTO files(hash, size, time_creation, time_offer) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",tmpbuf,fsize)
 		if err != nil {
 			fmt.Println("ERROR: ",err.Error())
 			return
@@ -44,7 +48,7 @@ func prconefile(filehashbuf []byte, filename string, fsize uint64, filetype stri
 	}
 	
 	//sources
-	res, err = db.Exec("UPDATE sources SET time_offer = CURRENT_TIMESTAMP WHERE file_hash = ? AND user_hash = ?",filehashbuf[0:16],uhash)
+	res, err = db.Exec("UPDATE sources SET time_offer = CURRENT_TIMESTAMP WHERE file_hash = ? AND user_hash = ?",tmpbuf,uhash)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
@@ -59,7 +63,7 @@ func prconefile(filehashbuf []byte, filename string, fsize uint64, filetype stri
 	}
 	//todo figure out ext (file extension e.g. zip)
 	if affectedRows == 0 {
-		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1)",filehashbuf[0:16],uhash,filename,filename2ext(filename),filetype)
+		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1)",tmpbuf,uhash,filename,filename2ext(filename),filetype)
 		if err != nil {
 			fmt.Println("ERROR: ",err.Error())
 			panic("fuck")
@@ -76,7 +80,11 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 	
 	//30 bytes more: [2 1 0 1 50 0 116 104 101 46 115 105 109 112 115 111 110 115 46 115 48 50 101 49 48 46 105 110 116 101]
 	// [2 1 0 1] len 50 
-	count := ByteToInt32(buf[0:4]) //cant be more than 200 by spec
+	var tmpbuf []byte
+	if !SliceBuf(buf,0,4,&tmpbuf) {
+		return
+	}
+	count := ByteToInt32(tmpbuf) //cant be more than 200 by spec
 	if debug {
 		fmt.Println("DEBUG: prcofferfiles")
 		fmt.Println("DEBUG: files:", count)
@@ -95,11 +103,18 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 			}
 			break;
 		}
-		filehashbuf := buf[byteoffset+0:byteoffset+16]
+		if !SliceBuf(buf,byteoffset,byteoffset+16,&tmpbuf) {
+			return
+		}
+		filehashbuf := tmpbuf//buf[byteoffset+0:byteoffset+16]
 		//obfuscated
 		//fmt.Println("DEBUG: client id:", buf[byteoffset+16:byteoffset+20])
 		//fmt.Println("DEBUG: client port:", buf[byteoffset+20:byteoffset+22])
-		itag := ByteToInt32(buf[byteoffset+22:byteoffset+26])
+		if !SliceBuf(buf,byteoffset+22,byteoffset+26,&tmpbuf) {
+			return
+		}
+		itag := ByteToInt32(tmpbuf)
+		//itag := ByteToInt32(buf[byteoffset+22:byteoffset+26])
 		if debugloop {
 			fmt.Println("DEBUG: 1. tag count:", itag)
 		}
@@ -172,7 +187,11 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 	fmt.Println("DEBUG: Client offers Files / Keep alive")
 	fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
   }
-  bufcomp := buf[1:n]
+	var bufcomp []byte
+	if !SliceBuf(buf,1,n,&bufcomp) {
+		return
+	}
+  //bufcomp := buf[1:n]
   if protocol == 0xd4 {
 	var blen int = 0
  	var decompressed []byte  //maybe move Decompressor creation to the creation of the connection
@@ -215,11 +234,18 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 
 func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB) {
 	//type=buf[0]
+	var tmpbuf []byte
   if debug {
     fmt.Println("DEBUG: Client looks for File Sources")
-    fmt.Println("DEBUG: 16lehash:", buf[1:17])
-    fmt.Printf("DEBUG: file hash: %x\n",buf[1:17])
-    fmt.Println("DEBUG: size bytes after hash:", buf[17:n],ByteToUint32(buf[17:n])) 
+	if !SliceBuf(buf,1,17,&tmpbuf) {
+		return
+	}
+    fmt.Println("DEBUG: 16lehash:", tmpbuf)
+    fmt.Printf("DEBUG: file hash: %x\n",tmpbuf)
+	  if !SliceBuf(buf,17,n,&tmpbuf) {
+		return
+	}
+    fmt.Println("DEBUG: size bytes after hash:", tmpbuf,ByteToUint32(tmpbuf)) 
 	  //current db layout doesn't allow for the same hash with differing sizes (unique key)
 	  //thus I ignore it until I decide on a new db layout.
     
@@ -229,8 +255,11 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
 	  
     //fmt.Println("DEBUG: full buf:", n, buf[0:n])	  
   }
+	if !SliceBuf(buf,1,17,&tmpbuf) {
+		return
+	}
   data := make([]byte, 0)
-  listitems, srcdata:=queryfilesources(buf[1:17],uhash,debug,db) //valid hash
+  listitems, srcdata:=queryfilesources(tmpbuf,uhash,debug,db) //valid hash
   if listitems > 0 {
     if debug {
       fmt.Println("DEBUG: found sources: ",listitems)
@@ -243,7 +272,7 @@ func filesources(buf []byte, uhash []byte, protocol byte, conn net.Conn, debug b
     data = append(data,protocol)
     data = append(data,UInt32ToByte(msgsize)...)
     data = append(data,0x42)
-    data = append(data,buf[1:17]...) //file hash
+    data = append(data,tmpbuf...) //file hash
     data = append(data,byte(listitems))   // count of sources, just one byte? - limit 255 in sql querry
     data = append(data,srcdata...)
     if debug {
@@ -416,17 +445,28 @@ func searchfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db
 if 1==1 {
     fmt.Println("DEBUG: Client looks for Files")
     //fmt.Println("DEBUG: searchfiles")
-    fmt.Println("DEBUG: buf full query:", buf[1:n])
+	
+	var tmpbuf []byte
+	if !SliceBuf(buf,1,n,&tmpbuf) {
+		return
+	}
+    fmt.Println("DEBUG: buf full query:", tmpbuf)
     if(buf[1] == 0x01) {
 	fmt.Println("DEBUG: simple search")
-    	strlen := ByteToInt16(buf[2:4])
+    	strlen := ByteToInt16(tmpbuf[2:4])
     	fmt.Println("DEBUG: strlen:", strlen)
-    	fmt.Println("DEBUG: strlen buf:", buf[2:4])
-    	fmt.Println("DEBUG: buf string:", buf[4:4+strlen])
-    	strbuf := buf[4:4+strlen]
+    	fmt.Println("DEBUG: strlen buf:", tmpbuf[2:4])
+	if !SliceBuf(buf,4,4+strlen,&tmpbuf) {
+		return
+	}
+    	fmt.Println("DEBUG: buf string:", tmpbuf)
+    	strbuf := tmpbuf
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
-        fmt.Println("DEBUG: buf other:", buf[4+strlen:n])
+	if !SliceBuf(buf,4+strlen,n,&tmpbuf) {
+		return
+	}
+        fmt.Println("DEBUG: buf other:", tmpbuf)
 	querystr, strarr := search2query(str)
 	fmt.Println("DEBUG: qry:", querystr)
 	fmt.Println("DEBUG: strarr:", strarr)
@@ -434,7 +474,7 @@ if 1==1 {
     } else {
 	fmt.Println("DEBUG: complex search")
 	 //readConstraints(pos int, buf []byte)(readb int,ret *Constraint)
-	readbytes, constraints := readConstraints(1, buf)
+	readbytes, constraints := readConstraints(0, tmpbuf) //readConstraints(1, buf)
 	fmt.Println("read bytes:",readbytes)
 	if constraints == nil {
 		fmt.Println("ERROR: No Contrainsts could be parsed")
