@@ -24,8 +24,9 @@ import (
 	"fmt"
 	"math"
 )
+
 func SliceBuf(buf []byte, int from, int to, newbuf *[]byte) bool {
-	if(len(buf) < to)
+	if len(buf) < to
 		return false
 	*newbuf = buf[from:to]
 	return true
