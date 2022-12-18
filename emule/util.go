@@ -25,7 +25,7 @@ import (
 	"math"
 )
 
-func SliceBuf(buf []byte, int from, int to, newbuf *[]byte) bool {
+func SliceBuf(buf []byte, from int, to int, newbuf *[]byte) bool {
 	if len(buf) < to {
 		return false
 	}
