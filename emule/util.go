@@ -32,6 +32,16 @@ func SliceBuf(buf []byte, from int, to int, newbuf *[]byte) bool {
 	*newbuf = buf[from:to]
 	return true
 }
+/*//type ErrorFunc func(int, int)int
+type ErrorFunc func()
+func SliceBufOrErr(buf []byte, from int, to int, errf ErrorFunc) []byte {
+	tmpbuf := make([]byte,0)
+	if !SliceBuf(buf,from,to,&tmpbuf) {
+		errf()
+	}
+	return 
+}*/
+
 
 func ByteToInt32(data []byte) (ret int32) {
 	buf := bytes.NewBuffer(data)
