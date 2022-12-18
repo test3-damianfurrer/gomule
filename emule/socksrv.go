@@ -184,7 +184,9 @@ func (this *SockSrv) respConn(conn net.Conn) {
 				}
 				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
 			} else if errors.Is(err, net.ErrClosed) {
-				fmt.Println("DEBUG: conn closed due to invalid client data:", err.Error())
+				if this.Debug {
+					fmt.Println("DEBUG: conn closed due to invalid client data")
+				}
 			}else {
 				fmt.Println("ERROR: from read:", err.Error())
 			}
