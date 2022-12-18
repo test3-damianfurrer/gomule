@@ -45,7 +45,8 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
-	uhash=buf[1:17]
+	SliceBuf(buf,1,17,&uhash)
+	//uhash=buf[1:17]
 	//uhash = make([]byte, 16)
 	//i := 0
 	//for{
