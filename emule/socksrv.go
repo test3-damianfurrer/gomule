@@ -105,9 +105,10 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 
 	n, err = conn.Read(buf)
 	if err != nil {
-		if err != io.EOF {
+		/*if err != io.EOF {
 			fmt.Println("ERROR:", err.Error())
 		}
+		*/
 		return
 	}
 	if buf[0] == 0xE3 {
