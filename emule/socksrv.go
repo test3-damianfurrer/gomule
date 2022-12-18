@@ -184,7 +184,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 				}
 				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
 			} else {
-				fmt.Println("ERROR: from read:", err.Error())
+				fmt.Println("ERROR: from read:", err, err.Error())
 			}
 			return
 		}
