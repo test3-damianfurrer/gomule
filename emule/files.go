@@ -295,13 +295,13 @@ func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (li
     rows, err := db.Query("select sources.user_hash,clients.id_ed2k,clients.port from sources left join clients on sources.user_hash=clients.hash where sources.file_hash = ? AND sources.user_hash <> ? LIMIT 255", filehash, uhash)
 	//INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     if err != nil {
-	fmt.Println("ERROR: ",err.Error())
+	fmt.Println("ERROR query: ",err.Error())
 	return
     }
     for rows.Next() {
 	err := rows.Scan(&srcuhash,&ed2kid,&port)
 	if err != nil {
-		fmt.Println("ERROR: ",err.Error())
+		fmt.Println("ERROR row scan: ",err.Error())
 		return
 	}
 	listitems+=1
@@ -318,7 +318,7 @@ func queryfilesources(filehash []byte, uhash []byte, debug bool, db *sql.DB) (li
     }
     err = rows.Err()
     if err != nil {
-	fmt.Println("ERROR: ",err.Error())
+	fmt.Println("ERROR rows: ",err.Error())
     }
     rows.Close()
     if debug {
