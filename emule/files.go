@@ -356,7 +356,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
 }
 */
 
-func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
+func dbsearchfilesexec(query string, params *[]interface{}, db *sql.DB, conn net.Conn){
   var scount int
   var sname string
   var sext string
@@ -507,7 +507,7 @@ if 1==1 {
 	fmt.Println("DEBUG: qry:", querystr)
 	//fmt.Println("DEBUG: strarr:", strarr)
 	//dbsearchfiles(querystr,strarr,db)
-  	dbsearchfilesexec(querystr,&params,db)
+  	dbsearchfilesexec(querystr,&params,db,conn)
     } else {
 	fmt.Println("DEBUG: complex search")
 	 //readConstraints(pos int, buf []byte)(readb int,ret *Constraint)
@@ -529,7 +529,7 @@ if 1==1 {
 	sqlquery := constraintsearch2query(constraints, &params)
 	fmt.Println(sqlquery)
 	fmt.Println("params: ",params)
-	dbsearchfilesexec(sqlquery,&params,db)
+	dbsearchfilesexec(sqlquery,&params,db,conn)
 	    
 	    /*
 	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
