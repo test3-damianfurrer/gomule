@@ -371,15 +371,41 @@ func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
     fmt.Println("ERROR: ",err.Error())
     return
   }
+  response_b := make([]byte,0)
+  rescount := 0
   for rows.Next() {
 	err := rows.Scan(&scount,&sname,&sext,&stype,&srating,&sfilehash,&sfilesize)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
 	}
+	rescount++
 	fmt.Println("Debug: file found: ",sname,scount)
 	fmt.Printf("Debug file hash: %x, size: %d\n",sfilehash,sfilesize)
+	  /*
+	  answer:
+	  */
+	response_b = append(response_b,sfilehash...) //hash
+	response_b = append(response_b,255,255,255,255) //clientid
+	response_b = append(response_b,255,255) //clientport
+	response_b = append(response_b,UInt32ToByte(uint32(4))...) //tag count
+	filename_b := EncodeByteTagString(EncodeByteTagNameInt(0x1),sname)
+	filesize_b := EncodeByteTagInt(EncodeByteTagNameInt(0x2),sfilesize)
+	filetype_b := EncodeByteTagString(EncodeByteTagNameInt(0x3),stype)
+	filesources_b := EncodeByteTagInt(EncodeByteTagNameInt(0x15),scount)
+	response_b = append(response_b,filename_b...)
+	response_b = append(response_b,filesize_b...)
+	response_b = append(response_b,filetype_b...)
+	response_b = append(response_b,filesources_b...)
   }
+	response2_b = make([]byte,0)
+	response2_b = append(response2_b,0xe3)
+	response2_b = append(response2_b,UInt32ToByte(len(response_b)+5)...) //res count 4 + 1 b type
+	response2_b = append(response2_b,0x16)
+	response2_b = append(response2_b,UInt32ToByte(uint32(rescount))...)
+	response2_b = append(response2_b,response_b...)
+	fmt.Println("DEBUG: search response: ",response2_b)
+	conn.Write(response2_b) //respond
   return
 }
 
