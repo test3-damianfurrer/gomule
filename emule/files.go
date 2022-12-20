@@ -472,7 +472,7 @@ if 1==1 {
 	params := make([]interface{}, 0)
 	querystr :=  search2query2(str,params)
 	fmt.Println("DEBUG: qry:", querystr)
-	fmt.Println("DEBUG: strarr:", strarr)
+	//fmt.Println("DEBUG: strarr:", strarr)
 	//dbsearchfiles(querystr,strarr,db)
   	dbsearchfilesexec(querystr,&params,db)
     } else {
