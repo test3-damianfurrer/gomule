@@ -96,6 +96,24 @@ func constraintsearch2query(in *Constraint, params *[]interface{})(sqlquery stri
 	return
 }
 
+func search2query2(search string,params *[]interface{})(sqlquery string){
+  fields := "sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size"
+  sqlquery = "select count(sources.id), "+fields+" from sources left join files on sources.file_hash=files.hash WHERE "
+  strarr = strings.Split(search," ")
+  for i := 0; i < len(strarr); i++ {
+	  *params = append(*params,"%"+strarr[i]+"%")
+	  if i < len(strarr)-1 {
+	  	sqlquery += "sources.name like ? AND "
+	  } else {
+		sqlquery += "sources.name like ?"
+	  }
+	  fmt.Println("String: ",i,strarr[i])
+  }
+  sqlquery += " group by " + fields
+  fmt.Println("DEBUG: simple query: ",sqlquery)
+  return
+}
+
 func search2query(search string)(sqlquery string, strarr []string){
   fields := "sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size"
   sqlquery = "select count(sources.id), "+fields+" from sources left join files on sources.file_hash=files.hash WHERE "
