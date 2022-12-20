@@ -470,7 +470,7 @@ if 1==1 {
 	//func search2query2(search string,params *[]interface{})(sqlquery string){
 	//    querystr, strarr := search2query(str)
 	params := make([]interface{}, 0)
-	querystr :=  search2query2(str,params)
+	querystr :=  search2query2(str,&params)
 	fmt.Println("DEBUG: qry:", querystr)
 	//fmt.Println("DEBUG: strarr:", strarr)
 	//dbsearchfiles(querystr,strarr,db)
