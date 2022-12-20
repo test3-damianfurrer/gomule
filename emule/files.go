@@ -341,7 +341,7 @@ func listservers(buf []byte, protocol byte, conn net.Conn, debug bool, n int) {
     //fmt.Println("DEBUG: listservers")
   }
 }
-
+/*
 func dbsearchfiles(query string,strarr []string, db *sql.DB){
     //params := make([]any,len(strarr)) ///test
   //for i:=0;i < len(strarr);i++ {
@@ -354,6 +354,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
   }
   dbsearchfilesexec(query,&params,db)
 }
+*/
 
 func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
   var scount int
