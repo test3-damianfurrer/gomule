@@ -390,17 +390,17 @@ func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
 	response_b = append(response_b,255,255) //clientport
 	response_b = append(response_b,UInt32ToByte(uint32(4))...) //tag count
 	filename_b := EncodeByteTagString(EncodeByteTagNameInt(0x1),sname)
-	filesize_b := EncodeByteTagInt(EncodeByteTagNameInt(0x2),sfilesize)
+	filesize_b := EncodeByteTagInt(EncodeByteTagNameInt(0x2),uint32(sfilesize)) //if over uint32 max add the special tag (prob like in offer files)
 	filetype_b := EncodeByteTagString(EncodeByteTagNameInt(0x3),stype)
-	filesources_b := EncodeByteTagInt(EncodeByteTagNameInt(0x15),scount)
+	filesources_b := EncodeByteTagInt(EncodeByteTagNameInt(0x15),uint32(scount))
 	response_b = append(response_b,filename_b...)
 	response_b = append(response_b,filesize_b...)
 	response_b = append(response_b,filetype_b...)
 	response_b = append(response_b,filesources_b...)
   }
-	response2_b = make([]byte,0)
+	response2_b := make([]byte,0)
 	response2_b = append(response2_b,0xe3)
-	response2_b = append(response2_b,UInt32ToByte(len(response_b)+5)...) //res count 4 + 1 b type
+	response2_b = append(response2_b,UInt32ToByte(uint32(len(response_b)+5))...) //res count 4 + 1 b type //shouldnt be too long
 	response2_b = append(response2_b,0x16)
 	response2_b = append(response2_b,UInt32ToByte(uint32(rescount))...)
 	response2_b = append(response2_b,response_b...)
