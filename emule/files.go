@@ -451,15 +451,18 @@ if 1==1 {
 	
 	var tmpbuf []byte
 	if !SliceBuf(buf,1,n,&tmpbuf) {
+		fmt.Println("DEBUG: searchfiles: slice to n failed:", 1, n)
 		return
 	}
     fmt.Println("DEBUG: buf full query:", tmpbuf)
-    if(buf[1] == 0x01) {
+    if(tmpbuf[0] == 0x01) {
 	fmt.Println("DEBUG: simple search")
-    	strlen := ByteToInt16(tmpbuf[2:4])
+	    
+    	strlen := ByteToInt16(tmpbuf[1:3])
     	fmt.Println("DEBUG: strlen:", strlen)
-    	fmt.Println("DEBUG: strlen buf:", tmpbuf[2:4])
+    	fmt.Println("DEBUG: strlen buf:", tmpbuf[1:3])
 	    if !SliceBuf(buf,4,4+int(strlen),&tmpbuf) {
+		fmt.Println("DEBUG: searchfiles:slice failed:", 4, 4+strlen)
 		return
 	}
     	fmt.Println("DEBUG: buf string:", tmpbuf)
@@ -467,6 +470,7 @@ if 1==1 {
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
 	    if !SliceBuf(buf,4+int(strlen),n,&tmpbuf) {
+		fmt.Println("DEBUG: searchfiles:slice failed:", 4+strlen,n)
 		return
 	}
         fmt.Println("DEBUG: buf other:", tmpbuf)
