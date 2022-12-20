@@ -99,7 +99,7 @@ func constraintsearch2query(in *Constraint, params *[]interface{})(sqlquery stri
 func search2query2(search string,params *[]interface{})(sqlquery string){
   fields := "sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size"
   sqlquery = "select count(sources.id), "+fields+" from sources left join files on sources.file_hash=files.hash WHERE "
-  strarr = strings.Split(search," ")
+  strarr := strings.Split(search," ")
   for i := 0; i < len(strarr); i++ {
 	  *params = append(*params,"%"+strarr[i]+"%")
 	  if i < len(strarr)-1 {
