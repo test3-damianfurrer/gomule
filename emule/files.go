@@ -467,10 +467,14 @@ if 1==1 {
 		return
 	}
         fmt.Println("DEBUG: buf other:", tmpbuf)
-	querystr, strarr := search2query(str)
+	//func search2query2(search string,params *[]interface{})(sqlquery string){
+	//    querystr, strarr := search2query(str)
+	params := make([]interface{}, 0)
+	querystr :=  search2query2(str,params)
 	fmt.Println("DEBUG: qry:", querystr)
 	fmt.Println("DEBUG: strarr:", strarr)
-	dbsearchfiles(querystr,strarr,db)
+	//dbsearchfiles(querystr,strarr,db)
+  	dbsearchfilesexec(querystr,&params,db)
     } else {
 	fmt.Println("DEBUG: complex search")
 	 //readConstraints(pos int, buf []byte)(readb int,ret *Constraint)
