@@ -364,6 +364,8 @@ func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
   var srating int
   var sfilehash []byte
   var sfilesize uint
+	fmt.Println("Debug: dbsearchfilesexec: ",query)
+	fmt.Println("Debug: params: ",*params)
   rows, err := db.Query(query,*params...)
   if err != nil {
     fmt.Println("ERROR: ",err.Error())
