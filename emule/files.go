@@ -401,7 +401,7 @@ func dbsearchfilesexec(query string, params *[]interface{}, db *sql.DB, conn net
 	response2_b := make([]byte,0)
 	response2_b = append(response2_b,0xe3)
 	response2_b = append(response2_b,UInt32ToByte(uint32(len(response_b)+5))...) //res count 4 + 1 b type //shouldnt be too long
-	response2_b = append(response2_b,0x16)
+	response2_b = append(response2_b,0x33) // 0x16) 16 is wrong
 	response2_b = append(response2_b,UInt32ToByte(uint32(rescount))...)
 	response2_b = append(response2_b,response_b...)
 	fmt.Println("DEBUG: search response: ",response2_b)
