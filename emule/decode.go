@@ -249,6 +249,10 @@ func ReadTag(pos int, buf []byte, debug bool)(bread int, ret *OneTag) {
     default:
       fmt.Println("Error decoding Tag, unknown tag datatype!",ret.Type)
     }
+	if debug {
+		fmt.Printf("tag name 0x%x %d %s\n",ret.NameByte,ret.NameByte,ret.NameString)
+		fmt.Println("tag value",ret.Type,ret.ValueLen,ret.Value)
+  	}
   
   return
 }

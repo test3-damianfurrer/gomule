@@ -105,9 +105,10 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 
 	n, err = conn.Read(buf)
 	if err != nil {
-		if err != io.EOF {
+		/*if err != io.EOF {
 			fmt.Println("ERROR:", err.Error())
 		}
+		*/
 		return
 	}
 	if buf[0] == 0xE3 {
@@ -183,6 +184,12 @@ func (this *SockSrv) respConn(conn net.Conn) {
 				    fmt.Printf("DEBUG: %v disconnected\n", conn.RemoteAddr())
 				}
 				logout(uhash, this.Debug, this.db) //logout(chigh_id, cport, this.Debug, this.db)
+			} else if errors.Is(err, net.ErrClosed) {
+				if this.Debug {
+					fmt.Println("DEBUG: conn closed due to invalid client data")
+				}
+			}else {
+				fmt.Println("ERROR: from read:", err.Error())
 			}
 			return
 		}
