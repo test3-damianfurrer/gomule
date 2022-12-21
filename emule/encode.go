@@ -33,7 +33,7 @@ func EncodeByteString(str string) []byte {
 
 
 //func EncodeByteTag(ttype byte, tagname []byte, tagvalue []byte, specialdesignator byte){
-//	
+//
 //}
 
 func EncodeByteTagString(tagname []byte, tagvalue string) []byte {
