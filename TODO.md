@@ -1,4 +1,10 @@
-- handle related search (query=related::>hash<)
-- send data compressed
 - recognize & send more tags
 - keep track of additional info like bitrate
+- correct code formatting
+- if SupportGzip: send data compressed where reasonable
+- if SupportNewTags: handle correctly
+- if SupportUnicode: handle correctly
+- if SupportRelSearch: handle related search (query=related::>hash<)
+-	if SupportTTagInteger: handle correctly
+-	if SupportLargeFiles: send the correctly calculated extension tags too. Don't send too large files, if not enabled
+- if SupportObfuscation: obfuscate sent data & read obfuscated data
