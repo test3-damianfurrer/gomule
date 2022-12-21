@@ -1,0 +1,4 @@
+- handle related search (query=related::>hash<)
+- send data compressed
+- recognize & send more tags
+- keep track of additional info like bitrate
