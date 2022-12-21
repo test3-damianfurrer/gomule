@@ -5,11 +5,11 @@ import (
 )
 //TODO: check buf len on all and prevent read > len(buf)
 type OneTag struct {
-  Type byte
-  NameByte byte
-  NameString string
-  Value []byte
-  ValueLen uint16
+	Type byte
+	NameByte byte
+	NameString string
+	Value []byte
+	ValueLen uint16
 }
 
 type constrainttype byte
@@ -197,62 +197,57 @@ func ReadTags(pos int, buf []byte, tags int,debug bool)(totalread int, ret []*On
 }
 
 func readString(pos int, buf []byte)(bread int, ret string) {
-  fmt.Println("readstring!",buf[pos-3:len(buf)])
-  bread=2
-  bread += int(ByteToUint16(buf[pos:pos+2]))
-  ret = fmt.Sprintf("%s",buf[pos+2:bread])
-  return
+	fmt.Println("readstring!",buf[pos-3:len(buf)])
+	bread=2
+	bread += int(ByteToUint16(buf[pos:pos+2]))
+	ret = fmt.Sprintf("%s",buf[pos+2:bread])
+	return
 }
 
 func ReadTag(pos int, buf []byte, debug bool)(bread int, ret *OneTag) {
-  dpos := pos + 50
-  if dpos > len(buf){
-	  dpos = len(buf)
-  }
-	
-  //fmt.Println("TAG BUF:",buf[pos:dpos])
-  if debug {
-    fmt.Println("readtag! at ",pos)
-  }
-  ret = &OneTag{Type: buf[pos], NameString: ""}
-  bread=3
-  readname:=0
-  namelen := ByteToUint16(buf[pos+1:pos+bread])
-  if debug {
-    fmt.Println("name tag len",namelen)
-  }
-  
-  if namelen == uint16(1) {
-    ret.NameByte = buf[pos+3]
-    readname = 1
-  } else {
-    readname, ret.NameString = readString(pos+3,buf)
-  }
-  bread+=readname
-  
-  //[3 1 0 17 60 0 0 0]
-  
-  switch ret.Type {
-    case byte(2): //varstring
-      ret.ValueLen = ByteToUint16(buf[pos+bread:pos+bread+2])
-      bread += 2
-      ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
-      bread+=int(ret.ValueLen)
-    case byte(3): //uint32
-      ret.ValueLen = 4
-      ret.Value = buf[pos+bread:pos+bread+4]
-      bread += 4
-    case byte(4): //float
-      ret.ValueLen = 4
-      ret.Value = buf[pos+bread:pos+bread+4]
-      bread += 4
-    default:
-      fmt.Println("Error decoding Tag, unknown tag datatype!",ret.Type)
-    }
+	dpos := pos + 50
+	if dpos > len(buf){
+		dpos = len(buf)
+	}
+	//fmt.Println("TAG BUF:",buf[pos:dpos])
+	if debug {
+		fmt.Println("readtag! at ",pos)
+	}
+	ret = &OneTag{Type: buf[pos], NameString: ""}
+	bread=3
+	readname:=0
+	namelen := ByteToUint16(buf[pos+1:pos+bread])
+	if debug {
+		fmt.Println("name tag len",namelen)
+	}
+	if namelen == uint16(1) {
+		ret.NameByte = buf[pos+3]
+		readname = 1
+	} else {
+		readname, ret.NameString = readString(pos+3,buf)
+	}
+	bread+=readname
+	//[3 1 0 17 60 0 0 0]
+	switch ret.Type {
+		case byte(2): //varstring
+			ret.ValueLen = ByteToUint16(buf[pos+bread:pos+bread+2])
+			bread += 2
+			ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
+			bread+=int(ret.ValueLen)
+		case byte(3): //uint32
+			ret.ValueLen = 4
+			ret.Value = buf[pos+bread:pos+bread+4]
+			bread += 4
+		case byte(4): //float
+			ret.ValueLen = 4
+			ret.Value = buf[pos+bread:pos+bread+4]
+			bread += 4
+		default:
+			fmt.Println("Error decoding Tag, unknown tag datatype!",ret.Type)
+	}
 	if debug {
 		fmt.Printf("tag name 0x%x %d %s\n",ret.NameByte,ret.NameByte,ret.NameString)
 		fmt.Println("tag value",ret.Type,ret.ValueLen,ret.Value)
-  	}
-  
-  return
+	}
+	return
 }
