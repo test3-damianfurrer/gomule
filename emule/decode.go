@@ -24,6 +24,7 @@ const (
 	C_MAXSIZE
 	C_FILETYPE
 	C_FILEEXT
+	C_AVAIL
 )
 
 type Constraint struct {
@@ -33,7 +34,19 @@ type Constraint struct {
 	Right *Constraint
 }
 func enumNumberConstraint(one byte, two byte, three byte, four byte) constrainttype {
+	// [1 1 0 2] - min size amule
+	// [2 1 0 2] - max size
+	// [1 1 0 21] - verfügbarkeit (min amount of available sources?)
+	// 3 1 0 2 - min size emule
+	// 4 1 0 2 - max size emule
+	//[3 1 0 21] - availabillity emule
 	switch one {
+		case 4:
+			if two == 1 && three == 0 && four == 2 {
+				return C_MAXSIZE
+			} else {
+				return C_NONE
+			}
 		case 3:
 			switch two {
 				case 1:
@@ -41,7 +54,11 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 						case 0:
 							switch four {
 								case 211:
-									return C_MAXSIZE
+									return C_NONE //C_MAXSIZE
+								case 21:
+									return C_AVAIL
+								case 2:
+									return C_MINSIZE
 								default:
 									return C_NONE
 							}
@@ -50,6 +67,25 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 					}
 				default:
 					return C_NONE
+			}
+		case 1:
+			if two == 1 && three == 0 {
+				switch four {
+					case 2:
+						return C_MINSIZE
+					case 21:
+						return C_AVAIL
+					default:
+						return C_NONE
+				}
+			} else {
+				return C_NONE
+			}
+		case 2:
+			if two == 1 && three == 0 && four == 2{
+				return C_MAXSIZE
+			} else {
+				return C_NONE
 			}
 		default:
 			return C_NONE
@@ -213,6 +249,10 @@ func ReadTag(pos int, buf []byte, debug bool)(bread int, ret *OneTag) {
     default:
       fmt.Println("Error decoding Tag, unknown tag datatype!",ret.Type)
     }
+	if debug {
+		fmt.Printf("tag name 0x%x %d %s\n",ret.NameByte,ret.NameByte,ret.NameString)
+		fmt.Println("tag value",ret.Type,ret.ValueLen,ret.Value)
+  	}
   
   return
 }
