@@ -356,7 +356,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
 }
 */
 
-func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
+func dbsearchfilesexec(query string, params *[]interface{}, db *sql.DB, conn net.Conn){
   var scount int
   var sname string
   var sext string
@@ -371,15 +371,41 @@ func dbsearchfilesexec(query string,params *[]interface{},db *sql.DB){
     fmt.Println("ERROR: ",err.Error())
     return
   }
+  response_b := make([]byte,0)
+  rescount := 0
   for rows.Next() {
 	err := rows.Scan(&scount,&sname,&sext,&stype,&srating,&sfilehash,&sfilesize)
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
 	}
+	rescount++
 	fmt.Println("Debug: file found: ",sname,scount)
 	fmt.Printf("Debug file hash: %x, size: %d\n",sfilehash,sfilesize)
+	  /*
+	  answer:
+	  */
+	response_b = append(response_b,sfilehash...) //hash
+	response_b = append(response_b,255,255,255,255) //clientid
+	response_b = append(response_b,255,255) //clientport
+	response_b = append(response_b,UInt32ToByte(uint32(4))...) //tag count
+	filename_b := EncodeByteTagString(EncodeByteTagNameInt(0x1),sname)
+	filesize_b := EncodeByteTagInt(EncodeByteTagNameInt(0x2),uint32(sfilesize)) //if over uint32 max add the special tag (prob like in offer files)
+	filetype_b := EncodeByteTagString(EncodeByteTagNameInt(0x3),stype)
+	filesources_b := EncodeByteTagInt(EncodeByteTagNameInt(0x15),uint32(scount))
+	response_b = append(response_b,filename_b...)
+	response_b = append(response_b,filesize_b...)
+	response_b = append(response_b,filetype_b...)
+	response_b = append(response_b,filesources_b...)
   }
+	response2_b := make([]byte,0)
+	response2_b = append(response2_b,0xe3)
+	response2_b = append(response2_b,UInt32ToByte(uint32(len(response_b)+5))...) //res count 4 + 1 b type //shouldnt be too long
+	response2_b = append(response2_b,0x33) // 0x16) 16 is wrong
+	response2_b = append(response2_b,UInt32ToByte(uint32(rescount))...)
+	response2_b = append(response2_b,response_b...)
+	fmt.Println("DEBUG: search response: ",response2_b)
+	conn.Write(response2_b) //respond
   return
 }
 
@@ -451,15 +477,18 @@ if 1==1 {
 	
 	var tmpbuf []byte
 	if !SliceBuf(buf,1,n,&tmpbuf) {
+		fmt.Println("DEBUG: searchfiles: slice to n failed:", 1, n)
 		return
 	}
     fmt.Println("DEBUG: buf full query:", tmpbuf)
-    if(buf[1] == 0x01) {
+    if(tmpbuf[0] == 0x01) {
 	fmt.Println("DEBUG: simple search")
-    	strlen := ByteToInt16(tmpbuf[2:4])
+	    
+    	strlen := ByteToInt16(tmpbuf[1:3])
     	fmt.Println("DEBUG: strlen:", strlen)
-    	fmt.Println("DEBUG: strlen buf:", tmpbuf[2:4])
+    	fmt.Println("DEBUG: strlen buf:", tmpbuf[1:3])
 	    if !SliceBuf(buf,4,4+int(strlen),&tmpbuf) {
+		fmt.Println("DEBUG: searchfiles:slice failed:", 4, 4+strlen)
 		return
 	}
     	fmt.Println("DEBUG: buf string:", tmpbuf)
@@ -467,6 +496,7 @@ if 1==1 {
     	str := fmt.Sprintf("%s",strbuf)
 	fmt.Println("DEBUG: str:", str)
 	    if !SliceBuf(buf,4+int(strlen),n,&tmpbuf) {
+		fmt.Println("DEBUG: searchfiles:slice failed:", 4+strlen,n)
 		return
 	}
         fmt.Println("DEBUG: buf other:", tmpbuf)
@@ -477,7 +507,7 @@ if 1==1 {
 	fmt.Println("DEBUG: qry:", querystr)
 	//fmt.Println("DEBUG: strarr:", strarr)
 	//dbsearchfiles(querystr,strarr,db)
-  	dbsearchfilesexec(querystr,&params,db)
+  	dbsearchfilesexec(querystr,&params,db,conn)
     } else {
 	fmt.Println("DEBUG: complex search")
 	 //readConstraints(pos int, buf []byte)(readb int,ret *Constraint)
@@ -499,7 +529,7 @@ if 1==1 {
 	sqlquery := constraintsearch2query(constraints, &params)
 	fmt.Println(sqlquery)
 	fmt.Println("params: ",params)
-	dbsearchfilesexec(sqlquery,&params,db)
+	dbsearchfilesexec(sqlquery,&params,db,conn)
 	    
 	    /*
 	fmt.Println("sub constraint left type(should be Main):",constraints.Left.Type)
