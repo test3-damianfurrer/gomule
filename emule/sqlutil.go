@@ -88,15 +88,35 @@ func constraintsearch2query(in *Constraint, params *[]interface{})(sqlquery stri
 	constraints := stringifyConstraint(in, params)
 	sqlquery = "select " + fields + " from sources left join files on sources.file_hash=files.hash WHERE "
 	sqlquery += constraints
-	sqlquery2 = "select count(sources.id)" + fields + " from sources left join files on sources.file_hash=files.hash WHERE "
+	sqlquery2 := "select count(sources.id), " + fields + " from sources left join files on sources.file_hash=files.hash WHERE "
 	sqlquery2 += constraints
-	sqlquery2 = sqlquery + "group by " + fields + " "
+	sqlquery2 = sqlquery2 + " group by " + fields + " "
 	fmt.Println("DEBUG: QUERY2: ",sqlquery2) //availability would have to be having after where
+	sqlquery = sqlquery2
 	return
 }
 
+func search2query2(search string,params *[]interface{})(sqlquery string){
+  fields := "sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size"
+  sqlquery = "select count(sources.id), "+fields+" from sources left join files on sources.file_hash=files.hash WHERE "
+  strarr := strings.Split(search," ")
+  for i := 0; i < len(strarr); i++ {
+	  *params = append(*params,"%"+strarr[i]+"%")
+	  if i < len(strarr)-1 {
+	  	sqlquery += "sources.name like ? AND "
+	  } else {
+		sqlquery += "sources.name like ?"
+	  }
+	  fmt.Println("String: ",i,strarr[i])
+  }
+  sqlquery += " group by " + fields
+  fmt.Println("DEBUG: simple query: ",sqlquery)
+  return
+}
+
 func search2query(search string)(sqlquery string, strarr []string){
-  sqlquery = "select sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size from sources left join files on sources.file_hash=files.hash WHERE "
+  fields := "sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size"
+  sqlquery = "select count(sources.id), "+fields+" from sources left join files on sources.file_hash=files.hash WHERE "
   strarr = strings.Split(search," ")
   for i := 0; i < len(strarr); i++ {
 	  strarr[i] = "%"+strarr[i]+"%"
@@ -107,6 +127,7 @@ func search2query(search string)(sqlquery string, strarr []string){
 	  }
 	  fmt.Println("String: ",i,strarr[i])
   }
+  sqlquery += " group by " + fields
   fmt.Println("query: ",strarr)
   return
 }
