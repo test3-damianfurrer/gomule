@@ -29,16 +29,15 @@ func logout(uhash []byte, debug bool, db *sql.DB){
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
-    	}
+	}
 	if debug {
 		affectedRows, err := res.RowsAffected()
 		if err != nil {
 			fmt.Println("ERROR: ",err.Error())
 			return
-	    	}
+		}
 		fmt.Println("Updated Rows: ",affectedRows)
 	}
-	
 }
 
 func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16, ssname string, ssdesc string, ssmsg string, sflags uint32) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
@@ -185,12 +184,12 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
-    	}
+	}
 	affectedRows, err := res.RowsAffected()
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
-    	}
+	}
 	if debug {
 		fmt.Println("Updated Rows: ",affectedRows)
 	}
@@ -201,17 +200,16 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
-    	}
-
+	}
 
 	data := EncodeByteMsg(protocol,0x38,EncodeByteString(ssmsg))
-		//"server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
+	//"server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 
-//tcp tags uin32 here
+	//tcp tags uin32 here
 	high_id_b := UInt32ToByte(high_id)
 	tcpflags_b:= UInt32ToByte(sflags)
 	data = EncodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],tcpflags_b[0], tcpflags_b[1], tcpflags_b[2], tcpflags_b[3]})
@@ -239,9 +237,9 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	iddata=append(iddata,serverport_b...)
 	iddata=append(iddata,tagcount_b...)
 	servname := EncodeByteTagString(EncodeByteTagNameInt(0x1),ssname)
-					//"Servername")
+	//"Servername")
 	servdesc := EncodeByteTagString(EncodeByteTagNameInt(0xb),ssdesc)
-					//"Serverdesc")
+	//"Serverdesc")
 	iddata=append(iddata,servname...)
 	iddata=append(iddata,servdesc...)
 	if debug {
