@@ -10,6 +10,9 @@ go install github.com/test3-damianfurrer/gomule@latest
 ```
 binary will be in the ```go env GOBIN``` path
 
+sql db used is according to eNode:
+https://github.com/zt8989/eNode/blob/5fb46f1e2a64ce91c274f6cbb85e854f6aa3f6dc/misc/enode_2019-05-26.sql
+
 usage dev
 =====
 * go run gomule.go -d 
