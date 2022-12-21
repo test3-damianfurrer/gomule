@@ -57,13 +57,10 @@ func init() {
 	flag.StringVar(&sqldb, "db", "gomule", "SQL DB name")
 	flag.StringVar(&sqladdr, "ssi", "127.0.0.1", "SQL Server ip/domain")
 	flag.IntVar(&sqlport, "ssp", 3306, "SQL port number")
-	
-
 }
 
 func main() {
 	flag.Parse()
-
 	if version {
 		fmt.Println("GoMule server Version 1.0")
 		fmt.Println("Copyright 2013 Leslie Zhai")
