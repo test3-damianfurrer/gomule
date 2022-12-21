@@ -4,7 +4,7 @@ import (
 	"fmt"
 	//"net"
 	"database/sql"
-  	"strings"
+	"strings"
 )
 
 //Field   Type    Null    Key     Default Extra
@@ -53,7 +53,7 @@ func stringifyConstraint(in *Constraint, params *[]interface{})(ret string){
 		case C_MAIN:
 			strarr := strings.Split(fmt.Sprintf("%s",in.Value)," ")
 			ret = ""
-  			for i := 0; i < len(strarr); i++ {
+			for i := 0; i < len(strarr); i++ {
 				if i != 0 {
 					ret += " AND "
 				}
@@ -121,9 +121,9 @@ func search2query(search string)(sqlquery string, strarr []string){
   for i := 0; i < len(strarr); i++ {
 	  strarr[i] = "%"+strarr[i]+"%"
 	  if i < len(strarr)-1 {
-	  	sqlquery += "sources.name like ? AND "
+			sqlquery += "sources.name like ? AND "
 	  } else {
-		sqlquery += "sources.name like ?"
+			sqlquery += "sources.name like ?"
 	  }
 	  fmt.Println("String: ",i,strarr[i])
   }
@@ -135,7 +135,7 @@ func search2query(search string)(sqlquery string, strarr []string){
 func readRowUint32(query string,db *sql.DB) uint32 {
 	var value uint32
 	err := db.QueryRow(query).Scan(&value)
-    	if err != nil {
+	if err != nil {
 		fmt.Println("ERROR(readRowUint32): ",err.Error())
 	}
 	return value

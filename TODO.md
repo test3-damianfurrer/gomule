@@ -1,4 +1,5 @@
 - recognize & send more tags
+- recognize all constraints C_AVAIL -> etc. translate constraints
 - keep track of additional info like bitrate
 - correct code formatting
 - if SupportGzip: send data compressed where reasonable

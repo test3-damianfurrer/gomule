@@ -107,7 +107,7 @@ func (this *SockSrv) read(conn net.Conn) (buf []byte, protocol byte, err error, 
 	if err != nil {
 		/*if err != io.EOF {
 			fmt.Println("ERROR:", err.Error())
-		}
+			}
 		*/
 		return
 	}
@@ -221,12 +221,11 @@ func (this *SockSrv) yoursam() string {
 func (this *SockSrv) Start() {
 	if this.SQL {
 		if this.Debug {
-		fmt.Println("With SQL")	
-		fmt.Printf("String: %s:%s@tcp(%s:%d)/%s\n", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB)
-		fmt.Println("SQL DRIVER", this.SqlDriver)
+			fmt.Println("With SQL")	
+			fmt.Printf("String: %s:%s@tcp(%s:%d)/%s\n", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB)
+			fmt.Println("SQL DRIVER", this.SqlDriver)
 		}
-	
-		
+
 		db, err := sql.Open(this.SqlDriver, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", this.SqlUser, this.SqlPW, this.SqlAddr, this.SqlPort, this.SqlDB))
 		if err != nil {
 			fmt.Println("ERROR:", err.Error())
