@@ -175,7 +175,13 @@ func (this *SockSrv) respConn(conn net.Conn) {
 	//var chigh_id uint32
 	//var cport int16
 	
+	//test
 	uhash := make([]byte, 16)
+	dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
+	if err != nil {
+		fmt.Println("ERROR libdeflate:", err.Error())
+		return
+	}
 	
 	if this.Debug {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())
