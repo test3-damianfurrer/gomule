@@ -56,6 +56,10 @@ type SockSrv struct {
 	db       *sql.DB
 	listener net.Listener
 }
+type SockSrvClient struct {
+	Conn net.Conn
+	
+}
 
 func (this *SockSrv) getTCPFlags() (ret uint32) {
 	ret = uint32(0)
