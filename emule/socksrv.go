@@ -26,6 +26,7 @@ import (
 
 	sam "github.com/eyedeekay/sam3/helper"
 	"database/sql"
+	libdeflate "github.com/4kills/go-libdeflate/v2"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -58,7 +59,8 @@ type SockSrv struct {
 }
 type SockSrvClient struct {
 	Conn net.Conn
-	
+	Comp	   libdeflate.Compressor
+	DeComp	   libdeflate.Decompressor
 }
 
 func (this *SockSrv) getTCPFlags() (ret uint32) {
@@ -176,12 +178,22 @@ func (this *SockSrv) respConn(conn net.Conn) {
 	//var cport int16
 	
 	//test
+	var err error
 	uhash := make([]byte, 16)
-	dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
+	client := SockSrvClient{Conn: conn}
+	
+	
+	client.DeComp, err = libdeflate.NewDecompressor()
 	if err != nil {
-		fmt.Println("ERROR libdeflate:", err.Error())
+		fmt.Println("ERROR libdeflate Decompressor:", err.Error())
 		return
 	}
+	client.Comp, err = libdeflate.NewCompressor()
+	if err != nil {
+		fmt.Println("ERROR libdeflate Compressor:", err.Error())
+		return
+	}
+
 	
 	if this.Debug {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())
@@ -211,7 +223,7 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		} else if buf[0] == 0x14 {
 			listservers(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x15 {
-			offerfiles(buf, protocol, conn, this.Debug, buflen, this.db ,uhash)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
+			offerfiles(buf, protocol, client, this.Debug, buflen, this.db ,uhash)  //offerfiles(buf, protocol, conn, this.Debug, buflen)
 		} else if buf[0] == 0x16 {
 			searchfiles(buf, protocol, conn, this.Debug, buflen, this.db)
 		} else if buf[0] == 0x19 {
