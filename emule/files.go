@@ -182,7 +182,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 	}
 }
 
-func offerfiles(buf []byte, protocol byte, client SockSrvClient, debug bool, n int, db *sql.DB, uhash []byte) {
+func offerfiles(buf []byte, protocol byte, client *SockSrvClient, debug bool, n int, db *sql.DB, uhash []byte) {
 	conn:=client.Conn
 	if debug {
 		fmt.Println("DEBUG: Client offers Files / Keep alive")
