@@ -213,6 +213,9 @@ func (this *SockSrv) respConn(conn net.Conn) {
 			}else {
 				fmt.Println("ERROR: from read:", err.Error())
 			}
+			client.DeComp.Close()
+			client.Comp.Close()
+			client.Conn.Close()
 			return
 		}
 		if this.Debug {
