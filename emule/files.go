@@ -182,7 +182,8 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 	}
 }
 
-func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db *sql.DB, uhash []byte) {
+func offerfiles(buf []byte, protocol byte, client SockSrvClient, debug bool, n int, db *sql.DB, uhash []byte) {
+	conn:=client.Conn
 	if debug {
 		fmt.Println("DEBUG: Client offers Files / Keep alive")
 		fmt.Printf("DEBUG: File offering protocol 0x%02x\n", protocol)
@@ -195,17 +196,18 @@ func offerfiles(buf []byte, protocol byte, conn net.Conn, debug bool, n int, db 
 	if protocol == 0xd4 {
 		var blen int = 0
  		var decompressed []byte  //maybe move Decompressor creation to the creation of the connection
-		dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
-		if err != nil {
-			fmt.Println("ERROR libdeflate:", err.Error())
-			return
-		}
+		//dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
+		//if err != nil {
+		//	fmt.Println("ERROR libdeflate:", err.Error())
+		//	return
+		//}
 		if debug {
 			fmt.Println("DEBUG: decompressing")
 		}
 		//blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
-		blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
-		dc.Close()
+		//blen, decompressed, err = dc.Decompress(bufcomp, nil, 1)
+		blen, decompressed, err = client.DeComp.Decompress(bufcomp, nil, 1)
+		//dc.Close()
 		if blen != n-1{
 			fmt.Println("Warning: less bytes processed", blen)
 		}
