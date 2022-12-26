@@ -146,6 +146,10 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 				if debug {
 					fmt.Printf("Debug Port Tag: %d\n",ByteToUint32(tagarr[i].Value))
 				}
+			case 0x60:
+				if debug {
+					fmt.Printf("Debug ipv6 Tag: %d\n",tagarr[i].Value)
+				}
 			default:
 				if debug {
 					fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
