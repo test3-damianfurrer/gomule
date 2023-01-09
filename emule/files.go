@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 	"database/sql"
-	"errors"
+	//"errors"
 	//libdeflate "github.com/4kills/go-libdeflate/v2"
 )
 
