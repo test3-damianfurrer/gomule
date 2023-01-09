@@ -200,6 +200,7 @@ func offerfiles(buf []byte, protocol byte, client *SockSrvClient, debug bool, n 
 	if protocol == 0xd4 {
 		var blen int = 0
 		var err error
+
  		var decompressed []byte  //maybe move Decompressor creation to the creation of the connection
 		//dc, err := libdeflate.NewDecompressor() //not recomended to create a new instance each, but also not possible to use the same simultaniously
 		//if err != nil {
