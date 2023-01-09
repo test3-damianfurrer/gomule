@@ -29,23 +29,26 @@ func logout(uhash []byte, debug bool, db *sql.DB){
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
-    	}
+	}
 	if debug {
 		affectedRows, err := res.RowsAffected()
 		if err != nil {
 			fmt.Println("ERROR: ",err.Error())
 			return
-	    	}
+		}
 		fmt.Println("Updated Rows: ",affectedRows)
 	}
-	
 }
 
-func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16, ssname string, ssdesc string, ssmsg string) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
+func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shighid uint32, sport uint16, ssname string, ssdesc string, ssmsg string, sflags uint32) (uhash []byte){ //func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB) (high_id uint32, port int16, uhash []byte){
 	if debug {
 		fmt.Println("DEBUG: Login")
 	}
-	uhash=buf[1:17]
+	if !SliceBuf(buf,1,17,&uhash) {
+		conn.Close()
+		return
+	}
+	//uhash=buf[1:17]
 	//uhash = make([]byte, 16)
 	//i := 0
 	//for{
@@ -56,10 +59,20 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	//	}
 	//}
 	//buf[1:17]
+
+	var tmpbuf []byte
 	
 	high_id := HighId(conn.RemoteAddr().String())
-	port := ByteToInt16(buf[21:23])
-	tags := ByteToInt32(buf[23:27])
+	if !SliceBuf(buf,21,23,&tmpbuf) {
+		conn.Close()
+		return
+	}
+	port := ByteToInt16(tmpbuf)
+	if !SliceBuf(buf,23,27,&tmpbuf) {
+		conn.Close()
+		return
+	}
+	tags := ByteToInt32(tmpbuf)
 	if debug {
 		uuid := fmt.Sprintf("%x-%x-%x-%x-%x-%x-%x-%x",
 		buf[1:3], buf[3:5], buf[5:7], buf[7:9], buf[9:11], buf[11:13],
@@ -70,37 +83,78 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 		fmt.Println("DEBUG: tagscount:  ", tags)
 		fmt.Println("DEBUG: port bytes:  ", buf[21:23])
 		fmt.Println("DEBUG: tagscount bytes:  ", buf[23:27])
+		if !SliceBuf(buf,27,31,&tmpbuf) {
+			conn.Close()
+			return
+		}
 		fmt.Println("DEBUG: pre str tag bytes:  ", buf[27:31])
 		//fmt.Println("DEBUG: other:  ", buf[27:50])
 		//+4 some codes    [2 1 0 1 21 0 104 116
 		//21 0 = lenght, 104 116 .. string
-		strlen := ByteToInt16(buf[31:33])
-		str := fmt.Sprintf("%s",buf[33:33+strlen])
+		if !SliceBuf(buf,31,33,&tmpbuf) {
+			conn.Close()
+			return
+		}
+		strlen := ByteToInt16(tmpbuf)
+		if !SliceBuf(buf,33,33+int(strlen),&tmpbuf) {
+			conn.Close()
+			return
+		}
+		str := fmt.Sprintf("%s",tmpbuf)
 		fmt.Println("DEBUG: user name:  ", str)
-		fmt.Println("DEBUG: vers tag:  ", buf[33+strlen:33+strlen+8])
-		fmt.Println("DEBUG: port tag:  ", buf[33+strlen+8:33+strlen+16])
-		fmt.Println("DEBUG: flag tag:  ", buf[33+strlen+16:33+strlen+24])
+		if !SliceBuf(buf,33+int(strlen),33+int(strlen)+8,&tmpbuf) {
+			conn.Close()
+			return
+		}
+		fmt.Println("DEBUG: vers tag:  ", tmpbuf)
+		if !SliceBuf(buf,33+int(strlen)+8,33+int(strlen)+16,&tmpbuf) {
+			conn.Close()
+			return
+		}
+		fmt.Println("DEBUG: port tag:  ", tmpbuf)
+		if !SliceBuf(buf,33+int(strlen)+16,33+int(strlen)+24,&tmpbuf) {
+			conn.Close()
+			return
+		}
+		fmt.Println("DEBUG: flag tag:  ", tmpbuf)
 		//strlen + 3*8bytes should exactly be the end of the buffer //confirmed
 	}
 	
 	//(pos int, buf []byte, tags int)(totalread int, ret []*OneTag)
 	
-	totalread, tagarr := readTags(27,buf,4)
-	fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+	totalread, tagarr := ReadTags(27,buf,int(tags),debug)
+	if debug {
+		fmt.Println("DEBUG: len(tagarr)",len(tagarr))
+	}
 	for i := 0; i < len(tagarr); i++ {
 		switch tagarr[i].NameByte {
 			case 0x1:
 				if tagarr[i].Type == byte(2) {
-					fmt.Printf("Debug Name Tag: %s\n",tagarr[i].Value)
+					if debug {
+						fmt.Printf("Debug Name Tag: %s\n",tagarr[i].Value)
+					}
 				}
 			case 0x11:
-				fmt.Printf("Debug Version Tag: %d\n",ByteToUint32(tagarr[i].Value))
+				if debug {
+					fmt.Printf("Debug Version Tag: %d\n",ByteToUint32(tagarr[i].Value))
+				}
 			case 0x20:
-				fmt.Printf("Debug Flags Tag: %b\n",ByteToUint32(tagarr[i].Value))
+				if debug {
+					fmt.Printf("Debug Flags Tag: %b\n",ByteToUint32(tagarr[i].Value))
+				}
 			case 0x0f:
-				fmt.Printf("Debug Port Tag: %d\n",ByteToUint32(tagarr[i].Value))
+				if debug {
+					fmt.Printf("Debug Port Tag: %d\n",ByteToUint32(tagarr[i].Value))
+				}
+			case 0x60:
+				if debug {
+					fmt.Printf("Debug ipv6 Tag: %d\n",tagarr[i].Value)
+				}
 			default:
-				fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+				if debug {
+					fmt.Printf("Warning: unknown tag 0x%x\n",tagarr[i].NameByte)
+					fmt.Println(" ->Value: ",tagarr[i].Value)
+				}
 		}
 		/*fmt.Println("DEBUG: test val len:  ",tagarr[i].ValueLen)
 		if tagarr[i].Type == byte(2) {
@@ -108,10 +162,10 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 		}
 		*/
 	}
-	fmt.Println("DEBUG: totalread:  ",totalread)
-	
-	fmt.Println("DEBUG: after loop")
-	
+	if debug {
+		fmt.Println("DEBUG: totalread:  ",totalread)
+		fmt.Println("DEBUG: after loop")
+	}
 	/*index:=27
 	tstbread, tstres := readTag(index,buf)
 	index+=tstbread
@@ -134,12 +188,12 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
-    	}
+	}
 	affectedRows, err := res.RowsAffected()
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
-    	}
+	}
 	if debug {
 		fmt.Println("Updated Rows: ",affectedRows)
 	}
@@ -150,19 +204,19 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
 		return
-    	}
-
+	}
 
 	data := EncodeByteMsg(protocol,0x38,EncodeByteString(ssmsg))
-		//"server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
+	//"server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"))
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
 	conn.Write(data)
 
-
+	//tcp tags uin32 here
 	high_id_b := UInt32ToByte(high_id)
-	data = EncodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],1, 0, 0, 0})
+	tcpflags_b:= UInt32ToByte(sflags)
+	data = EncodeByteMsg(protocol,0x40,[]byte{high_id_b[0],high_id_b[1],high_id_b[2],high_id_b[3],tcpflags_b[0], tcpflags_b[1], tcpflags_b[2], tcpflags_b[3]})
 	if debug {
 		fmt.Println("DEBUG: login:", data)
 	}
@@ -187,9 +241,9 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	iddata=append(iddata,serverport_b...)
 	iddata=append(iddata,tagcount_b...)
 	servname := EncodeByteTagString(EncodeByteTagNameInt(0x1),ssname)
-					//"Servername")
+	//"Servername")
 	servdesc := EncodeByteTagString(EncodeByteTagNameInt(0xb),ssdesc)
-					//"Serverdesc")
+	//"Serverdesc")
 	iddata=append(iddata,servname...)
 	iddata=append(iddata,servdesc...)
 	if debug {

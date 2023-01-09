@@ -1,0 +1,12 @@
+- create decompress & compress instance per client(instead of for each function call)
+- recognize & send more tags
+- recognize all constraints C_AVAIL -> etc. translate constraints
+- keep track of additional info like bitrate
+- ~correct code formatting~
+- if SupportGzip: send data compressed where reasonable
+-	if SupportLargeFiles: send the correctly calculated extension tags too. Don't send too large files, if not enabled
+- if SupportNewTags: handle correctly
+- if SupportUnicode: handle correctly
+- if SupportRelSearch: handle related search (query=related::>hash<)
+-	if SupportTTagInteger: handle correctly
+- if SupportObfuscation: obfuscate sent data & read obfuscated data

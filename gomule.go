@@ -57,13 +57,10 @@ func init() {
 	flag.StringVar(&sqldb, "db", "gomule", "SQL DB name")
 	flag.StringVar(&sqladdr, "ssi", "127.0.0.1", "SQL Server ip/domain")
 	flag.IntVar(&sqlport, "ssp", 3306, "SQL port number")
-	
-
 }
 
 func main() {
 	flag.Parse()
-
 	if version {
 		fmt.Println("GoMule server Version 1.0")
 		fmt.Println("Copyright 2013 Leslie Zhai")
@@ -71,6 +68,19 @@ func main() {
 	}
 
 	sock := emule.NewSockSrv(host, port, debug)
+	
+	/*
+	SupportGzip
+	SupportNewTags
+	SupportUnicode
+	SupportRelSearch
+	SupportTTagInteger
+	SupportLargeFiles
+	SupportObfuscation
+	*/
+	sock.SupportGzip=true
+	sock.SupportLargeFiles=true
+
 	sock.Ssname = "Test Server"
 	sock.Ssdesc = "Gomule a Testing Server"
 	sock.Ssmsg = "server version 0.0.1 (gomule)\nwarning - warning you\nHeLlo Brother in christ\n->New Line"

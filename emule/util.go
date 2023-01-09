@@ -24,6 +24,23 @@ import (
 	"fmt"
 	"math"
 )
+func SliceBuf(buf []byte, from int, to int, newbuf *[]byte) bool {
+	if len(buf) < to {
+		return false
+	}
+	*newbuf = buf[from:to]
+	return true
+}
+/*//type ErrorFunc func(int, int)int
+type ErrorFunc func()
+func SliceBufOrErr(buf []byte, from int, to int, errf ErrorFunc) []byte {
+	tmpbuf := make([]byte,0)
+	if !SliceBuf(buf,from,to,&tmpbuf) {
+		errf()
+	}
+	return 
+}*/
+
 
 func ByteToInt32(data []byte) (ret int32) {
 	buf := bytes.NewBuffer(data)
@@ -43,6 +60,7 @@ func ByteToInt16(data []byte) (ret int16) {
 	return
 }
 func ByteToUint16(data []byte) (ret uint16) {
+
 	buf := bytes.NewBuffer(data)
 	binary.Read(buf, binary.LittleEndian, &ret)
 	return
@@ -60,7 +78,6 @@ func Float32ToByte(data float32) (ret []byte) {
 	ret = buf.Bytes()
 	return
 }
-
 func Int16ToByte(data int16) (ret []byte) {
 	ret = []byte{}
 	buf := new(bytes.Buffer)
@@ -96,6 +113,6 @@ func HighId(addr string) (ret uint32) {
 	var ip1, ip2, ip3, ip4, port uint32
 	fmt.Sscanf(addr, "%d.%d.%d.%d:%d", &ip1, &ip2, &ip3, &ip4, &port)
 	ret = ip1 + uint32(math.Pow(2, 8))*ip2 + uint32(math.Pow(2, 16))*ip3 +
-		uint32(math.Pow(2, 24))*ip4
+	uint32(math.Pow(2, 24))*ip4
 	return
 }

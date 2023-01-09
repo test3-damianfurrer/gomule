@@ -4,12 +4,13 @@ import (
 	"fmt"
 )
 
+//TODO: check buf len on all and prevent read > len(buf)
 type OneTag struct {
-  Type byte
-  NameByte byte
-  NameString string
-  Value []byte
-  ValueLen uint16
+	Type byte
+	NameByte byte
+	NameString string
+	Value []byte
+	ValueLen uint16
 }
 
 type constrainttype byte
@@ -24,6 +25,7 @@ const (
 	C_MAXSIZE
 	C_FILETYPE
 	C_FILEEXT
+	C_AVAIL
 )
 
 type Constraint struct {
@@ -33,7 +35,19 @@ type Constraint struct {
 	Right *Constraint
 }
 func enumNumberConstraint(one byte, two byte, three byte, four byte) constrainttype {
+	// [1 1 0 2] - min size amule
+	// [2 1 0 2] - max size
+	// [1 1 0 21] - verfügbarkeit (min amount of available sources?)
+	// 3 1 0 2 - min size emule
+	// 4 1 0 2 - max size emule
+	//[3 1 0 21] - availabillity emule
 	switch one {
+		case 4:
+			if two == 1 && three == 0 && four == 2 {
+				return C_MAXSIZE
+			} else {
+				return C_NONE
+			}
 		case 3:
 			switch two {
 				case 1:
@@ -41,7 +55,11 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 						case 0:
 							switch four {
 								case 211:
-									return C_MAXSIZE
+									return C_NONE //C_MAXSIZE
+								case 21:
+									return C_AVAIL
+								case 2:
+									return C_MINSIZE
 								default:
 									return C_NONE
 							}
@@ -50,6 +68,25 @@ func enumNumberConstraint(one byte, two byte, three byte, four byte) constraintt
 					}
 				default:
 					return C_NONE
+			}
+		case 1:
+			if two == 1 && three == 0 {
+				switch four {
+					case 2:
+						return C_MINSIZE
+					case 21:
+						return C_AVAIL
+					default:
+						return C_NONE
+				}
+			} else {
+				return C_NONE
+			}
+		case 2:
+			if two == 1 && three == 0 && four == 2{
+				return C_MAXSIZE
+			} else {
+				return C_NONE
 			}
 		default:
 			return C_NONE
@@ -147,11 +184,12 @@ func readConstraints(pos int, buf []byte)(readb int,ret *Constraint){
 
 }
 
-func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
+func ReadTags(pos int, buf []byte, tags int,debug bool)(totalread int, ret []*OneTag){
 	index := pos
 	totalread = 0
+	//fmt.Println("TAGS BUF:",buf[pos:pos+50])
 	for i := 0; i < tags; i++ {
-		bread, tag := readTag(index,buf)
+		bread, tag := ReadTag(index,buf,debug)
 		totalread += bread
 		index += bread
 		ret = append(ret,tag)
@@ -160,48 +198,57 @@ func readTags(pos int, buf []byte, tags int)(totalread int, ret []*OneTag){
 }
 
 func readString(pos int, buf []byte)(bread int, ret string) {
-  fmt.Println("readstring!",buf[pos-3:len(buf)])
-  bread=2
-  bread += int(ByteToUint16(buf[pos:pos+2]))
-  ret = fmt.Sprintf("%s",buf[pos+2:bread])
-  return
+	fmt.Println("readstring!",buf[pos-3:len(buf)])
+	bread=2
+	bread += int(ByteToUint16(buf[pos:pos+2]))
+	ret = fmt.Sprintf("%s",buf[pos+2:bread])
+	return
 }
 
-func readTag(pos int, buf []byte)(bread int, ret *OneTag) {
-  fmt.Println("readtag! at ",pos)
-  ret = &OneTag{Type: buf[pos], NameString: ""}
-  bread=3
-  readname:=0
-  namelen := ByteToUint16(buf[pos+1:pos+bread])
-  fmt.Println("name tag len",namelen)
-  
-  if namelen == uint16(1) {
-    ret.NameByte = buf[pos+3]
-    readname = 1
-  } else {
-    readname, ret.NameString = readString(pos+3,buf)
-  }
-  bread+=readname
-  
-  //[3 1 0 17 60 0 0 0]
-  
-  switch ret.Type {
-    case byte(2): //varstring
-      ret.ValueLen = ByteToUint16(buf[pos+bread:pos+bread+2])
-      bread += 2
-      ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
-      bread+=int(ret.ValueLen)
-    case byte(3): //uint32
-      ret.ValueLen = 4
-      ret.Value = buf[pos+bread:pos+bread+4]
-      bread += 4
-    case byte(4): //float
-      ret.ValueLen = 4
-      ret.Value = buf[pos+bread:pos+bread+4]
-      bread += 4
-    default:
-      fmt.Println("Error decoding Tag, unknown tag datatype!",ret.Type)
-    }
-  
-  return
+func ReadTag(pos int, buf []byte, debug bool)(bread int, ret *OneTag) {
+	dpos := pos + 50
+	if dpos > len(buf){
+		dpos = len(buf)
+	}
+	//fmt.Println("TAG BUF:",buf[pos:dpos])
+	if debug {
+		fmt.Println("readtag! at ",pos)
+	}
+	ret = &OneTag{Type: buf[pos], NameString: ""}
+	bread=3
+	readname:=0
+	namelen := ByteToUint16(buf[pos+1:pos+bread])
+	if debug {
+		fmt.Println("name tag len",namelen)
+	}
+	if namelen == uint16(1) {
+		ret.NameByte = buf[pos+3]
+		readname = 1
+	} else {
+		readname, ret.NameString = readString(pos+3,buf)
+	}
+	bread+=readname
+	//[3 1 0 17 60 0 0 0]
+	switch ret.Type {
+		case byte(2): //varstring
+			ret.ValueLen = ByteToUint16(buf[pos+bread:pos+bread+2])
+			bread += 2
+			ret.Value = buf[pos+bread:pos+bread+int(ret.ValueLen)]
+			bread+=int(ret.ValueLen)
+		case byte(3): //uint32
+			ret.ValueLen = 4
+			ret.Value = buf[pos+bread:pos+bread+4]
+			bread += 4
+		case byte(4): //float
+			ret.ValueLen = 4
+			ret.Value = buf[pos+bread:pos+bread+4]
+			bread += 4
+		default:
+			fmt.Println("Error decoding Tag, unknown tag datatype!",ret.Type)
+	}
+	if debug {
+		fmt.Printf("tag name 0x%x %d %s\n",ret.NameByte,ret.NameByte,ret.NameString)
+		fmt.Println("tag value",ret.Type,ret.ValueLen,ret.Value)
+	}
+	return
 }
