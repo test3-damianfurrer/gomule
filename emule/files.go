@@ -53,6 +53,7 @@ func prconefile(filehashbuf []byte, filename string, fsize uint64, filetype stri
 		fmt.Println("ERROR: ",err.Error())
 		return
 	}
+
 	affectedRows, err = res.RowsAffected()
 	if err != nil {
 		fmt.Println("ERROR: ",err.Error())
@@ -64,6 +65,7 @@ func prconefile(filehashbuf []byte, filename string, fsize uint64, filetype stri
 	//todo figure out ext (file extension e.g. zip)
 	if affectedRows == 0 {
 		res, err = db.Exec("INSERT INTO sources(file_hash, user_hash, time_offer,name,ext,type,online) VALUES (?, ?, CURRENT_TIMESTAMP, ?, ?, ?, 1)",tmpbuf,uhash,filename,filename2ext(filename),filetype)
+
 		if err != nil {
 			fmt.Println("ERROR: ",err.Error())
 			panic("fuck")
@@ -80,6 +82,7 @@ func prcofferfiles(buf []byte, conn net.Conn, debug bool, blen int, db *sql.DB, 
 	
 	//30 bytes more: [2 1 0 1 50 0 116 104 101 46 115 105 109 112 115 111 110 115 46 115 48 50 101 49 48 46 105 110 116 101]
 	// [2 1 0 1] len 50 
+
 	var tmpbuf []byte
 	if !SliceBuf(buf,0,4,&tmpbuf) {
 		return
@@ -353,6 +356,7 @@ func dbsearchfiles(query string,strarr []string, db *sql.DB){
   dbsearchfilesexec(query,&params,db)
 }
 */
+
 
 func dbsearchfilesexec(query string, params *[]interface{}, db *sql.DB, conn net.Conn){
 	var scount int

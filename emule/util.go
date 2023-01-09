@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"math"
 )
-
 func SliceBuf(buf []byte, from int, to int, newbuf *[]byte) bool {
 	if len(buf) < to {
 		return false
@@ -61,6 +60,7 @@ func ByteToInt16(data []byte) (ret int16) {
 	return
 }
 func ByteToUint16(data []byte) (ret uint16) {
+
 	buf := bytes.NewBuffer(data)
 	binary.Read(buf, binary.LittleEndian, &ret)
 	return
@@ -78,7 +78,6 @@ func Float32ToByte(data float32) (ret []byte) {
 	ret = buf.Bytes()
 	return
 }
-
 func Int16ToByte(data int16) (ret []byte) {
 	ret = []byte{}
 	buf := new(bytes.Buffer)

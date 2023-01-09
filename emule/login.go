@@ -59,7 +59,7 @@ func login(buf []byte, protocol byte, conn net.Conn, debug bool, db *sql.DB, shi
 	//	}
 	//}
 	//buf[1:17]
-	
+
 	var tmpbuf []byte
 	
 	high_id := HighId(conn.RemoteAddr().String())

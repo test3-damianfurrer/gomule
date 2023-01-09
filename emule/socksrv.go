@@ -193,7 +193,6 @@ func (this *SockSrv) respConn(conn net.Conn) {
 		fmt.Println("ERROR libdeflate Compressor:", err.Error())
 		return
 	}
-
 	
 	if this.Debug {
 		fmt.Printf("DEBUG: %v connected\n", conn.RemoteAddr())

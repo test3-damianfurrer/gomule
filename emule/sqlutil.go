@@ -117,6 +117,7 @@ func search2query2(search string,params *[]interface{})(sqlquery string){
 func search2query(search string)(sqlquery string, strarr []string){
   fields := "sources.name, sources.ext, sources.type, sources.rating, sources.file_hash, files.size"
   sqlquery = "select count(sources.id), "+fields+" from sources left join files on sources.file_hash=files.hash WHERE "
+
   strarr = strings.Split(search," ")
   for i := 0; i < len(strarr); i++ {
 	  strarr[i] = "%"+strarr[i]+"%"
@@ -128,6 +129,7 @@ func search2query(search string)(sqlquery string, strarr []string){
 	  fmt.Println("String: ",i,strarr[i])
   }
   sqlquery += " group by " + fields
+
   fmt.Println("query: ",strarr)
   return
 }

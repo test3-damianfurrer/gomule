@@ -3,6 +3,7 @@ package emule
 import (
 	"fmt"
 )
+
 //TODO: check buf len on all and prevent read > len(buf)
 type OneTag struct {
 	Type byte
